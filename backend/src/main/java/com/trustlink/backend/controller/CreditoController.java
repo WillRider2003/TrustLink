@@ -2,6 +2,7 @@ package com.trustlink.backend.controller;
 
 import com.trustlink.backend.security.UsuarioPrincipal;
 import com.trustlink.backend.service.CreditoService;
+import com.trustlink.backend.service.ExplicacionScoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 public class CreditoController {
 
     private final CreditoService creditoService;
+    private final ExplicacionScoreService explicacionScoreService;
 
     @GetMapping
     public String panel(Model model, @AuthenticationPrincipal UsuarioPrincipal principal) {
@@ -27,6 +29,7 @@ public class CreditoController {
         }
         model.addAttribute("techo", creditoService.techoActual(principal.getUsuario()));
         model.addAttribute("historial", creditoService.historial(principal.getUsuario()));
+        model.addAttribute("explicacionScore", explicacionScoreService.explicarScore(principal.getUsuario()));
         return "credito/panel";
     }
 
@@ -40,6 +43,7 @@ public class CreditoController {
         var solicitud = creditoService.solicitar(principal.getUsuario(), monto);
         model.addAttribute("techo", creditoService.techoActual(principal.getUsuario()));
         model.addAttribute("historial", creditoService.historial(principal.getUsuario()));
+        model.addAttribute("explicacionScore", explicacionScoreService.explicarScore(principal.getUsuario()));
         model.addAttribute("ultimaSolicitud", solicitud);
         return "credito/panel";
     }
