@@ -6,6 +6,7 @@ import com.trustlink.backend.security.UsuarioPrincipal;
 import com.trustlink.backend.service.EscrowOrquestadorService;
 import com.trustlink.backend.service.ProductoService;
 import com.trustlink.backend.service.ResenaService;
+import com.trustlink.backend.service.TraductorCriptoService;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,6 +26,7 @@ public class MarketplaceController {
     private final ProductoService productoService;
     private final EscrowOrquestadorService escrowOrquestadorService;
     private final ResenaService resenaService;
+    private final TraductorCriptoService traductorCriptoService;
 
     @GetMapping
     public String listado(Model model, @AuthenticationPrincipal UsuarioPrincipal principal) {
@@ -111,6 +113,7 @@ public class MarketplaceController {
         model.addAttribute("confirmada", confirmada != null && confirmada);
         model.addAttribute("usuarioActual", principal.getUsuario());
         model.addAttribute("puedeResenar", resenaService.puedeResenar(principal.getUsuario(), orden));
+        model.addAttribute("explicacionSimple", traductorCriptoService.explicarOrden(orden));
         return "marketplace/orden-detalle";
     }
 
@@ -144,6 +147,7 @@ public class MarketplaceController {
             model.addAttribute("confirmada", false);
             model.addAttribute("usuarioActual", principal.getUsuario());
             model.addAttribute("puedeResenar", resenaService.puedeResenar(principal.getUsuario(), orden));
+            model.addAttribute("explicacionSimple", traductorCriptoService.explicarOrden(orden));
             return "marketplace/orden-detalle";
         }
     }
