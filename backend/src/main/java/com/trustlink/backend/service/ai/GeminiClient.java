@@ -63,7 +63,15 @@ public class GeminiClient {
                 "contents", new Object[]{
                         Map.of("parts", new Object[]{ Map.of("text", prompt) })
                 },
-                "generationConfig", Map.of("temperature", 0.4, "maxOutputTokens", 200)
+                // thinkingBudget=0 apaga el razonamiento interno de los modelos
+                // Gemini 2.5+/3.x: sin esto, el "thinking" consume del mismo
+                // limite de maxOutputTokens que la respuesta visible, y con
+                // pocos tokens de margen la respuesta sale cortada a la mitad.
+                "generationConfig", Map.of(
+                        "temperature", 0.4,
+                        "maxOutputTokens", 512,
+                        "thinkingConfig", Map.of("thinkingBudget", 0)
+                )
         );
 
         String url = "https://generativelanguage.googleapis.com/v1beta/models/" + geminiModel +

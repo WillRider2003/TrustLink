@@ -37,6 +37,15 @@ img { max-width: 100%; display: block; }
   overflow: hidden;
 }
 
+/* Wrapper que agrupa logo + copy al centro del panel */
+.brand-center {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: relative;
+  z-index: 1;
+}
+
 /* Glow superior derecho — más intenso */
 .auth-panel-brand::before {
   content: "";
@@ -65,8 +74,8 @@ img { max-width: 100%; display: block; }
 
 /* Logo — grande y con presencia */
 .auth-panel-brand .logo-shield {
-  width: 130px;
-  height: 130px;
+  width: 140px;
+  height: 140px;
   object-fit: contain;
   margin-bottom: 0;
   position: relative;
