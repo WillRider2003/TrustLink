@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Logs de auditoría')}"></head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1>Logs de auditoría</h1>
+            <p class="subtitle">Registro de acciones del sistema. El rango de fechas es de máximo <span th:text="${maxMeses}">6</span> meses.</p>
+        </div>
+        <a href="/admin" class="btn btn-secondary btn-sm">← Volver al panel</a>
+    </div>
+
+    <form id="filtroForm" method="get" style="display:flex; gap:12px; align-items:end; flex-wrap:wrap; margin-bottom:20px;">
+        <div class="form-group" style="margin:0;">
+            <label for="desde">Desde</label>
+            <input type="date" id="desde" name="desde" class="form-control" th:value="${desde}" required>
+        </div>
+        <div class="form-group" style="margin:0;">
+            <label for="hasta">Hasta</label>
+            <input type="date" id="hasta" name="hasta" class="form-control" th:value="${hasta}" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+        <a class="btn btn-secondary btn-sm" th:href="@{/admin/auditoria/exportar/csv(desde=${desde},hasta=${hasta})}">Exportar CSV</a>
+        <a class="btn btn-secondary btn-sm" th:href="@{/admin/auditoria/exportar/excel(desde=${desde},hasta=${hasta})}">Exportar Excel</a>
+    </form>
+
+    <div style="overflow-x:auto;">
+        <table class="tabla-admin">
+            <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Actor</th>
+                <th>Acción</th>
+                <th>Entidad</th>
+                <th>Detalle</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="log : ${logs}">
+                <td th:text="${#temporals.format(log.creadoEn, 'dd/MM/yyyy HH:mm')}"></td>
+                <td th:text="${log.actorEmail}"></td>
+                <td th:text="${log.accion}"></td>
+                <td th:text="${log.entidadTipo != null ? (log.entidadTipo + ' #' + log.entidadId) : '—'}"></td>
+                <td th:text="${log.detalle}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(logs)}">
+                <td colspan="5" style="text-align:center; color:var(--tl-grey-600); padding:24px;">No hay registros en este rango.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script th:inline="none">
+(function () {
+    var maxMeses = /*[[${maxMeses}]]*/ 6;
+    var desdeInput = document.getElementById('desde');
+    var hastaInput = document.getElementById('hasta');
+
+    function sumarMeses(fechaStr, meses) {
+        var d = new Date(fechaStr + 'T00:00:00');
+        d.setMonth(d.getMonth() + meses);
+        return d.toISOString().slice(0, 10);
+    }
+
+    function actualizarLimites() {
+        var hoy = new Date().toISOString().slice(0, 10);
+        // "hasta" nunca puede ser antes que "desde", ni en el futuro
+        hastaInput.min = desdeInput.value;
+        hastaInput.max = hoy;
+        // "desde" nunca puede ser después de "hasta"
+        desdeInput.max = hastaInput.value || hoy;
+
+        // Si el rango elegido supera los N meses permitidos, se ajusta
+        // automáticamente para que el usuario no pueda enviar un rango inválido.
+        if (desdeInput.value && hastaInput.value) {
+            var limite = sumarMeses(desdeInput.value, maxMeses);
+            if (hastaInput.value > limite) {
+                hastaInput.value = limite;
+            }
+        }
+    }
+
+    desdeInput.addEventListener('change', actualizarLimites);
+    hastaInput.addEventListener('change', actualizarLimites);
+    actualizarLimites();
+})();
+</script>
+</body>
+</html>
