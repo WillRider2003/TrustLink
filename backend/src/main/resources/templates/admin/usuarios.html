@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Usuarios')}"></head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1>Usuarios</h1>
+            <p class="subtitle">Gestiona las cuentas de la plataforma.</p>
+        </div>
+        <a href="/admin" class="btn btn-secondary btn-sm">← Volver al panel</a>
+    </div>
+
+    <form th:action="@{/admin/usuarios}" method="get" style="margin-bottom:20px; max-width:360px;">
+        <input type="text" name="q" th:value="${query}" placeholder="Buscar por nombre o correo..." class="form-control" style="padding-left:14px;">
+    </form>
+
+    <div style="overflow-x:auto;">
+        <table class="tabla-admin">
+            <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Correo</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="u : ${usuarios}">
+                <td th:text="${u.nombreCompleto}">Nombre</td>
+                <td th:text="${u.email}">correo@ejemplo.com</td>
+                <td th:text="${u.rol}">USUARIO</td>
+                <td>
+                    <span class="badge badge-liberado" th:unless="${u.baneado}">Activo</span>
+                    <span class="badge badge-disputa" th:if="${u.baneado}">Baneado</span>
+                </td>
+                <td>
+                    <form th:if="${!u.baneado and u.rol.name() != 'SUPERADMIN'}" th:action="@{/admin/usuarios/{id}/banear(id=${u.id})}" method="post" style="display:inline;">
+                        <input type="hidden" name="motivo" value="Suspendido por el administrador">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Banear a este usuario?')">Banear</button>
+                    </form>
+                    <form th:if="${u.baneado}" th:action="@{/admin/usuarios/{id}/desbanear(id=${u.id})}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-secondary btn-sm">Desbanear</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
