@@ -1,456 +1,95 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Iniciar sesión — TrustLink</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --tl-red:        #C0392B;
-      --tl-red-dark:   #96281B;
-      --tl-red-glow:   rgba(192,57,43,0.35);
-      --tl-bg:         #0F0B0B;
-      --tl-bg-mid:     #1A1010;
-      --tl-surface:    #FFFFFF;
-      --tl-grey-100:   #F7F7F7;
-      --tl-grey-300:   #E0E0E0;
-      --tl-grey-500:   #9E9E9E;
-      --tl-grey-700:   #424242;
-      --tl-text:       #1A1A1A;
-      --tl-radius:     12px;
-      --tl-shadow:     0 20px 60px rgba(0,0,0,0.12);
-    }
-
-    html, body {
-      height: 100%;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: var(--tl-surface);
-    }
-
-    /* ── Layout ── */
-    .auth-wrapper {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      min-height: 100vh;
-    }
-
-    /* ── LEFT PANEL ── */
-    .auth-panel-brand {
-      background: var(--tl-bg);
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 48px 52px;
-      overflow: hidden;
-    }
-
-    /* Decorative circles */
-    .auth-panel-brand::before {
-      content: '';
-      position: absolute;
-      top: -120px; right: -120px;
-      width: 480px; height: 480px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(192,57,43,0.28) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .auth-panel-brand::after {
-      content: '';
-      position: absolute;
-      bottom: -80px; left: -60px;
-      width: 320px; height: 320px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(150,40,27,0.18) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    /* Logo block — TOP */
-    .brand-logo {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      position: relative; z-index: 1;
-    }
-    .brand-logo img {
-      width: 52px;
-      height: 52px;
-      object-fit: contain;
-      filter: drop-shadow(0 0 12px rgba(192,57,43,0.6));
-    }
-    /* Fallback SVG shield if image doesn't load */
-    .logo-shield-svg {
-      width: 52px; height: 52px; flex-shrink: 0;
-      filter: drop-shadow(0 0 14px rgba(192,57,43,0.7));
-    }
-    .brand-logo-name {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: #FFFFFF;
-      letter-spacing: -0.02em;
-    }
-    .brand-logo-tagline {
-      font-size: 0.7rem;
-      font-weight: 500;
-      color: var(--tl-red);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-top: 2px;
-    }
-
-    /* Center copy */
-    .brand-copy {
-      position: relative; z-index: 1;
-    }
-    .brand-copy h1 {
-      font-size: clamp(1.9rem, 3vw, 2.6rem);
-      font-weight: 800;
-      color: #FFFFFF;
-      line-height: 1.15;
-      letter-spacing: -0.03em;
-      margin-bottom: 20px;
-    }
-    .brand-copy h1 span {
-      color: var(--tl-red);
-    }
-    .brand-copy p {
-      font-size: 0.95rem;
-      color: rgba(255,255,255,0.55);
-      line-height: 1.65;
-      max-width: 380px;
-    }
-
-    /* Badges — BOTTOM */
-    .brand-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      position: relative; z-index: 1;
-    }
-    .brand-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.12);
-      color: rgba(255,255,255,0.75);
-      font-size: 0.78rem;
-      font-weight: 600;
-      padding: 8px 14px;
-      border-radius: 999px;
-      letter-spacing: 0.01em;
-      backdrop-filter: blur(4px);
-    }
-    .brand-badge svg { flex-shrink: 0; }
-
-    /* ── RIGHT PANEL ── */
-    .auth-panel-form {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 48px 40px;
-      background: var(--tl-surface);
-    }
-
-    .auth-card {
-      width: 100%;
-      max-width: 420px;
-    }
-
-    .auth-card h2 {
-      font-size: 1.75rem;
-      font-weight: 800;
-      color: var(--tl-text);
-      letter-spacing: -0.03em;
-      margin-bottom: 6px;
-    }
-    .auth-card .subtitle {
-      font-size: 0.9rem;
-      color: var(--tl-grey-500);
-      margin-bottom: 28px;
-      line-height: 1.5;
-    }
-
-    /* Alerts */
-    .alert {
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 0.875rem;
-      font-weight: 500;
-      margin-bottom: 20px;
-      line-height: 1.4;
-    }
-    .alert-error   { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
-    .alert-success { background: #F0FDF4; color: #166534; border: 1px solid #BBF7D0; }
-
-    /* Form */
-    .form-group {
-      margin-bottom: 18px;
-    }
-    .form-group label {
-      display: block;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--tl-grey-700);
-      margin-bottom: 7px;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
-    }
-    .input-wrap {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-    .input-wrap .icon {
-      position: absolute;
-      left: 14px;
-      width: 16px; height: 16px;
-      color: var(--tl-grey-500);
-      flex-shrink: 0;
-      pointer-events: none;
-    }
-    .form-control {
-      width: 100%;
-      padding: 13px 14px 13px 42px;
-      border: 1.5px solid var(--tl-grey-300);
-      border-radius: 9px;
-      font-size: 0.95rem;
-      color: var(--tl-text);
-      background: var(--tl-grey-100);
-      transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
-      outline: none;
-    }
-    .form-control:focus {
-      border-color: var(--tl-red);
-      background: #FFFFFF;
-      box-shadow: 0 0 0 3px var(--tl-red-glow);
-    }
-    .toggle-password {
-      position: absolute; right: 12px;
-      background: none; border: none; cursor: pointer;
-      color: var(--tl-grey-500); padding: 4px;
-      display: flex; align-items: center;
-    }
-    .toggle-password:hover { color: var(--tl-grey-700); }
-
-    .forgot-link {
-      display: block;
-      text-align: right;
-      margin-bottom: 22px;
-      font-size: 0.83rem;
-      font-weight: 700;
-      color: var(--tl-red);
-      text-decoration: none;
-    }
-    .forgot-link:hover { text-decoration: underline; }
-
-    /* Buttons */
-    .btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      padding: 14px;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      border: none;
-      text-decoration: none;
-      transition: transform 0.12s, box-shadow 0.12s, background 0.15s;
-      letter-spacing: 0.01em;
-    }
-    .btn:active { transform: scale(0.98); }
-
-    .btn-primary {
-      background: var(--tl-red);
-      color: #FFFFFF;
-      box-shadow: 0 4px 18px rgba(192,57,43,0.35);
-    }
-    .btn-primary:hover {
-      background: var(--tl-red-dark);
-      box-shadow: 0 6px 24px rgba(192,57,43,0.45);
-    }
-
-    .btn-google {
-      background: #FFFFFF;
-      color: var(--tl-text);
-      border: 1.5px solid var(--tl-grey-300);
-      gap: 10px;
-      margin-top: 12px;
-    }
-    .btn-google:hover {
-      background: var(--tl-grey-100);
-      border-color: #bdbdbd;
-    }
-
-    /* Divider */
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 22px 0 0;
-    }
-    .divider::before, .divider::after {
-      content: ''; flex: 1;
-      height: 1px; background: var(--tl-grey-300);
-    }
-    .divider span {
-      font-size: 0.75rem;
-      color: var(--tl-grey-500);
-      font-weight: 500;
-    }
-
-    /* Auth links */
-    .auth-links {
-      text-align: center;
-      margin-top: 24px;
-      font-size: 0.875rem;
-      color: var(--tl-grey-500);
-    }
-    .auth-links a {
-      color: var(--tl-red);
-      font-weight: 700;
-      text-decoration: none;
-    }
-    .auth-links a:hover { text-decoration: underline; }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .auth-wrapper { grid-template-columns: 1fr; }
-      .auth-panel-brand { padding: 36px 28px; min-height: 220px; justify-content: flex-start; gap: 24px; }
-      .auth-panel-brand::before { width: 260px; height: 260px; top: -80px; right: -60px; }
-      .auth-panel-brand::after { display: none; }
-      .brand-copy h1 { font-size: 1.6rem; }
-      .brand-copy p { display: none; }
-      .auth-panel-form { padding: 36px 24px; }
-    }
-  </style>
-</head>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Iniciar sesión')}"></head>
 <body>
-
 <div class="auth-wrapper">
-
-  <!-- LEFT PANEL -->
-  <div class="auth-panel-brand">
-
-    <!-- Logo — top -->
-    <div class="brand-logo">
-      <!-- SVG shield fallback (replace img tag with your real logo) -->
-      <svg class="logo-shield-svg" viewBox="0 0 52 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M26 2L4 12V30C4 43.3 13.6 55.7 26 58C38.4 55.7 48 43.3 48 30V12L26 2Z"
-              fill="#C0392B" opacity="0.15" stroke="#C0392B" stroke-width="2.5"/>
-        <path d="M26 8L8 17V30C8 41.2 16.2 51.5 26 54C35.8 51.5 44 41.2 44 30V17L26 8Z"
-              fill="#C0392B" opacity="0.25"/>
-        <path d="M17 30L23 36L35 24" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <div>
-        <div class="brand-logo-name">TrustLink</div>
-        <div class="brand-logo-tagline">Arbitrum · Sepolia</div>
-      </div>
-    </div>
-
-    <!-- Copy — center -->
-    <div class="brand-copy">
-      <h1>El Protocolo de<br>Confianza para la<br><span>Economía Informal</span></h1>
-      <p>Escrow verificado, reputación on-chain y crédito progresivo para vendedores informales, en Arbitrum.</p>
-    </div>
-
-    <!-- Badges — bottom -->
-    <div class="brand-badges">
-      <span class="brand-badge">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Escrow on-chain
-      </span>
-      <span class="brand-badge">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="6"/><path d="M9 13.5 7 22l5-3 5 3-2-8.5"/></svg>
-        Reputación SBT
-      </span>
-      <span class="brand-badge">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        Arbitrum
-      </span>
-    </div>
-  </div>
-
-  <!-- RIGHT PANEL -->
-  <div class="auth-panel-form">
-    <div class="auth-card">
-      <h2>Bienvenido de nuevo</h2>
-      <p class="subtitle">Inicia sesión para comprar, vender y construir tu historial de confianza.</p>
-
-      <!-- Alerts (Thymeleaf condiciones preservadas como comentario) -->
-      <!-- th:if="${param.error}" -->
-      <div class="alert alert-error" style="display:none">
-        Correo o contraseña incorrectos, o tu cuenta fue suspendida.
-      </div>
-      <!-- th:if="${param.bloqueado}" -->
-      <div class="alert alert-error" style="display:none">
-        Demasiados intentos fallidos. Por seguridad, espera unos minutos antes de volver a intentar.
-      </div>
-
-      <form action="/auth/login" method="post">
-
-        <div class="form-group">
-          <label for="email">Correo electrónico</label>
-          <div class="input-wrap">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M2 6h20v12H2z"/><path d="M22 6l-10 7L2 6"/>
-            </svg>
-            <input type="email" id="email" name="email" class="form-control"
-                   placeholder="tucorreo@ejemplo.com" required autofocus>
-          </div>
+    <div class="auth-panel-brand">
+        <img src="/img/logo.png" alt="TrustLink" class="logo-shield">
+        <h1>El Protocolo de<br>Confianza para la<br>Economía Informal</h1>
+        <p>Escrow verificado, reputación on-chain y crédito progresivo para vendedores informales, en Arbitrum.</p>
+        <div class="brand-badges">
+            <span class="brand-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px; margin-right:4px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Escrow on-chain</span>
+            <span class="brand-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px; margin-right:4px;"><circle cx="12" cy="8" r="6"/><path d="M9 13.5 7 22l5-3 5 3-2-8.5"/></svg>Reputación SBT</span>
+            <span class="brand-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px; margin-right:4px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Arbitrum</span>
         </div>
-
-        <div class="form-group">
-          <label for="contrasena">Contraseña</label>
-          <div class="input-wrap">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
-            </svg>
-            <input type="password" id="contrasena" name="contrasena" class="form-control"
-                   placeholder="••••••••" required>
-            <button type="button" class="toggle-password" onclick="togglePwd('contrasena')">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <a href="/auth/recuperar" class="forgot-link">¿Olvidaste tu contraseña?</a>
-
-        <button type="submit" class="btn btn-primary">Iniciar sesión</button>
-      </form>
-
-      <div class="divider"><span>o</span></div>
-
-      <a href="/oauth2/authorization/google" class="btn btn-google">
-        <svg width="18" height="18" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.66-.22-2.45H12v4.63h6.47a5.53 5.53 0 01-2.4 3.63v3h3.87c2.27-2.09 3.58-5.17 3.58-8.81z"/>
-          <path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.94-2.92l-3.87-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.27v3.11A12 12 0 0012 24z"/>
-          <path fill="#FBBC05" d="M5.27 14.27a7.2 7.2 0 010-4.54V6.62H1.27a12 12 0 000 10.76l4-3.11z"/>
-          <path fill="#EA4335" d="M12 4.75c1.76 0 3.34.61 4.58 1.79l3.44-3.44C17.95 1.19 15.24 0 12 0A12 12 0 001.27 6.62l4 3.11C6.22 6.86 8.87 4.75 12 4.75z"/>
-        </svg>
-        Continuar con Google
-      </a>
-
-      <div class="auth-links">
-        ¿No tienes cuenta? <a href="/auth/registro">Regístrate gratis</a>
-      </div>
     </div>
-  </div>
 
+    <div class="auth-panel-form">
+        <div class="auth-card">
+            <h2>Bienvenido de nuevo</h2>
+            <p class="subtitle">Inicia sesión para comprar, vender y construir tu historial de confianza.</p>
+
+            <div class="alert alert-error" th:if="${param.error}">
+                Correo o contraseña incorrectos, o tu cuenta fue suspendida.
+            </div>
+            <div class="alert alert-error" th:if="${param.bloqueado}">
+                Demasiados intentos fallidos. Por seguridad, espera unos minutos antes de volver a intentar.
+            </div>
+            <div class="alert alert-success" th:if="${param.logout}">
+                Sesión cerrada correctamente.
+            </div>
+            <div class="alert alert-success" th:if="${registroExitoso}">
+                Cuenta creada. Ya puedes iniciar sesión.
+            </div>
+            <div class="alert alert-success" th:if="${cambioExitoso}">
+                Contraseña actualizada. Inicia sesión con tu nueva contraseña.
+            </div>
+
+            <form th:action="@{/auth/login}" method="post">
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <div class="input-wrap">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6l-10 7L2 6"/><path d="M2 6h20v12H2z"/></svg>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="tucorreo@ejemplo.com" required autofocus>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="contrasena">Contraseña</label>
+                    <div class="input-wrap">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                        <input type="password" id="contrasena" name="contrasena" class="form-control" placeholder="••••••••" required>
+                        <button type="button" class="toggle-password" onclick="togglePwd('contrasena', this)">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div style="text-align:right; margin-bottom: 18px;">
+                    <a href="/auth/recuperar" style="color: var(--tl-red); font-size: 0.85rem; font-weight: 700;">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Iniciar sesión</button>
+            </form>
+
+            <div style="display:flex; align-items:center; gap:12px; margin:18px 0;">
+                <div style="flex:1; height:1px; background:var(--tl-grey-300, #e0e0e0);"></div>
+                <span style="font-size:0.78rem; color:var(--tl-grey-600);">o</span>
+                <div style="flex:1; height:1px; background:var(--tl-grey-300, #e0e0e0);"></div>
+            </div>
+
+            <a href="/oauth2/authorization/google" class="btn btn-secondary btn-block" style="display:flex; align-items:center; justify-content:center; gap:10px;">
+                <svg width="18" height="18" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.66-.22-2.45H12v4.63h6.47a5.53 5.53 0 01-2.4 3.63v3h3.87c2.27-2.09 3.58-5.17 3.58-8.81z"/>
+                    <path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.94-2.92l-3.87-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.27v3.11A12 12 0 0012 24z"/>
+                    <path fill="#FBBC05" d="M5.27 14.27a7.2 7.2 0 010-4.54V6.62H1.27a12 12 0 000 10.76l4-3.11z"/>
+                    <path fill="#EA4335" d="M12 4.75c1.76 0 3.34.61 4.58 1.79l3.44-3.44C17.95 1.19 15.24 0 12 0A12 12 0 001.27 6.62l4 3.11C6.22 6.86 8.87 4.75 12 4.75z"/>
+                </svg>
+                Continuar con Google
+            </a>
+
+            <div class="auth-links">
+                ¿No tienes cuenta? <a href="/auth/registro">Regístrate gratis</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-  function togglePwd(id) {
+function togglePwd(id, btn) {
     const input = document.getElementById(id);
     input.type = input.type === 'password' ? 'text' : 'password';
-  }
+}
 </script>
-
 </body>
 </html>
