@@ -37,7 +37,7 @@ public class GeminiClient {
     @Value("${trustlink.ai.gemini-api-key:}")
     private String geminiApiKey;
 
-    @Value("${trustlink.ai.gemini-model:gemini-2.5-flash}")
+    @Value("${trustlink.ai.gemini-model:gemini-flash-latest}")
     private String geminiModel;
 
     /**
