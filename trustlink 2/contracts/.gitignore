@@ -1,6 +1,0 @@
-node_modules/
-.env
-cache/
-artifacts-hardhat/
-deployed_addresses.json
-*.log
