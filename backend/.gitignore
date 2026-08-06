@@ -6,3 +6,4 @@ trustlink-h2-db.*
 .idea/
 *.iml
 .vscode/
+application.properties
