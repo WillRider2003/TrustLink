@@ -13,6 +13,15 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Map;
 
+/**
+ * Cliente compartido para pedirle a Gemini que redacte un texto a partir
+ * de un prompt. Lo usan los distintos "traductores" de la app (jerga
+ * cripto, explicacion de score, etc.) para no duplicar la llamada HTTP.
+ * <p>
+ * SIEMPRE hay un texto de respaldo: si la IA esta deshabilitada, no hay
+ * API key, o la llamada falla o tarda demasiado, se devuelve el fallback
+ * tal cual y el llamador sigue funcionando igual.
+ */
 @Component
 @Slf4j
 public class GeminiClient {
@@ -28,7 +37,7 @@ public class GeminiClient {
     @Value("${trustlink.ai.gemini-api-key:}")
     private String geminiApiKey;
 
-    @Value("${trustlink.ai.gemini-model:gemini-1.5-flash}")
+    @Value("${trustlink.ai.gemini-model:gemini-2.5-flash}")
     private String geminiModel;
 
     /**
