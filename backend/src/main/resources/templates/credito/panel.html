@@ -18,6 +18,12 @@
         <p style="color:var(--tl-grey-600); font-size:0.85rem; margin-top:6px;">Calculado a partir de tu score de reputación actual</p>
     </div>
 
+    <div class="alert alert-info" style="margin-bottom:20px;" th:if="${explicacionScore}">
+        <p style="margin:0; font-size:0.92rem;" th:text="${explicacionScore}">
+            Tu score se calcula a partir de tus ventas.
+        </p>
+    </div>
+
     <div class="card" style="margin-bottom:20px;">
         <div style="font-weight:800; margin-bottom:14px;">Solicitar crédito</div>
 
