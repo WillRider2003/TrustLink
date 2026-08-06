@@ -13,11 +13,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Sayyy helllooo
  * Explica en lenguaje natural POR QUÉ un vendedor tiene el score que
  * tiene, a partir de los mismos numeros que ya calcula ScoringService
  * (ventas exitosas, compradores distintos, disputas). No promete
- * beneficios de credito no confirmados, solo explica el numero.
+ * beneficios de credito no confirmados — solo explica el numero.
  * <p>
  * Usa {@link GeminiClient} para redactar la frase de forma mas natural,
  * pero SIEMPRE hay un texto de respaldo generado localmente con los
@@ -52,13 +51,32 @@ public class ExplicacionScoreService {
 
         return cache.computeIfAbsent(claveCache, k -> {
             String fallback = explicacionFallback(rep, disputas);
-            String prompt = "Eres un asistente que explica en lenguaje simple, sin jerga tecnica ni financiera, " +
-                    "el score de reputación de un vendedor de un marketplace peruano. Reescribe la siguiente " +
-                    "explicación en 1-2 frases claras y directas, en segunda persona (\"tu score...\"). " +
-                    "NO menciones crédito, préstamos, techos de préstamo ni prometas ningún beneficio: solo " +
-                    "explica por qué el score es ese número, usando exclusivamente los datos del texto original. " +
-                    "No inventes datos nuevos. Responde solo con la frase final, sin comillas.\n\n" +
-                    "Texto original: " + fallback;
+            String prompt = "Eres un asistente de confianza dentro de TrustLink, un marketplace peruano " +
+            "donde vendedores y compradores hacen transacciones protegidas por escrow en blockchain. " +
+            "Tu única tarea en este momento es explicarle al vendedor, en lenguaje cotidiano y cercano, " +
+            "por qué tiene el score que tiene. Habla siempre en segunda persona (\"tu score...\", \"has completado...\"). " +
+            "\n\n" +
+            "DATOS DEL VENDEDOR (usa TODOS, no omitas ninguno):\n" +
+            "- Score actual: " + rep.getScoreActual() + " puntos\n" +
+            "- Ventas exitosas completadas: " + rep.getVentasExitosas() + "\n" +
+            "- Compradores distintos que te han comprado: " + rep.getCompradoresDistintos() + "\n" +
+            "- Problemas o disputas reportadas: " + disputas + "\n" +
+            "\n" +
+            "INSTRUCCIONES ESTRICTAS:\n" +
+            "1. Escribe exactamente 2 frases. Ni más, ni menos.\n" +
+            "2. La primera frase explica el score con los números concretos.\n" +
+            "3. La segunda frase da un mensaje motivador honesto: si va bien, reconócelo; " +
+            "   si tiene disputas, menciona que reducen el score sin ser alarmista.\n" +
+            "4. Incluye el número exacto del score (" + rep.getScoreActual() + ") en la primera frase.\n" +
+            "5. Menciona las ventas y los compradores distintos como factores positivos.\n" +
+            "6. Si disputas > 0, menciónalas como factor que afecta el score, sin dramatizar.\n" +
+            "7. Si disputas == 0, menciona que no tener problemas reportados es un punto a favor.\n" +
+            "8. PROHIBIDO mencionar crédito, préstamos, techos de préstamo o cualquier beneficio futuro.\n" +
+            "9. PROHIBIDO usar palabras técnicas: no digas blockchain, escrow, wallet, token, SBT.\n" +
+            "10. PROHIBIDO inventar datos que no estén en los números de arriba.\n" +
+            "11. Responde SOLO con las 2 frases. Sin comillas, sin introducción, sin explicación extra.\n" +
+            "\n" +
+            "Texto de referencia (puedes reescribirlo pero respeta todos sus datos): " + fallback;
             return geminiClient.generarOFallback(prompt, fallback);
         });
     }
