@@ -39,6 +39,12 @@
             </div>
         </div>
 
+        <div class="alert alert-info" style="margin-bottom:20px;" th:if="${explicacionSimple}">
+            <p style="margin:0; font-size:0.92rem;" th:text="${explicacionSimple}">
+                Tu pago está guardado de forma segura.
+            </p>
+        </div>
+
         <div th:if="${orden.estado.name() == 'EN_CUSTODIA'}">
             <div class="card-flat" style="margin-bottom:20px;" th:if="${orden.marcadoEnviado}">
                 <div style="font-weight:800; color:var(--tl-grey-600); margin-bottom:6px;">Estado de envío</div>

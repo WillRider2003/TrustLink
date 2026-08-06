@@ -75,6 +75,25 @@ openssl rand -base64 32
 Copiar el resultado en `trustlink.wallet.master-key` de
 `application.properties`. **No usen el valor de ejemplo en la demo real.**
 
+### 4.1. (Opcional) Traductor de jerga cripto con IA
+
+El detalle de cada orden (`/marketplace/orden/{id}`) muestra una frase en
+lenguaje simple explicando el estado del escrow (p. ej. "Tu pago de S/150
+está guardado de forma segura..."). Por defecto esa frase se genera con
+plantillas locales (`TraductorCriptoService`), sin depender de ningún
+servicio externo.
+
+Para que esa frase la redacte Gemini (más natural, mismo contenido) agregar
+en `application.properties`:
+```properties
+trustlink.ai.enabled=true
+trustlink.ai.gemini-api-key=<tu API key de Google AI Studio>
+trustlink.ai.gemini-model=gemini-1.5-flash
+```
+Si `trustlink.ai.enabled` es `false` (default), no hay API key configurada,
+o la llamada a Gemini falla o tarda demasiado, se usa automáticamente el
+texto de plantilla local — el flujo de compra nunca depende de esto.
+
 ### 5. Correr
 
 ```bash
