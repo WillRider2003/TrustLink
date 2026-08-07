@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi tienda — TrustLink</title>
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="dashboard-vendedor" data-active-link="dashboard-vendedor.html">
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Mi tienda</div>
+          <div class="topbar-subtitle">Publica productos y gestiona tu reputación</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="document.getElementById('publicarPanel').scrollIntoView({behavior:'smooth'})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>
+        Publicar producto
+      </button>
+    </header>
+
+    <div class="content-body">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+          </div>
+          <div class="stat-card-value">18</div>
+          <div class="stat-card-label">Ventas exitosas</div>
+          <div class="stat-card-delta up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M23 6l-9.5 9.5-5-5L1 18"/></svg> +3 esta semana</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          </div>
+          <div class="stat-card-value">742</div>
+          <div class="stat-card-label">Score de reputación on-chain</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/></svg></div>
+          </div>
+          <div class="stat-card-value">12</div>
+          <div class="stat-card-label">Compradores distintos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg></div>
+          </div>
+          <div class="stat-card-value">S/ 250</div>
+          <div class="stat-card-label">Crédito disponible (Nivel 3)</div>
+        </div>
+      </div>
+
+      <div class="panel" id="publicarPanel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Publicar nuevo producto</div>
+            <div class="panel-subtitle">Sube una foto y se agrega de inmediato al marketplace</div>
+          </div>
+        </div>
+
+        <form id="publicarForm">
+          <div class="field">
+            <label>Foto del producto</label>
+            <div class="dropzone" id="dropzone">
+              <svg id="dropzoneIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+              <img id="dropzonePreview" class="dropzone-preview" style="display:none;">
+              <div id="dropzoneText">
+                <div class="dropzone-text">Haz clic para subir una foto</div>
+                <div class="dropzone-sub">JPG o PNG, se guarda solo en esta sesión del navegador</div>
+              </div>
+              <input type="file" id="fileInput" accept="image/*" style="display:none;">
+            </div>
+          </div>
+          <div class="field">
+            <label>Nombre del producto</label>
+            <input type="text" id="prodNombre" placeholder="Ej. Taladro percutor Bosch" required>
+          </div>
+          <div class="field">
+            <label>Precio (S/)</label>
+            <input type="number" id="prodPrecio" placeholder="Ej. 120" min="1" step="0.5" required>
+          </div>
+          <div class="field">
+            <label>Descripción</label>
+            <textarea id="prodDesc" rows="3" placeholder="Detalles, estado, incluye accesorios..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>
+            Publicar en el marketplace
+          </button>
+        </form>
+      </div>
+
+      <div class="section-heading">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+        Mis productos publicados
+      </div>
+      <div class="product-grid" id="misProductosGrid"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="js/data.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  tlInitPublicarForm();
+  tlRenderProductGrid('misProductosGrid', { onlyOwn: true, rol: 'vendedor' });
+});
+</script>
+</body>
+</html>
