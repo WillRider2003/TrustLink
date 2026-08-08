@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<nav class="navbar" th:fragment="navbar" id="navbar">
+    <a href="/marketplace" class="brand">
+        <img src="/img/logo2.png" alt="TrustLink">
+        <span>TrustLink</span>
+    </a>
+
+    <div class="navbar-links" id="navbarLinks" sec:authorize="isAuthenticated()" th:with="esVendedor=${#authentication.principal.usuario.vendedorAprobado}">
+        <a href="/marketplace">Marketplace</a>
+        <a th:if="${esVendedor}" href="/marketplace/publicar">Vender</a>
+        <a th:if="${esVendedor}" href="/marketplace/dashboard">Dashboard</a>
+        <a th:unless="${esVendedor}" href="/vendedor/solicitud">Ser vendedor</a>
+        <a href="/marketplace/mis-compras">Mis compras</a>
+        <a th:if="${esVendedor}" href="/credito">Crédito</a>
+        <a href="/perfil">Perfil</a>
+        <a href="/admin" sec:authorize="hasRole('SUPERADMIN')">Admin</a>
+        <form th:action="@{/auth/logout}" method="post" style="display:inline; margin:0;">
+            <button type="submit" class="link-salir">Salir</button>
+        </form>
+    </div>
+
+    <div class="navbar-user" sec:authorize="isAuthenticated()">
+        <a href="/notificaciones" class="campana-notificaciones" aria-label="Notificaciones" id="campanaNotif">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <span class="badge-contador" id="contadorNotif" style="display:none;">0</span>
+        </a>
+        <button class="mobile-toggle" onclick="document.getElementById('navbarLinks').classList.toggle('mobile-open')" aria-label="Menú">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+        </button>
+    </div>
+
+    <script th:inline="none" sec:authorize="isAuthenticated()">
+    (function () {
+        fetch('/notificaciones/contador')
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (data) {
+                if (!data || !data.noLeidas) return;
+                var el = document.getElementById('contadorNotif');
+                el.textContent = data.noLeidas > 9 ? '9+' : data.noLeidas;
+                el.style.display = 'inline-flex';
+            })
+            .catch(function () {});
+    })();
+    </script>
+
+    <script th:inline="none">
+    (function () {
+        var path = window.location.pathname;
+        var links = document.querySelectorAll('#navbarLinks a[href]');
+        var best = null;
+        links.forEach(function (link) {
+            var href = link.getAttribute('href');
+            if (href === '/marketplace' ? path === href : path.indexOf(href) === 0) {
+                if (!best || href.length > best.getAttribute('href').length) best = link;
+            }
+        });
+        if (best) best.classList.add('active');
+    })();
+    </script>
+
+<div sec:authorize="isAuthenticated()" id="chatbotWidget" style="position:fixed; bottom:20px; right:20px; z-index:1000;">
+    <button id="chatbotToggle" aria-label="Ayuda de TrustLink"
+            style="width:56px; height:56px; border-radius:50%; border:none; background:var(--tl-red); color:#fff;
+                   box-shadow:0 4px 14px rgba(0,0,0,0.25); cursor:pointer; display:flex; align-items:center; justify-content:center;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+        </svg>
+    </button>
+
+    <div id="chatbotPanel" style="display:none; position:absolute; bottom:68px; right:0; width:320px; max-width:85vw;
+                                    background:#fff; border-radius:14px; box-shadow:0 8px 30px rgba(0,0,0,0.25);
+                                    overflow:hidden; flex-direction:column;">
+        <div style="background:var(--tl-red); color:#fff; padding:12px 16px; font-weight:800;">
+            Ayuda de TrustLink
+        </div>
+        <div id="chatbotMensajes" style="flex:1; overflow-y:auto; max-height:340px; padding:12px; display:flex; flex-direction:column; gap:8px;">
+            <div style="background:var(--tl-red-soft); color:var(--tl-red-hover); padding:8px 12px; border-radius:10px; font-size:0.85rem; align-self:flex-start;">
+                Hola 👋 Pregúntame lo que quieras sobre cómo funciona TrustLink: el pago protegido, tu score, el crédito, o qué hacer si hay un problema.
+            </div>
+        </div>
+        <form id="chatbotForm" style="display:flex; border-top:1px solid var(--tl-grey-600); padding:8px; gap:6px;">
+            <input id="chatbotInput" type="text" placeholder="Escribe tu duda..." autocomplete="off"
+                   style="flex:1; border:1px solid #ddd; border-radius:8px; padding:8px 10px; font-size:0.85rem;">
+            <button type="submit" style="background:var(--tl-red); color:#fff; border:none; border-radius:8px; padding:0 14px; font-weight:700; cursor:pointer;">
+                Enviar
+            </button>
+        </form>
+    </div>
+</div>
+
+<script th:inline="none" sec:authorize="isAuthenticated()">
+(function () {
+    var toggle = document.getElementById('chatbotToggle');
+    var panel = document.getElementById('chatbotPanel');
+    var form = document.getElementById('chatbotForm');
+    var input = document.getElementById('chatbotInput');
+    var mensajes = document.getElementById('chatbotMensajes');
+
+    toggle.addEventListener('click', function () {
+        var abierto = panel.style.display === 'flex';
+        panel.style.display = abierto ? 'none' : 'flex';
+        if (!abierto) input.focus();
+    });
+
+    function agregarMensaje(texto, esUsuario) {
+        var burbuja = document.createElement('div');
+        burbuja.textContent = texto;
+        burbuja.style.padding = '8px 12px';
+        burbuja.style.borderRadius = '10px';
+        burbuja.style.fontSize = '0.85rem';
+        burbuja.style.maxWidth = '85%';
+        if (esUsuario) {
+            burbuja.style.background = '#f1f1f1';
+            burbuja.style.color = '#222';
+            burbuja.style.alignSelf = 'flex-end';
+        } else {
+            burbuja.style.background = 'var(--tl-red-soft)';
+            burbuja.style.color = 'var(--tl-red-hover)';
+            burbuja.style.alignSelf = 'flex-start';
+        }
+        mensajes.appendChild(burbuja);
+        mensajes.scrollTop = mensajes.scrollHeight;
+        return burbuja;
+    }
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var texto = input.value.trim();
+        if (!texto) return;
+        agregarMensaje(texto, true);
+        input.value = '';
+        input.disabled = true;
+
+        var pensando = agregarMensaje('Escribiendo...', false);
+
+        fetch('/api/chatbot/mensaje', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mensaje: texto })
+        })
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+            .then(function (data) {
+                pensando.textContent = data.respuesta;
+            })
+            .catch(function () {
+                pensando.textContent = 'No pude responder en este momento. Intenta de nuevo en un rato.';
+            })
+            .finally(function () {
+                input.disabled = false;
+                input.focus();
+            });
+    });
+})();
+</script>
+</nav>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Solicitudes de vendedor')}"></head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1>Solicitudes de vendedor</h1>
+            <p class="subtitle">Aprueba o rechaza a los usuarios que quieren empezar a vender.</p>
+        </div>
+        <a href="/admin" class="btn btn-secondary btn-sm">← Volver al panel</a>
+    </div>
+
+    <div class="alert alert-error" th:if="${errorGeneral}" th:text="${errorGeneral}"></div>
+
+    <div style="overflow-x:auto;">
+        <table class="tabla-admin">
+            <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Negocio</th>
+                <th>Productos</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="s : ${solicitudes}">
+                <td>
+                    <div th:text="${s.usuario.nombreCompleto}">Nombre</div>
+                    <div style="font-size:0.78rem; color:var(--tl-grey-600);" th:text="${s.usuario.email}"></div>
+                </td>
+                <td th:text="${s.nombreNegocio}">Negocio</td>
+                <td th:text="${s.tipoProductos}">Tipo</td>
+                <td th:text="${#temporals.format(s.creadoEn, 'dd/MM/yyyy')}"></td>
+                <td>
+                    <span class="badge" style="background:rgba(232,67,47,0.12); color:var(--tl-red);" th:if="${s.estado.name() == 'PENDIENTE'}">Pendiente</span>
+                    <span class="badge badge-liberado" th:if="${s.estado.name() == 'APROBADA'}">Aprobada</span>
+                    <span class="badge badge-disputa" th:if="${s.estado.name() == 'RECHAZADA'}">Rechazada</span>
+                </td>
+                <td>
+                    <div th:if="${s.estado.name() == 'PENDIENTE'}" style="display:flex; gap:6px;">
+                        <form th:action="@{/admin/solicitudes-vendedor/{id}/aprobar(id=${s.id})}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-primary btn-sm" onclick="return confirm('¿Aprobar a este vendedor?')">Aprobar</button>
+                        </form>
+                        <form th:action="@{/admin/solicitudes-vendedor/{id}/rechazar(id=${s.id})}" method="post" style="display:inline;"
+                              onsubmit="return agregarMotivo(this)">
+                            <button type="submit" class="btn btn-danger btn-sm">Rechazar</button>
+                        </form>
+                    </div>
+                    <span th:if="${s.estado.name() != 'PENDIENTE'}" style="font-size:0.8rem; color:var(--tl-grey-600);">—</span>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(solicitudes)}">
+                <td colspan="6" style="text-align:center; color:var(--tl-grey-600); padding:24px;">No hay solicitudes registradas.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function agregarMotivo(form) {
+    var motivo = prompt('Motivo del rechazo (opcional):');
+    if (motivo === null) return false;
+    var input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'motivo';
+    input.value = motivo;
+    form.appendChild(input);
+    return confirm('¿Rechazar esta solicitud?');
+}
+</script>
+</body>
+</html>

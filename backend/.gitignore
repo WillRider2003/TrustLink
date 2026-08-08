@@ -1,0 +1,9 @@
+target/
+uploads/
+*.log
+.env
+trustlink-h2-db.*
+.idea/
+*.iml
+.vscode/
+application.properties
