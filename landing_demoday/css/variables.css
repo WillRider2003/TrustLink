@@ -1,0 +1,26 @@
+:root {
+  /* Paleta TrustLink (azul marino + azul brillante + blanco) */
+  --tl-bg-dark: #0a1128;
+  --tl-bg-dark-2: #0e1836;
+  --tl-accent: #2563eb;
+  --tl-accent-dark: #1d4ed8;
+  --tl-accent-soft: rgba(37, 99, 235, 0.18);
+  --tl-accent-soft-2: rgba(37, 99, 235, 0.08);
+  --tl-white: #FFFFFF;
+  --tl-text-dark: #0f172a;
+  --tl-grey-100: #F5F7FB;
+  --tl-grey-200: #E7EBF3;
+  --tl-grey-300: #CBD3E1;
+  --tl-grey-600: #94a3b8;
+  --tl-green: #1E9E5A;
+  --tl-amber: #C8891A;
+
+  --tl-radius-sm: 8px;
+  --tl-radius-md: 14px;
+  --tl-radius-lg: 20px;
+  --tl-shadow-sm: 0 2px 8px rgba(10, 17, 40, 0.08);
+  --tl-shadow-md: 0 8px 24px rgba(10, 17, 40, 0.12);
+  --tl-shadow-lg: 0 20px 50px rgba(10, 17, 40, 0.18);
+
+  --sidebar-width: 240px;
+}

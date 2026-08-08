@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Órdenes — TrustLink</title>
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="ordenes" data-active-link="ordenes.html">
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title" id="ordenesTitle">Órdenes</div>
+          <div class="topbar-subtitle">Historial verificable en la blockchain</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-body">
+      <div class="panel" style="padding:0; overflow:hidden;">
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr style="background:var(--tl-grey-100); text-align:left;">
+              <th style="padding:14px 18px; font-size:0.74rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--tl-grey-600);">Producto</th>
+              <th style="padding:14px 18px; font-size:0.74rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--tl-grey-600);">Monto</th>
+              <th style="padding:14px 18px; font-size:0.74rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--tl-grey-600);">Estado</th>
+              <th style="padding:14px 18px; font-size:0.74rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--tl-grey-600);">Tx Hash</th>
+              <th style="padding:14px 18px; font-size:0.74rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--tl-grey-600);">Fecha</th>
+            </tr>
+          </thead>
+          <tbody id="ordenesBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="js/data.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const rol = sessionStorage.getItem('tl_rol');
+  document.getElementById('ordenesTitle').textContent = rol === 'comprador' ? 'Mis compras' : 'Mis ventas';
+
+  const badgeFor = (estado) => {
+    if (estado === 'ENTREGADO') return `<span class="badge badge-green">Entregado</span>`;
+    if (estado === 'EN_DISPUTA') return `<span class="badge badge-amber">En disputa</span>`;
+    return `<span class="badge badge-dark">${estado}</span>`;
+  };
+
+  document.getElementById('ordenesBody').innerHTML = TL_STATE.ordenes.map(o => `
+    <tr style="border-top:1px solid var(--tl-grey-200);">
+      <td style="padding:14px 18px; font-weight:700; font-size:0.86rem;">${o.producto}</td>
+      <td style="padding:14px 18px; font-weight:800; color:var(--tl-accent-dark);">S/ ${o.monto.toFixed(2)}</td>
+      <td style="padding:14px 18px;">${badgeFor(o.estado)}</td>
+      <td style="padding:14px 18px; font-family:'SF Mono',monospace; font-size:0.76rem; color:var(--tl-grey-600);">${o.txHash}</td>
+      <td style="padding:14px 18px; font-size:0.82rem; color:var(--tl-grey-600);">${o.fecha}</td>
+    </tr>
+  `).join('');
+});
+</script>
+</body>
+</html>

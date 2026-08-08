@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrustLink — Confianza y crédito on-chain para la economía informal</title>
+<meta name="description" content="Marketplace descentralizado con escrow, reputación on-chain y crédito progresivo para vendedores informales, sobre Arbitrum.">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/landing.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body class="tl-landing" data-page="landing">
+
+<!-- NAV -->
+<nav class="tl-nav">
+  <a href="#top" class="tl-nav-brand">
+    <img src="img/logo.png" alt="TrustLink">
+    <div class="tl-nav-brand-text">Trust<span>Link</span></div>
+  </a>
+  <div class="tl-nav-links">
+    <a href="#problema">El problema</a>
+    <a href="#como-funciona">Cómo funciona</a>
+    <a href="#reputacion">Reputación</a>
+    <a href="#arquitectura">Arquitectura</a>
+  </div>
+  <a href="login.html" class="tl-btn tl-btn-primary">Iniciar sesión</a>
+</nav>
+
+<!-- HERO -->
+<header class="tl-hero" id="top">
+  <div class="tl-wrap tl-hero-inner">
+    <div class="tl-hero-tag"><span class="dot"></span>Arbitrum Sepolia · Testnet en vivo</div>
+    <h1 class="tl-hero-title">Confianza <em>verificable</em> para quienes el sistema financiero dejó afuera.</h1>
+    <p class="tl-hero-sub">
+      Marketplace con <b>escrow on-chain</b> y <b>crédito progresivo</b> para vendedores
+      informales que hoy operan sin historial ni respaldo bancario.
+    </p>
+    <div class="tl-hero-actions">
+      <a href="login.html" class="tl-btn tl-btn-primary tl-btn-lg">Iniciar sesión</a>
+      <a href="#como-funciona" class="tl-btn tl-btn-outline tl-btn-lg">Ver cómo funciona</a>
+    </div>
+
+    <div class="tl-hero-meta">
+      <div class="tl-hero-meta-item"><b>Escrow</b>Depósito y liberación on-chain</div>
+      <div class="tl-hero-meta-item"><b>SBT no transferible</b>Reputación pública verificable</div>
+      <div class="tl-hero-meta-item"><b>Score 0–100</b>Fórmula transparente 60/40</div>
+      <div class="tl-hero-meta-item"><b>Asistente IA</b>Explica el score en lenguaje simple</div>
+    </div>
+  </div>
+</header>
+
+<!-- TICKER -->
+<div class="tl-ticker-wrap">
+  <div class="tl-ticker">
+    <span>Arbitrum Sepolia</span><span>Escrow Contract</span><span>SBT Reputación</span><span>Score 60% Volumen / 40% Diversidad</span><span>Java · Spring Boot</span><span>Google Gemini API</span><span>Arbitrum Sepolia</span><span>Escrow Contract</span><span>SBT Reputación</span><span>Score 60% Volumen / 40% Diversidad</span><span>Java · Spring Boot</span><span>Google Gemini API</span>
+  </div>
+</div>
+
+<!-- STATS EN VIVO (sección corta) -->
+<section class="tl-section-tight">
+  <div class="tl-wrap tl-reveal">
+    <div class="tl-stat-grid">
+      <div class="tl-stat-cell">
+        <div class="tl-stat-value tl-countup" data-countup="10" data-prefix="S/ ">10</div>
+        <div class="tl-stat-label">Monto mínimo por transacción</div>
+      </div>
+      <div class="tl-stat-cell">
+        <div class="tl-stat-value tl-countup" data-countup="100">0</div>
+        <div class="tl-stat-label">Score máximo posible</div>
+      </div>
+      <div class="tl-stat-cell">
+        <div class="tl-stat-value">60<span style="color:var(--tl-grey-dim); font-size:1.1rem;">/40</span></div>
+        <div class="tl-stat-label">Ponderación volumen / diversidad</div>
+      </div>
+      <div class="tl-stat-cell">
+        <div class="tl-stat-value">3</div>
+        <div class="tl-stat-label">Roles: Comprador, Vendedor, Admin</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EL PROBLEMA -->
+<section class="tl-section" id="problema">
+  <div class="tl-wrap">
+    <div class="tl-reveal">
+      <div class="tl-eyebrow">(01) — El problema</div>
+      <h2 class="tl-h2">Dos brechas que se <em>alimentan entre sí.</em></h2>
+      <p class="tl-lede">
+        Sin confianza no hay transacción, y sin transacciones no hay crédito. Millones de
+        vendedores informales en Perú quedan atrapados en ese círculo.
+      </p>
+    </div>
+
+    <div class="tl-problem-grid tl-reveal">
+      <div class="tl-problem-card">
+        <div class="tl-problem-num">01 — Confianza</div>
+        <div class="tl-problem-title">Comprar entre desconocidos es un riesgo</div>
+        <div class="tl-problem-desc">
+          El comprador no sabe si recibirá el producto; el vendedor no sabe si le pagarán.
+          Sin un intermediario neutral, cada venta es un salto de fe.
+        </div>
+      </div>
+      <div class="tl-problem-card">
+        <div class="tl-problem-num">02 — Crédito</div>
+        <div class="tl-problem-title">Vender bien no abre puertas en el banco</div>
+        <div class="tl-problem-desc">
+          La banca tradicional exige historial formal. Un vendedor informal puede ser
+          confiable durante años y nunca tener cómo demostrarlo.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CÓMO FUNCIONA -->
+<section class="tl-section" id="como-funciona" style="background:var(--tl-bg-2); border-top:1px solid var(--tl-line); border-bottom:1px solid var(--tl-line);">
+  <div class="tl-wrap">
+    <div class="tl-reveal">
+      <div class="tl-eyebrow">(02) — Cómo funciona</div>
+      <h2 class="tl-h2">De depósito a <em>reputación on-chain</em>, sin intermediarios.</h2>
+      <p class="tl-lede">
+        El dinero queda retenido en garantía hasta que la entrega se confirma. Así de simple.
+      </p>
+    </div>
+
+    <div class="tl-steps tl-reveal">
+      <div class="tl-step">
+        <span class="tl-step-num">01</span>
+        <div class="tl-step-title">Depósito en garantía</div>
+        <div class="tl-step-desc">El comprador paga y el dinero queda bloqueado on-chain. Nadie puede tocarlo todavía — ni el vendedor, ni TrustLink.</div>
+        <div class="tl-step-fn">crearOrden()</div>
+      </div>
+      <div class="tl-step">
+        <span class="tl-step-num">02</span>
+        <div class="tl-step-title">Confirmación con código</div>
+        <div class="tl-step-desc">El comprador recibe el producto e ingresa un código. Eso libera el pago al vendedor al instante.</div>
+        <div class="tl-step-fn">confirmarEntrega()</div>
+      </div>
+      <div class="tl-step">
+        <span class="tl-step-num">03</span>
+        <div class="tl-step-title">Timeout protector</div>
+        <div class="tl-step-desc">Si el comprador no confirma a tiempo, el contrato reembolsa solo — sin árbitro humano.</div>
+        <div class="tl-step-fn">liberarPorTimeout()</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REPUTACIÓN / SCORE -->
+<section class="tl-section" id="reputacion">
+  <div class="tl-wrap">
+    <div class="tl-reveal">
+      <div class="tl-eyebrow">(03) — Reputación</div>
+      <h2 class="tl-h2">Cada venta exitosa construye <em>historial verificable.</em></h2>
+      <p class="tl-lede">
+        Al confirmarse la entrega, el backend recalcula el score del vendedor (0–100) con una
+        fórmula transparente, y se emite automáticamente un token de reputación no transferible.
+      </p>
+    </div>
+
+    <div class="tl-formula-card tl-reveal">
+      <div class="tl-formula-bars">
+        <div class="tl-formula-row">
+          <div class="tl-formula-label">Volumen de ventas</div>
+          <div class="tl-formula-track"><div class="tl-formula-fill" style="width:60%"></div></div>
+          <div class="tl-formula-pct">60%</div>
+        </div>
+        <div class="tl-formula-row">
+          <div class="tl-formula-label">Diversidad de compradores</div>
+          <div class="tl-formula-track"><div class="tl-formula-fill" style="width:40%"></div></div>
+          <div class="tl-formula-pct">40%</div>
+        </div>
+      </div>
+      <div class="tl-formula-note">
+        Esta ponderación penaliza <b>vender siempre a las mismas wallets</b> — la señal
+        más común de fraude simulado. Un score alto solo se logra con compradores reales y distintos.
+      </div>
+    </div>
+
+    <div class="tl-contracts-block tl-reveal">
+      <div class="tl-contract-box">
+        <div class="tl-contract-box-head">
+          <div class="tl-contract-box-name">Soulbound Token (SBT)</div>
+          <div class="tl-contract-box-badge">No transferible</div>
+        </div>
+        <div class="tl-contract-box-addr">Emitido automáticamente al cerrar una venta exitosa</div>
+        <div class="tl-contract-fn-row">Sella el hito de venta exitosa on-chain</div>
+        <div class="tl-contract-fn-row">Da visibilidad pública sin exponer el detalle de cada transacción</div>
+        <div class="tl-contract-fn-row">Funciona como historial crediticio verificable, sin depender de un banco</div>
+      </div>
+      <div class="tl-contract-box">
+        <div class="tl-contract-box-head">
+          <div class="tl-contract-box-name">Asistente de IA</div>
+          <div class="tl-contract-box-badge">Google Gemini API</div>
+        </div>
+        <div class="tl-contract-box-addr">Traduce el estado técnico a lenguaje cotidiano</div>
+        <div class="tl-contract-fn-row">"¿Por qué mi scoring es bajo?" — respondido sin jerga cripto</div>
+        <div class="tl-contract-fn-row">Usa el historial de ventas y el score como contexto real</div>
+        <div class="tl-contract-fn-row">Oculta wallets, gas y firmas del usuario final</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARQUITECTURA -->
+<section class="tl-section" id="arquitectura" style="background:var(--tl-bg-2); border-top:1px solid var(--tl-line); border-bottom:1px solid var(--tl-line);">
+  <div class="tl-wrap">
+    <div class="tl-reveal">
+      <div class="tl-eyebrow">(04) — Arquitectura</div>
+      <h2 class="tl-h2">Lo on-chain y lo off-chain, <em>separados a propósito.</em></h2>
+      <p class="tl-lede">
+        Solo la custodia de fondos y el sello de reputación viven en la blockchain. El resto
+        se resuelve off-chain, donde es más rápido y barato — sin perder transparencia.
+      </p>
+    </div>
+
+    <div class="tl-arch-board tl-reveal">
+      <div class="tl-arch-row">
+        <div class="tl-arch-row-label">
+          <span class="tl-arch-row-dot onchain"></span>Capa on-chain
+          <small>Arbitrum Sepolia</small>
+        </div>
+        <div class="tl-arch-row-cards">
+          <div class="tl-arch-card onchain">
+            <div class="tl-arch-card-icon">⛓</div>
+            <div class="tl-arch-card-title">Escrow.sol</div>
+            <div class="tl-arch-card-desc">Depósito, liberación por código y timeout automático.</div>
+          </div>
+          <div class="tl-arch-card onchain">
+            <div class="tl-arch-card-icon">🏅</div>
+            <div class="tl-arch-card-title">SBT.sol</div>
+            <div class="tl-arch-card-desc">Sello de reputación no transferible por venta exitosa.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-arch-connector">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        <span>El backend orquesta ambas capas</span>
+      </div>
+
+      <div class="tl-arch-row">
+        <div class="tl-arch-row-label">
+          <span class="tl-arch-row-dot offchain"></span>Capa off-chain
+          <small>Java · Spring Boot</small>
+        </div>
+        <div class="tl-arch-row-cards four">
+          <div class="tl-arch-card offchain">
+            <div class="tl-arch-card-icon">⚙️</div>
+            <div class="tl-arch-card-title">Orquestador</div>
+            <div class="tl-arch-card-desc">Conecta la confirmación on-chain con el recálculo de score.</div>
+          </div>
+          <div class="tl-arch-card offchain">
+            <div class="tl-arch-card-icon">🗄️</div>
+            <div class="tl-arch-card-title">MySQL</div>
+            <div class="tl-arch-card-desc">Historial de ventas y tabla de reputación por vendedor.</div>
+          </div>
+          <div class="tl-arch-card offchain">
+            <div class="tl-arch-card-icon">🖥️</div>
+            <div class="tl-arch-card-title">Thymeleaf SSR</div>
+            <div class="tl-arch-card-desc">Interfaz por rol — Web3 queda oculto al usuario final.</div>
+          </div>
+          <div class="tl-arch-card offchain">
+            <div class="tl-arch-card-icon">🤖</div>
+            <div class="tl-arch-card-title">Gemini API</div>
+            <div class="tl-arch-card-desc">Explica el score y el historial en lenguaje simple.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY ARBITRUM -->
+<section class="tl-section">
+  <div class="tl-wrap">
+    <div class="tl-reveal">
+      <div class="tl-eyebrow">(05) — Por qué Arbitrum</div>
+      <h2 class="tl-h2">Construido para <em>microtransacciones reales.</em></h2>
+      <p class="tl-lede">
+        TrustLink mueve montos de S/10 a S/300. Esa realidad económica define la red — no al revés.
+      </p>
+    </div>
+
+    <div class="tl-why-grid tl-reveal">
+      <div class="tl-why-card">
+        <div class="tl-why-num">01</div>
+        <div class="tl-why-title">Gas bajo para montos pequeños</div>
+        <div class="tl-why-desc">En Ethereum mainnet, el gas podría costar más que la venta misma. Arbitrum lo hace viable.</div>
+      </div>
+      <div class="tl-why-card">
+        <div class="tl-why-num">02</div>
+        <div class="tl-why-title">Seguridad heredada de Ethereum</div>
+        <div class="tl-why-desc">Como rollup optimista, hereda las garantías de Ethereum sin replicar sus costos.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="tl-cta">
+  <div class="tl-wrap tl-reveal">
+    <h2 class="tl-cta-title">Confianza que se puede <em>verificar</em>, no solo prometer.</h2>
+    <p class="tl-cta-sub">Explora la plataforma como comprador, vendedor o administrador.</p>
+    <a href="login.html" class="tl-btn tl-btn-primary tl-btn-lg">Iniciar sesión</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="tl-footer">
+  <div class="tl-wrap">
+    <div class="tl-footer-grid">
+      <div>
+        <div class="tl-footer-brand">
+          <img src="img/logo.png" alt="TrustLink">
+          <div class="tl-footer-brand-text">Trust<span>Link</span></div>
+        </div>
+        <div class="tl-footer-desc">Marketplace descentralizado con escrow, reputación on-chain y crédito progresivo para vendedores informales, sobre Arbitrum Sepolia.</div>
+      </div>
+      <div>
+        <div class="tl-footer-col-title">Protocolo</div>
+        <div class="tl-footer-link">Escrow <span class="fn">crearOrden()</span></div>
+        <div class="tl-footer-link">Confirmación <span class="fn">confirmarEntrega()</span></div>
+        <div class="tl-footer-link">Timeout <span class="fn">liberarPorTimeout()</span></div>
+        <div class="tl-footer-link">Reputación <span class="fn">SBT</span></div>
+      </div>
+      <div>
+        <div class="tl-footer-col-title">Stack</div>
+        <div class="tl-footer-link">Red <span class="fn">Arbitrum Sepolia</span></div>
+        <div class="tl-footer-link">Backend <span class="fn">Spring Boot</span></div>
+        <div class="tl-footer-link">Base de datos <span class="fn">MySQL</span></div>
+        <div class="tl-footer-link">IA <span class="fn">Gemini API</span></div>
+      </div>
+    </div>
+    <div class="tl-footer-bottom">
+      <div class="tl-footer-bottom-text">© 2026 TrustLink — BUIDL Hackathon, Arbitrum Track</div>
+      <div class="tl-footer-bottom-text">Arbitrum Sepolia · Testnet</div>
+    </div>
+  </div>
+</footer>
+
+<div id="chatbotMount"></div>
+
+<script src="js/landing.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script>document.addEventListener('DOMContentLoaded', tlRenderChatbotWidget);</script>
+</body>
+</html>

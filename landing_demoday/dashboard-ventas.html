@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard de ventas — TrustLink</title>
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="dashboard-ventas" data-active-link="dashboard-ventas.html">
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Dashboard de ventas</div>
+          <div class="topbar-subtitle">Cuánto y qué estás vendiendo en TrustLink</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-body">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-card-top"><div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg></div></div>
+          <div class="stat-card-value" id="statIngresoTotal">S/ 0</div>
+          <div class="stat-card-label">Ingresos últimos 6 meses</div>
+          <div class="stat-card-delta up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M23 6l-9.5 9.5-5-5L1 18"/></svg> +23% vs. semestre anterior</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top"><div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div></div>
+          <div class="stat-card-value" id="statUnidades">0</div>
+          <div class="stat-card-label">Unidades vendidas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top"><div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg></div></div>
+          <div class="stat-card-value" id="statTicketProm">S/ 0</div>
+          <div class="stat-card-label">Ticket promedio por venta</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top"><div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div></div>
+          <div class="stat-card-value">742</div>
+          <div class="stat-card-label">Score de reputación</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Ingresos por mes</div>
+            <div class="panel-subtitle">Monto vendido (S/) en los últimos 6 meses</div>
+          </div>
+        </div>
+        <div class="sales-bar-chart" id="ventasChart"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Productos más vendidos</div>
+            <div class="panel-subtitle">Ranking por unidades e ingresos generados</div>
+          </div>
+        </div>
+        <div id="productosRanking"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="js/data.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script src="js/app.js"></script>
+<script>
+function tlRenderVentasChart() {
+  const datos = TL_VENTAS_MENSUALES;
+  const max = Math.max(...datos.map(d => d.monto));
+
+  document.getElementById('ventasChart').innerHTML = datos.map(d => {
+    const pct = Math.round((d.monto / max) * 100);
+    return `
+      <div class="sales-bar-col">
+        <div class="sales-bar-value">S/ ${d.monto}</div>
+        <div class="sales-bar-track">
+          <div class="sales-bar-fill" style="height:${pct}%"></div>
+        </div>
+        <div class="sales-bar-label">${d.mes}</div>
+      </div>
+    `;
+  }).join('');
+
+  const ingresoTotal = datos.reduce((sum, d) => sum + d.monto, 0);
+  const unidadesTotal = datos.reduce((sum, d) => sum + d.unidades, 0);
+  document.getElementById('statIngresoTotal').textContent = `S/ ${ingresoTotal.toLocaleString('es-PE')}`;
+  document.getElementById('statUnidades').textContent = unidadesTotal;
+  document.getElementById('statTicketProm').textContent = `S/ ${Math.round(ingresoTotal / unidadesTotal)}`;
+}
+
+function tlRenderProductosRanking() {
+  const productos = [...TL_VENTAS_POR_PRODUCTO].sort((a, b) => b.monto - a.monto);
+  const maxMonto = productos[0].monto;
+
+  document.getElementById('productosRanking').innerHTML = productos.map((p, i) => `
+    <div class="ranking-row">
+      <div class="ranking-pos">${i + 1}</div>
+      <div class="ranking-body">
+        <div class="ranking-name">${p.nombre}</div>
+        <div class="ranking-track"><div class="ranking-fill" style="width:${Math.round((p.monto / maxMonto) * 100)}%"></div></div>
+      </div>
+      <div class="ranking-stats">
+        <div class="ranking-monto">S/ ${p.monto}</div>
+        <div class="ranking-unidades">${p.unidades} unid.</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  tlRenderVentasChart();
+  tlRenderProductosRanking();
+});
+</script>
+</body>
+</html>
