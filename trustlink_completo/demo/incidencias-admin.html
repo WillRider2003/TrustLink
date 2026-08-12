@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incidencias — TrustLink (Demo)</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="incidencias-admin" data-active-link="incidencias-admin.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Incidencias</div>
+          <div class="topbar-subtitle">Resuelve disputas entre compradores y vendedores</div>
+        </div>
+      </div>
+      <div id="topbarNotifMount" style="position:relative;"></div>
+    </header>
+
+    <div class="content-body">
+      <div id="incidenciasLista"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="incidenciaOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Detalle de incidencia</div>
+      <button class="modal-close" onclick="document.getElementById('incidenciaOverlay').classList.remove('show')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6L6 18M6 6l18 18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="font-weight:800;" id="detCategoria"></div>
+      <div style="font-size:0.86rem; color:var(--tl-grey-600); margin-top:4px;" id="detDescripcion"></div>
+      <div class="field" style="margin-top:16px;">
+        <label>Resolución</label>
+        <textarea id="detResolucion" rows="3" placeholder="Explica brevemente la decisión"></textarea>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-primary" style="flex:1;" id="btnFavorComprador" onclick="tlResolverIncidenciaDemo('comprador')">Resolver a favor del comprador</button>
+        <button class="btn btn-outline" style="flex:1;" onclick="tlResolverIncidenciaDemo('vendedor')">Resolver a favor del vendedor</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="js/data.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script src="js/app.js"></script>
+<script>
+let tlIncidenciaAbiertaId = null;
+
+function tlIncidenciaCardHTML(i) {
+  const badge = i.estado === 'abierta' ? '<span class="badge badge-amber">Abierta</span>'
+    : i.estado === 'resuelta_comprador' ? '<span class="badge badge-green">Resuelta a favor del comprador</span>'
+    : '<span class="badge badge-dark">Resuelta a favor del vendedor</span>';
+
+  return `
+    <div class="panel" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <div>
+        <div style="font-weight:800;">${i.categoria}</div>
+        <div style="font-size:0.82rem; color:var(--tl-grey-600);">${i.reportadoPor} · ${i.fecha}${i.pedidoId ? ' · ' + i.pedidoId : ''}</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        ${badge}
+        ${i.estado === 'abierta' ? `<button class="btn btn-outline btn-sm" onclick="tlAbrirIncidenciaDemo('${i.id}')">Revisar</button>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function tlRenderIncidenciasDemo() {
+  document.getElementById('incidenciasLista').innerHTML = TL_INCIDENCIAS_SEED.length
+    ? TL_INCIDENCIAS_SEED.map(tlIncidenciaCardHTML).join('')
+    : `<div class="empty-state"><div class="empty-state-title">No hay incidencias</div></div>`;
+}
+
+function tlAbrirIncidenciaDemo(id) {
+  const inc = TL_INCIDENCIAS_SEED.find(i => i.id === id);
+  if (!inc) return;
+  tlIncidenciaAbiertaId = id;
+  document.getElementById('detCategoria').textContent = inc.categoria;
+  document.getElementById('detDescripcion').textContent = inc.descripcion;
+  document.getElementById('detResolucion').value = '';
+  document.getElementById('incidenciaOverlay').classList.add('show');
+}
+
+function tlResolverIncidenciaDemo(favorA) {
+  const inc = TL_INCIDENCIAS_SEED.find(i => i.id === tlIncidenciaAbiertaId);
+  if (!inc) return;
+  inc.estado = favorA === 'comprador' ? 'resuelta_comprador' : 'resuelta_vendedor';
+
+  if (inc.pedidoId) {
+    const orden = TL_STATE.ordenes.find(o => o.id === inc.pedidoId);
+    if (orden) orden.estado = favorA === 'comprador' ? 'REEMBOLSADO' : 'ENTREGADO';
+  }
+
+  tlAgregarNotificacion('comprador', 'Incidencia resuelta', `Tu reporte "${inc.categoria}" fue resuelto a favor del ${favorA}.`);
+  tlAgregarNotificacion('vendedor', 'Incidencia resuelta', `La incidencia "${inc.categoria}" fue resuelta a favor del ${favorA}.`);
+
+  document.getElementById('incidenciaOverlay').classList.remove('show');
+  tlShowToast('Incidencia resuelta', 'success');
+  tlRenderIncidenciasDemo();
+}
+
+document.addEventListener('DOMContentLoaded', tlRenderIncidenciasDemo);
+</script>
+</body>
+</html>

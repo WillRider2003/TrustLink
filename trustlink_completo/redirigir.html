@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrustLink — Ingresando...</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+</head>
+<body style="display:flex; align-items:center; justify-content:center; min-height:100vh; background:var(--tl-bg-dark); color:white;">
+<div style="text-align:center;">
+  <div class="spinner"></div>
+  <div style="margin-top:16px; font-size:0.9rem; color:rgba(255,255,255,0.7);">Ingresando a TrustLink...</div>
+</div>
+<style>
+.spinner { width:36px; height:36px; border:3px solid rgba(255,255,255,0.15); border-top-color: var(--tl-accent); border-radius:50%; margin:0 auto; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script>
+(async () => {
+  const perfil = await tlGetMiPerfil();
+  if (!perfil) { window.location.href = 'login.html'; return; }
+
+  const destino = { comprador: 'marketplace.html', vendedor: 'dashboard-vendedor.html', superadmin: 'admin.html' }[perfil.rol];
+  window.location.href = destino || 'marketplace.html';
+})();
+</script>
+</body>
+</html>

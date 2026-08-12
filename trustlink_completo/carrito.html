@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carrito — TrustLink</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="carrito" data-active-link="carrito.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Tu carrito</div>
+          <div class="topbar-subtitle">Revisa tus productos antes de comprar (cada compra genera un pedido con escrow individual)</div>
+        </div>
+      </div>
+      <div id="topbarNotifMount" style="position:relative;"></div>
+    </header>
+
+    <div class="content-body">
+      <div id="carritoEmpty" style="display:none;" class="empty-state">
+        <div class="empty-state-title">Tu carrito está vacío</div>
+        <div class="empty-state-desc">Explora el <a href="marketplace.html" style="color:var(--tl-accent); font-weight:700;">marketplace</a> para agregar productos.</div>
+      </div>
+      <div id="carritoLista"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app-real.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script>
+async function tlCargarCarrito() {
+  const items = await tlListarCarrito();
+  const lista = document.getElementById('carritoLista');
+  const empty = document.getElementById('carritoEmpty');
+
+  if (!items.length) {
+    lista.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  lista.innerHTML = items.map(item => `
+    <div class="panel" style="display:flex; align-items:center; gap:16px;">
+      <img src="${item.productos.imagen_url || 'https://placehold.co/80x80/2563eb/FFFFFF'}" style="width:64px; height:64px; border-radius:10px; object-fit:cover;">
+      <div style="flex:1;">
+        <div style="font-weight:800;">${item.productos.nombre}</div>
+        <div style="font-size:0.84rem; color:var(--tl-grey-600);">S/ ${Number(item.productos.precio).toFixed(2)} · cantidad: ${item.cantidad}</div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="tlComprarDesdeCarrito(${item.producto_id}, ${item.id})">Comprar ahora</button>
+      <button class="btn btn-outline btn-sm" onclick="tlQuitarItem(${item.id})">Quitar</button>
+    </div>
+  `).join('');
+}
+
+async function tlComprarDesdeCarrito(productoId, itemId) {
+  try {
+    const pedidoId = await tlCrearPedido(productoId, 1);
+    tlShowToastReal('Pedido #' + pedidoId + ' creado. Revisa tus notificaciones para el código.', 'success');
+    await tlCargarCarrito();
+    await tlRenderNotifBell();
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo completar la compra');
+  }
+}
+
+async function tlQuitarItem(itemId) {
+  await tlQuitarDelCarrito(itemId);
+  await tlCargarCarrito();
+}
+
+(async () => {
+  const ctx = await tlInitLayout('carrito.html');
+  if (!ctx) return;
+  await tlCargarCarrito();
+})();
+</script>
+</body>
+</html>

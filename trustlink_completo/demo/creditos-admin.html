@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Créditos pendientes — TrustLink (Demo)</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="creditos-admin" data-active-link="creditos-admin.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Créditos pendientes</div>
+          <div class="topbar-subtitle">Aprueba o rechaza solicitudes de préstamo — interés del 12% mensual</div>
+        </div>
+      </div>
+      <div id="topbarNotifMount" style="position:relative;"></div>
+    </header>
+
+    <div class="content-body">
+      <div class="section-heading">Pendientes de revisión</div>
+      <div id="creditosPendientesLista"></div>
+
+      <div class="section-heading" style="margin-top:24px;">Historial</div>
+      <div id="creditosHistorialLista"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="js/data.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script src="js/app.js"></script>
+<script>
+function tlRenderCreditosDemo() {
+  const pendientes = TL_CREDITOS_SEED.filter(c => c.estado === 'pendiente');
+  const historial = TL_CREDITOS_SEED.filter(c => c.estado !== 'pendiente');
+
+  document.getElementById('creditosPendientesLista').innerHTML = pendientes.length
+    ? pendientes.map(c => `
+      <div class="panel" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <div style="font-weight:800;">${c.solicitante}</div>
+          <div style="font-size:0.84rem; color:var(--tl-grey-600);">Solicita S/ ${c.monto.toFixed(2)} · devolvería S/ ${c.montoAPagar.toFixed(2)} (12% interés mensual) · ${c.fecha}</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-primary btn-sm" onclick="tlDecidirCreditoDemo('${c.id}', true)">Aprobar</button>
+          <button class="btn btn-outline btn-sm" onclick="tlDecidirCreditoDemo('${c.id}', false)">Rechazar</button>
+        </div>
+      </div>
+    `).join('')
+    : `<div class="empty-state"><div class="empty-state-title">No hay créditos pendientes</div></div>`;
+
+  document.getElementById('creditosHistorialLista').innerHTML = historial.length
+    ? historial.map(c => `
+      <div class="panel" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <div style="font-weight:800;">${c.solicitante}</div>
+          <div style="font-size:0.84rem; color:var(--tl-grey-600);">S/ ${c.monto.toFixed(2)} · ${c.fecha}</div>
+        </div>
+        <span class="badge ${c.estado === 'aprobado' ? (c.pagado ? 'badge-green' : 'badge-amber') : 'badge-dark'}">
+          ${c.estado === 'rechazado' ? 'Rechazado' : c.pagado ? 'Pagado' : 'Aprobado — pendiente de pago'}
+        </span>
+      </div>
+    `).join('')
+    : `<div class="empty-state"><div class="empty-state-title">Sin historial todavía</div></div>`;
+}
+
+function tlDecidirCreditoDemo(id, aprobar) {
+  const cred = TL_CREDITOS_SEED.find(c => c.id === id);
+  if (!cred) return;
+  cred.estado = aprobar ? 'aprobado' : 'rechazado';
+  cred.pagado = false;
+
+  tlAgregarNotificacion('vendedor', aprobar ? 'Crédito aprobado' : 'Crédito rechazado',
+    aprobar ? `Se aprobó tu crédito de S/ ${cred.monto.toFixed(2)}. Deberás pagar S/ ${cred.montoAPagar.toFixed(2)}.` : 'Tu solicitud de crédito no fue aprobada esta vez.');
+
+  tlShowToast(aprobar ? 'Crédito aprobado' : 'Crédito rechazado', aprobar ? 'success' : 'default');
+  tlRenderCreditosDemo();
+}
+
+document.addEventListener('DOMContentLoaded', tlRenderCreditosDemo);
+</script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reportar incidencia — TrustLink</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="reportar-incidencia" data-active-link="reportar-incidencia.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Reportar una incidencia</div>
+          <div class="topbar-subtitle">TrustLink es segura para comprador y vendedor — cuéntanos qué pasó</div>
+        </div>
+      </div>
+      <div id="topbarNotifMount" style="position:relative;"></div>
+    </header>
+
+    <div class="content-body">
+      <div class="panel">
+        <form id="incidenciaForm">
+          <div class="field" id="pedidoFieldWrap">
+            <label>Pedido relacionado (opcional)</label>
+            <select id="incPedido">
+              <option value="">No es sobre un pedido específico</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Categoría</label>
+            <select id="incCategoria" required>
+              <option value="" disabled selected>Selecciona una categoría</option>
+              <option value="producto_dañado">El producto llegó dañado</option>
+              <option value="no_llego">El pedido nunca llegó</option>
+              <option value="no_es_lo_pedido">No es lo que pedí</option>
+              <option value="comprador_no_confirma">El comprador no confirma la entrega</option>
+              <option value="pago_no_liberado">El pago no se liberó correctamente</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Cuéntanos qué pasó</label>
+            <textarea id="incDescripcion" rows="4" required placeholder="Describe la situación con el mayor detalle posible..."></textarea>
+          </div>
+          <div class="field">
+            <label>Fotos de evidencia (opcional, hasta 4)</label>
+            <div class="dropzone" id="dropzone" onclick="document.getElementById('incArchivos').click()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+              <div class="dropzone-text">Haz clic para subir fotos</div>
+              <div class="dropzone-sub">JPG o PNG, máx. 50MB cada una</div>
+            </div>
+            <input type="file" id="incArchivos" accept="image/*" multiple style="display:none;">
+            <div id="incPreview" style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;"></div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Enviar reporte al superadmin</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app-real.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script>
+let tlArchivosSeleccionados = [];
+
+const TL_MAX_EVIDENCIA_BYTES = 50 * 1024 * 1024; // 50MB
+
+document.getElementById('incArchivos').addEventListener('change', (e) => {
+  const candidatos = Array.from(e.target.files);
+  const rechazados = candidatos.filter(f => f.size > TL_MAX_EVIDENCIA_BYTES);
+  const validos = candidatos.filter(f => f.size <= TL_MAX_EVIDENCIA_BYTES);
+
+  if (rechazados.length) {
+    tlShowToastReal(`${rechazados.length === 1 ? 'Un archivo supera' : rechazados.length + ' archivos superan'} el máximo de 50MB y no se agregó.`);
+  }
+
+  const nuevos = validos.slice(0, 4 - tlArchivosSeleccionados.length);
+  tlArchivosSeleccionados = [...tlArchivosSeleccionados, ...nuevos].slice(0, 4);
+  tlRenderPreview();
+  e.target.value = ''; // permite volver a elegir el mismo archivo si lo quita y re-agrega
+});
+
+function tlRenderPreview() {
+  document.getElementById('incPreview').innerHTML = tlArchivosSeleccionados.map((f, i) => `
+    <div style="position:relative; width:64px; height:64px;">
+      <img src="${URL.createObjectURL(f)}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">
+      <button type="button" onclick="tlQuitarArchivo(${i})" style="position:absolute; top:-6px; right:-6px; width:20px; height:20px; border-radius:50%; background:#dc2626; color:white; font-size:0.7rem; display:flex; align-items:center; justify-content:center;">✕</button>
+    </div>
+  `).join('');
+}
+
+function tlQuitarArchivo(i) {
+  tlArchivosSeleccionados.splice(i, 1);
+  tlRenderPreview();
+}
+
+document.getElementById('incidenciaForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  try {
+    const pedidoId = document.getElementById('incPedido').value || null;
+    await tlReportarIncidencia({
+      pedidoId: pedidoId ? parseInt(pedidoId, 10) : null,
+      categoria: document.getElementById('incCategoria').value,
+      descripcion: document.getElementById('incDescripcion').value.trim(),
+      archivos: tlArchivosSeleccionados,
+    });
+    tlShowToastReal('Reporte enviado. El superadmin lo revisará pronto.', 'success');
+    setTimeout(() => window.location.href = 'mis-pedidos.html', 1500);
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo enviar el reporte');
+    btn.disabled = false;
+    btn.textContent = 'Enviar reporte al superadmin';
+  }
+});
+
+(async () => {
+  const ctx = await tlInitLayout('reportar-incidencia.html');
+  if (!ctx) return;
+
+  const pedidos = await tlListarMisPedidos(ctx.perfil.rol);
+  const select = document.getElementById('incPedido');
+  pedidos.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = `#${p.id} — ${p.productos.nombre} (S/ ${Number(p.monto_total).toFixed(2)})`;
+    select.appendChild(opt);
+  });
+
+  // Si llegó con ?pedido=123 en la URL, lo preselecciona
+  const params = new URLSearchParams(window.location.search);
+  const pedidoParam = params.get('pedido');
+  if (pedidoParam) select.value = pedidoParam;
+})();
+</script>
+</body>
+</html>

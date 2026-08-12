@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crédito progresivo — TrustLink</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="credito" data-active-link="credito.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Crédito progresivo</div>
+          <div class="topbar-subtitle">Pide un préstamo y págalo con interés — estilo Yape Créditos</div>
+        </div>
+      </div>
+      <div id="topbarNotifMount" style="position:relative;"></div>
+    </header>
+
+    <div class="content-body">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Tu score de reputación</div>
+            <div class="panel-subtitle">Calculado según tus ventas confirmadas y el monto total vendido</div>
+          </div>
+        </div>
+
+        <div class="score-ring-wrap">
+          <div class="score-ring">
+            <svg width="84" height="84" viewBox="0 0 84 84">
+              <circle cx="42" cy="42" r="36" fill="none" stroke="var(--tl-grey-200)" stroke-width="8"/>
+              <circle id="scoreRingCircle" cx="42" cy="42" r="36" fill="none" stroke="var(--tl-accent)" stroke-width="8"
+                stroke-dasharray="226" stroke-dashoffset="226" stroke-linecap="round"/>
+            </svg>
+            <div class="score-ring-value" id="scoreRingValue">0</div>
+          </div>
+          <div>
+            <div style="font-weight:800; font-size:1rem;" id="scoreNivelTexto">Nivel 1 de 4</div>
+            <div style="font-size:0.82rem; color:var(--tl-grey-600); margin-top:2px;" id="scoreVentasTexto">0 ventas exitosas · 0 compradores distintos</div>
+            <div style="font-size:0.78rem; color:var(--tl-grey-600); margin-top:6px;" id="scoreFaltaTexto"></div>
+          </div>
+        </div>
+
+        <div class="credit-tier-row" id="creditTiers"></div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-card-top"><div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg></div></div>
+          <div class="stat-card-value" id="statCreditoDisponible">S/ 0</div>
+          <div class="stat-card-label">Crédito disponible ahora</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top"><div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div></div>
+          <div class="stat-card-value" id="statScore">0</div>
+          <div class="stat-card-label">Score de reputación</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">¿Cómo se calcula tu crédito?</div>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:16px;">
+          <div>
+            <div style="font-weight:800; font-size:0.86rem; display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--tl-accent)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              1. Historial de ventas confirmadas
+            </div>
+            <div style="font-size:0.82rem; color:var(--tl-grey-600); line-height:1.5;">Cada venta que el comprador confirma suma puntos automáticamente, ponderados por el monto vendido — no depende de papeles ni referencias.</div>
+          </div>
+          <div>
+            <div style="font-weight:800; font-size:0.86rem; display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--tl-accent)"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/></svg>
+              2. Diversidad de compradores
+            </div>
+            <div style="font-size:0.82rem; color:var(--tl-grey-600); line-height:1.5;">Se evalúa cuántos compradores distintos te compraron, para reducir el riesgo de que dos cuentas cómplices inflen el historial artificialmente.</div>
+          </div>
+          <div>
+            <div style="font-weight:800; font-size:0.86rem; display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--tl-accent)"><path d="M12 5v14M5 12h14"/></svg>
+              3. Aumento progresivo
+            </div>
+            <div style="font-size:0.82rem; color:var(--tl-grey-600); line-height:1.5;">El crédito nunca se otorga de golpe: empieza en S/50 y sube por niveles, igual que un historial crediticio tradicional pero construido en semanas, no en años.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Solicitar un préstamo</div>
+            <div class="panel-subtitle">Interés del 12% mensual — se suma al monto que pediste</div>
+          </div>
+        </div>
+        <form id="solicitarCreditoForm">
+          <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+            <div class="field" style="flex:1; min-width:180px; margin-bottom:0;">
+              <label>Monto a solicitar (S/)</label>
+              <input type="number" id="montoCredito" min="10" step="10" value="100" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="padding:10px 20px;">Solicitar</button>
+          </div>
+          <div id="creditoPreview" style="margin:10px 0; font-size:0.82rem; color:var(--tl-grey-600);"></div>
+
+          <label style="display:flex; gap:10px; align-items:flex-start; margin-top:14px; padding:12px 14px; background:var(--tl-grey-100); border-radius:var(--tl-radius-sm); cursor:pointer;">
+            <input type="checkbox" id="aceptoTrato" style="margin-top:3px;" required>
+            <span style="font-size:0.8rem; color:var(--tl-text-dark);">
+              Acepto el trato digital: autorizo que mi historial de compras y ventas en TrustLink se use para evaluar este préstamo, me comprometo a pagar el monto solicitado más el 12% de interés mensual dentro de 30 días, y entiendo que puedo aplazar el pago 5 días una sola vez (con 5% de recargo). Si no pago tras el aplazamiento, autorizo que se reporte a la SBS.
+            </span>
+          </label>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Historial de créditos</div>
+            <div class="panel-subtitle">Solicitudes pendientes, aprobadas, y pagadas</div>
+          </div>
+        </div>
+        <div id="creditosLista"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app-real.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script>
+const CREDIT_TIERS = [
+  { label: 'Nivel 1', monto: 'S/ 50', minScore: 0 },
+  { label: 'Nivel 2', monto: 'S/ 100', minScore: 25 },
+  { label: 'Nivel 3', monto: 'S/ 250', minScore: 55 },
+  { label: 'Nivel 4', monto: 'S/ 500', minScore: 80 },
+];
+
+function tlRenderScoreCard(score, stats) {
+  const circunferencia = 226; // 2πr con r=36
+  const progreso = Math.max(0, Math.min(100, score));
+  const offset = circunferencia - (circunferencia * progreso / 100);
+  document.getElementById('scoreRingCircle').setAttribute('stroke-dashoffset', offset);
+  document.getElementById('scoreRingValue').textContent = score;
+
+  let currentIdx = 0;
+  for (let i = CREDIT_TIERS.length - 1; i >= 0; i--) {
+    if (score >= CREDIT_TIERS[i].minScore) { currentIdx = i; break; }
+  }
+
+  document.getElementById('scoreNivelTexto').textContent = `Nivel ${currentIdx + 1} de ${CREDIT_TIERS.length}`;
+  document.getElementById('scoreVentasTexto').textContent = `${stats.ventas} venta${stats.ventas === 1 ? '' : 's'} exitosa${stats.ventas === 1 ? '' : 's'} · ${stats.compradoresDistintos} comprador${stats.compradoresDistintos === 1 ? '' : 'es'} distinto${stats.compradoresDistintos === 1 ? '' : 's'}`;
+
+  const faltaTexto = document.getElementById('scoreFaltaTexto');
+  if (currentIdx < CREDIT_TIERS.length - 1) {
+    const siguiente = CREDIT_TIERS[currentIdx + 1];
+    faltaTexto.textContent = `Te faltan ${siguiente.minScore - score} puntos para desbloquear el ${siguiente.label} (${siguiente.monto})`;
+  } else {
+    faltaTexto.textContent = 'Alcanzaste el nivel máximo de crédito progresivo.';
+  }
+
+  document.getElementById('creditTiers').innerHTML = CREDIT_TIERS.map((t, i) => {
+    let cls = 'locked';
+    if (i < currentIdx) cls = 'unlocked';
+    else if (i === currentIdx) cls = 'current';
+    return `<div class="credit-tier ${cls}">${t.label}<span class="credit-tier-amount">${t.monto}</span></div>`;
+  }).join('');
+}
+
+const CREDITO_BADGE = { pendiente: 'badge-amber', aprobado: 'badge-green', rechazado: 'badge-dark' };
+
+function tlCreditoCardHTML(c) {
+  const label = c.estado === 'pendiente' ? 'Pendiente de revisión'
+    : c.estado === 'rechazado' ? 'Rechazado'
+    : c.reportado_sbs ? 'Reportado a la SBS'
+    : c.pagado ? 'Pagado' : 'Aprobado — pendiente de pago';
+
+  const vencido = c.estado === 'aprobado' && !c.pagado && !c.reportado_sbs && c.fecha_vencimiento && new Date(c.fecha_vencimiento) < new Date();
+  const puedeAplazar = c.estado === 'aprobado' && !c.pagado && !c.aplazado && !c.reportado_sbs;
+
+  return `
+    <div class="panel" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; ${vencido ? 'border-left:3px solid var(--tl-amber);' : ''}">
+      <div>
+        <div style="font-weight:800;">S/ ${Number(c.monto_solicitado).toFixed(2)} solicitados</div>
+        <div style="font-size:0.8rem; color:var(--tl-grey-600);">
+          A pagar con interés: S/ ${Number(c.monto_a_pagar).toFixed(2)} · ${new Date(c.creado_en).toLocaleDateString('es-PE')}
+          ${c.fecha_vencimiento && c.estado === 'aprobado' && !c.pagado ? `<br>Vence: ${new Date(c.fecha_vencimiento).toLocaleDateString('es-PE')}${c.aplazado ? ' (ya aplazado)' : ''}` : ''}
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <span class="badge ${c.reportado_sbs ? 'badge-amber' : CREDITO_BADGE[c.estado]}">${label}</span>
+        ${puedeAplazar ? `<button class="btn btn-outline btn-sm" onclick="tlAplazarCreditoUI(${c.id})">Aplazar 5 días</button>` : ''}
+        ${c.estado === 'aprobado' && !c.pagado && !c.reportado_sbs ? `<button class="btn btn-primary btn-sm" onclick="tlPagarCreditoUI(${c.id})">Pagar ahora</button>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+async function tlCargarCreditos() {
+  const creditos = await tlListarMisCreditos();
+  document.getElementById('creditosLista').innerHTML = creditos.length
+    ? creditos.map(tlCreditoCardHTML).join('')
+    : `<div class="empty-state"><div class="empty-state-title">Sin solicitudes todavía</div></div>`;
+}
+
+/** Vuelve a pintar el saldo del sidebar/header con el perfil fresco de la BD. */
+async function tlRefrescarSaldoSidebar() {
+  try {
+    const perfil = await tlGetMiPerfil();
+    if (perfil) tlRenderSidebarReal(perfil, 'credito.html');
+  } catch (e) { console.error('refrescar saldo:', e); }
+}
+
+async function tlPagarCreditoUI(id) {
+  try {
+    await tlPagarCredito(id);
+    tlShowToastReal('Crédito pagado: el monto se descontó de tu saldo. Tu reputación mejoró.', 'success');
+    await tlCargarCreditos();
+    await tlRefrescarSaldoSidebar();
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo procesar el pago');
+  }
+}
+
+async function tlAplazarCreditoUI(id) {
+  if (!await tlConfirm('¿Aplazar el pago 5 días? Se aplicará un recargo del 5% sobre el saldo pendiente.', { titulo: 'Aplazar pago', textoAceptar: 'Sí, aplazar' })) return;
+  try {
+    await tlAplazarCredito(id);
+    tlShowToastReal('Pago aplazado 5 días', 'success');
+    await tlCargarCreditos();
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo aplazar');
+  }
+}
+
+function tlActualizarPreviewCredito() {
+  const monto = parseFloat(document.getElementById('montoCredito').value) || 0;
+  document.getElementById('creditoPreview').textContent = monto > 0
+    ? `Si te lo aprueban, deberás pagar S/ ${(monto * 1.12).toFixed(2)} en total (incluye 12% de interés mensual). Tienes 30 días para pagar.`
+    : '';
+}
+document.getElementById('montoCredito').addEventListener('input', tlActualizarPreviewCredito);
+
+document.getElementById('solicitarCreditoForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const monto = parseFloat(document.getElementById('montoCredito').value);
+  const acepto = document.getElementById('aceptoTrato').checked;
+  if (!acepto) { tlShowToastReal('Debes aceptar el trato digital para solicitar el préstamo'); return; }
+  try {
+    await tlSolicitarCredito(monto, acepto);
+    tlShowToastReal('Solicitud enviada. El superadmin la revisará pronto.', 'success');
+    document.getElementById('aceptoTrato').checked = false;
+    await tlCargarCreditos();
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo enviar la solicitud');
+  }
+});
+
+(async () => {
+  const ctx = await tlInitLayout('credito.html', 'vendedor');
+  if (!ctx) return;
+  document.getElementById('statCreditoDisponible').textContent = 'S/ ' + Number(ctx.perfil.credito_disponible).toFixed(2);
+  document.getElementById('statScore').textContent = ctx.perfil.score_reputacion;
+
+  const stats = await tlGetEstadisticasVendedor(ctx.perfil.id);
+  tlRenderScoreCard(ctx.perfil.score_reputacion, stats);
+
+  tlActualizarPreviewCredito();
+  await tlCargarCreditos();
+})();
+</script>
+</body>
+</html>

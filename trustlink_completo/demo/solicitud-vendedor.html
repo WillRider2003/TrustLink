@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ser vendedor — TrustLink</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="solicitud-vendedor" data-active-link="solicitud-vendedor.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Conviértete en vendedor</div>
+          <div class="topbar-subtitle">Completa tus datos para que el equipo de TrustLink revise tu solicitud</div>
+        </div>
+      </div>
+      <div id="topbarNotifMount" style="position:relative;"></div>
+    </header>
+
+    <div class="content-body">
+
+      <!-- Estado de una solicitud ya enviada -->
+      <div class="panel" id="estadoSolicitudPanel" style="display:none;">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Tu solicitud</div>
+            <div class="panel-subtitle">Así va el estado de tu solicitud para vender en TrustLink</div>
+          </div>
+        </div>
+        <div id="estadoSolicitudBody"></div>
+      </div>
+
+      <!-- Formulario -->
+      <div class="panel" id="formSolicitudPanel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Datos para vender en TrustLink</div>
+            <div class="panel-subtitle">Esta información la revisa el superadmin antes de habilitar tu cuenta como vendedor</div>
+          </div>
+        </div>
+
+        <form id="solicitudVendedorForm">
+          <div class="field">
+            <label>Nombre completo</label>
+            <input type="text" id="solNombre" placeholder="Ej. María Quispe Torres" required>
+          </div>
+          <div class="field">
+            <label>DNI</label>
+            <input type="text" id="solDni" placeholder="Ej. 71234567" maxlength="8" required>
+          </div>
+          <div class="field">
+            <label>Teléfono / WhatsApp</label>
+            <input type="tel" id="solTelefono" placeholder="Ej. 987 654 321" required>
+          </div>
+          <div class="field">
+            <label>¿Qué tipo de productos vendes?</label>
+            <select id="solRubro" required>
+              <option value="" disabled selected>Selecciona una categoría</option>
+              <option value="Herramientas y ferretería">Herramientas y ferretería</option>
+              <option value="Ropa y accesorios">Ropa y accesorios</option>
+              <option value="Electrónica">Electrónica</option>
+              <option value="Seguridad industrial">Seguridad industrial</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Cuéntanos sobre tu negocio</label>
+            <textarea id="solDescripcion" rows="3" placeholder="Ej. Vendo herramientas usadas y nuevas hace 3 años en el mercado de Comas..."></textarea>
+          </div>
+          <div class="modal-body-note" style="margin-bottom:16px;">
+            Al enviar, aceptas que estos datos se usen únicamente para verificar tu solicitud como vendedor en la plataforma.
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>
+            Enviar solicitud
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="js/data.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script src="js/app.js"></script>
+<script>
+function tlMiSolicitud() {
+  // En esta demo, "mi" solicitud es simplemente la más reciente
+  // guardada — no hay login real que la vincule a un usuario.
+  const lista = tlGetSolicitudes();
+  return lista[0] || null;
+}
+
+function tlRenderEstadoSolicitud() {
+  const solicitud = tlMiSolicitud();
+  const estadoPanel = document.getElementById('estadoSolicitudPanel');
+  const formPanel = document.getElementById('formSolicitudPanel');
+  const body = document.getElementById('estadoSolicitudBody');
+
+  if (!solicitud) {
+    estadoPanel.style.display = 'none';
+    formPanel.style.display = 'block';
+    return;
+  }
+
+  const cfg = {
+    pendiente: { badge: 'badge-amber', label: 'Pendiente de revisión', desc: 'El superadmin todavía no revisa tu solicitud. Vuelve a esta página más tarde.' },
+    aceptada: { badge: 'badge-green', label: 'Aceptada', desc: 'Tu solicitud fue aprobada. Sal de esta sesión demo y vuelve a entrar eligiendo el rol "Vendedor" para publicar productos.' },
+    rechazada: { badge: 'badge-dark', label: 'Rechazada', desc: 'Tu solicitud no fue aprobada esta vez. Puedes enviar una nueva con información más detallada.' },
+  }[solicitud.estado];
+
+  estadoPanel.style.display = 'block';
+  body.innerHTML = `
+    <div style="border:1.5px solid var(--tl-grey-200); border-radius:var(--tl-radius-md); padding:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:10px;">
+        <div>
+          <div style="font-weight:800; font-size:0.9rem;">${solicitud.nombre} · ${solicitud.rubro}</div>
+          <div style="font-size:0.8rem; color:var(--tl-grey-600); margin-top:2px;">DNI ${solicitud.dni} · Enviada el ${solicitud.fecha}</div>
+        </div>
+        <span class="badge ${cfg.badge}">${cfg.label}</span>
+      </div>
+      <div style="font-size:0.82rem; color:var(--tl-grey-600); margin-top:12px; line-height:1.5;">${cfg.desc}</div>
+    </div>
+  `;
+
+  // Si ya está resuelta (aceptada o rechazada), permite volver a postular.
+  formPanel.style.display = solicitud.estado === 'pendiente' ? 'none' : 'block';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  tlRenderEstadoSolicitud();
+
+  document.getElementById('solicitudVendedorForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const nombre = document.getElementById('solNombre').value.trim();
+    const dni = document.getElementById('solDni').value.trim();
+    const telefono = document.getElementById('solTelefono').value.trim();
+    const rubro = document.getElementById('solRubro').value;
+    const descripcion = document.getElementById('solDescripcion').value.trim();
+
+    if (!nombre || !dni || !telefono || !rubro) {
+      tlShowToast('Completa todos los campos obligatorios');
+      return;
+    }
+    if (!/^\d{8}$/.test(dni)) {
+      tlShowToast('El DNI debe tener 8 dígitos');
+      return;
+    }
+
+    tlCrearSolicitudVendedor({ nombre, dni, telefono, rubro, descripcion });
+    tlShowToast('Solicitud enviada. El superadmin la revisará pronto.', 'success');
+    e.target.reset();
+    tlRenderEstadoSolicitud();
+  });
+});
+</script>
+</body>
+</html>

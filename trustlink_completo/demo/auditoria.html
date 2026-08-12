@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditoría — TrustLink (Demo)</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="auditoria" data-active-link="auditoria.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Auditoría del sistema</div>
+          <div class="topbar-subtitle">Registro de todas las acciones sensibles de la plataforma</div>
+        </div>
+      </div>
+      <div id="topbarNotifMount" style="position:relative;"></div>
+    </header>
+
+    <div class="content-body">
+      <div class="panel" style="padding:0; overflow:hidden;">
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr style="background:var(--tl-grey-100); text-align:left;">
+              <th style="padding:14px 18px; font-size:0.74rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--tl-grey-600);">Fecha</th>
+              <th style="padding:14px 18px; font-size:0.74rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--tl-grey-600);">Acción</th>
+              <th style="padding:14px 18px; font-size:0.74rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--tl-grey-600);">Actor</th>
+              <th style="padding:14px 18px; font-size:0.74rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--tl-grey-600);">Entidad</th>
+              <th style="padding:14px 18px; font-size:0.74rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--tl-grey-600);">Detalle</th>
+            </tr>
+          </thead>
+          <tbody id="auditoriaBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="js/data.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script src="js/app.js"></script>
+<script>
+const ACCION_BADGE = {
+  LOGIN: 'badge-dark', LOGOUT: 'badge-dark',
+  PEDIDO_CREADO: 'badge-green', PEDIDO_CONFIRMADO: 'badge-green',
+  ROL_CAMBIADO: 'badge-amber', SOLICITUD_VENDEDOR_CREADA: 'badge-dark',
+  INCIDENCIA_REPORTADA: 'badge-amber', CREDITO_SOLICITADO: 'badge-dark',
+  CREDITO_APROBADO: 'badge-green', USUARIO_BANEADO: 'badge-amber',
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('auditoriaBody').innerHTML = TL_AUDITORIA_SEED.map(a => `
+    <tr style="border-top:1px solid var(--tl-grey-200);">
+      <td style="padding:14px 18px; font-size:0.82rem; color:var(--tl-grey-600); white-space:nowrap;">${new Date(a.fecha).toLocaleString('es-PE')}</td>
+      <td style="padding:14px 18px;"><span class="badge ${ACCION_BADGE[a.accion] || 'badge-dark'}">${a.accion}</span></td>
+      <td style="padding:14px 18px; font-weight:700; font-size:0.86rem;">${a.actor}</td>
+      <td style="padding:14px 18px; font-size:0.82rem; color:var(--tl-grey-600);">${a.entidad}</td>
+      <td style="padding:14px 18px; font-size:0.78rem; color:var(--tl-grey-600); font-family:'SF Mono',monospace;">${a.detalle}</td>
+    </tr>
+  `).join('');
+});
+</script>
+</body>
+</html>

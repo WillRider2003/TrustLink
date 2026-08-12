@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reportar incidencia — TrustLink (Demo)</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="reportar-incidencia" data-active-link="reportar-incidencia.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Reportar incidencia</div>
+          <div class="topbar-subtitle">Cuéntanos qué pasó y un superadmin lo revisará</div>
+        </div>
+      </div>
+      <div id="topbarNotifMount" style="position:relative;"></div>
+    </header>
+
+    <div class="content-body" style="max-width:640px;">
+      <div class="panel">
+        <form id="incidenciaForm">
+          <div class="field">
+            <label>Pedido relacionado (opcional)</label>
+            <select id="incPedido">
+              <option value="">No está relacionado a un pedido específico</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Categoría</label>
+            <select id="incCategoria">
+              <option>Producto dañado</option>
+              <option>Demora en la entrega</option>
+              <option>Vendedor no responde</option>
+              <option>Comprador no confirma</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Descripción</label>
+            <textarea id="incDescripcion" rows="4" required placeholder="Describe qué pasó con el mayor detalle posible"></textarea>
+          </div>
+          <div class="field">
+            <label>Evidencia (opcional)</label>
+            <div class="dropzone" id="incDropzone" onclick="document.getElementById('incArchivos').click()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+              <div class="dropzone-text">Haz clic para adjuntar imágenes o documentos</div>
+              <div class="dropzone-sub">JPG, PNG, PDF, Word o Excel · máx. 20MB cada uno (simulado)</div>
+            </div>
+            <input type="file" id="incArchivos" accept="image/jpeg,image/png,image/webp,.pdf,.doc,.docx,.xls,.xlsx" multiple style="display:none;">
+            <div id="incArchivosLista" style="margin-top:8px; font-size:0.8rem; color:var(--tl-grey-600);"></div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Enviar reporte</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="js/data.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script src="js/app.js"></script>
+<script>
+let tlIncArchivosSeleccionados = [];
+
+document.getElementById('incArchivos').addEventListener('change', (e) => {
+  const MAX_BYTES = 20 * 1024 * 1024;
+  const candidatos = Array.from(e.target.files);
+  const rechazados = candidatos.filter(f => f.size > MAX_BYTES);
+  const validos = candidatos.filter(f => f.size <= MAX_BYTES);
+
+  if (rechazados.length) {
+    tlShowToast(`${rechazados.length === 1 ? 'Un archivo supera' : rechazados.length + ' archivos superan'} el máximo de 20MB y no se agregó.`);
+  }
+
+  tlIncArchivosSeleccionados = [...tlIncArchivosSeleccionados, ...validos].slice(0, 4);
+  document.getElementById('incArchivosLista').textContent = tlIncArchivosSeleccionados.length
+    ? tlIncArchivosSeleccionados.map(f => f.name).join(', ')
+    : '';
+  e.target.value = '';
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const select = document.getElementById('incPedido');
+  TL_STATE.ordenes.forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o.id;
+    opt.textContent = `${o.producto} (${o.id})`;
+    select.appendChild(opt);
+  });
+
+  const prefill = sessionStorage.getItem('tl_incidencia_pedido_prefill');
+  if (prefill) {
+    select.value = prefill;
+    sessionStorage.removeItem('tl_incidencia_pedido_prefill');
+  }
+});
+
+document.getElementById('incidenciaForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const rol = sessionStorage.getItem('tl_rol');
+  const pedidoId = document.getElementById('incPedido').value;
+  const categoria = document.getElementById('incCategoria').value;
+  const descripcion = document.getElementById('incDescripcion').value.trim();
+
+  if (!descripcion) { tlShowToast('Describe qué pasó antes de enviar'); return; }
+
+  tlAgregarNotificacion('superadmin', 'Nueva incidencia reportada', `${TL_USERS[rol].nombre} reportó "${categoria}"${pedidoId ? ' sobre el pedido ' + pedidoId : ''}.`);
+  tlShowToast('Incidencia reportada. El equipo de TrustLink la revisará pronto.', 'success');
+
+  if (pedidoId) {
+    const orden = TL_STATE.ordenes.find(o => o.id === pedidoId);
+    if (orden) orden.estado = 'EN_DISPUTA';
+  }
+
+  e.target.reset();
+  tlIncArchivosSeleccionados = [];
+  document.getElementById('incArchivosLista').textContent = '';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel admin — TrustLink</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="admin" data-active-link="admin.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Panel de administración</div>
+          <div class="topbar-subtitle">Moderación de usuarios y resolución de disputas</div>
+        </div>
+      </div>
+      <div id="topbarNotifMount" style="position:relative;"></div>
+    </header>
+
+    <div class="content-body">
+      <div class="stat-grid">
+        <div class="stat-card with-icon">
+          <div class="stat-card-icon tint-violet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <div class="stat-card-body"><div class="stat-card-value">247</div>
+          <div class="stat-card-label">Usuarios registrados</div></div>
+        </div>
+        <div class="stat-card with-icon">
+          <div class="stat-card-icon tint-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/></svg></div>
+          <div class="stat-card-body"><div class="stat-card-value">156</div>
+          <div class="stat-card-label">Órdenes completadas</div></div>
+        </div>
+        <div class="stat-card with-icon">
+          <div class="stat-card-icon tint-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div>
+          <div class="stat-card-body"><div class="stat-card-value">1</div>
+          <div class="stat-card-label">Disputas activas</div></div>
+        </div>
+        <div class="stat-card with-icon">
+          <div class="stat-card-icon tint-sky"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2"/></svg></div>
+          <div class="stat-card-body"><div class="stat-card-value">S/ 8,420</div>
+          <div class="stat-card-label">Volumen total en escrow</div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Disputa activa</div>
+            <div class="panel-subtitle">Resolución vía resolverDisputa() — decide liberar el pago o devolverlo</div>
+          </div>
+        </div>
+
+        <div style="border:1.5px solid var(--tl-grey-200); border-radius:var(--tl-radius-md); padding:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:10px;">
+            <div>
+              <div style="font-weight:800; font-size:0.9rem;">Orden ord-1003 · Casco de seguridad industrial</div>
+              <div style="font-size:0.8rem; color:var(--tl-grey-600); margin-top:2px;">Comprador: Ana R. · Vendedor: Vendedor Demo · Monto: S/ 32.00</div>
+              <div style="font-size:0.78rem; color:var(--tl-grey-600); margin-top:6px;">Motivo del reclamo: "El producto llegó con el ajuste de rueda dañado."</div>
+            </div>
+            <span class="badge badge-amber">En disputa</span>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:14px;">
+            <button class="btn btn-primary btn-sm" onclick="tlResolverDisputa('vendedor')">Liberar al vendedor</button>
+            <button class="btn btn-outline btn-sm" onclick="tlResolverDisputa('comprador')">Devolver al comprador</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Usuarios</div>
+            <div class="panel-subtitle">Vendedores con mayor reputación en la plataforma</div>
+          </div>
+        </div>
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr style="text-align:left;">
+              <th style="padding:10px 4px; font-size:0.74rem; text-transform:uppercase; color:var(--tl-grey-600);">Usuario</th>
+              <th style="padding:10px 4px; font-size:0.74rem; text-transform:uppercase; color:var(--tl-grey-600);">Score</th>
+              <th style="padding:10px 4px; font-size:0.74rem; text-transform:uppercase; color:var(--tl-grey-600);">Ventas</th>
+              <th style="padding:10px 4px; font-size:0.74rem; text-transform:uppercase; color:var(--tl-grey-600);">Estado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-top:1px solid var(--tl-grey-200);">
+              <td style="padding:12px 4px; font-weight:700; font-size:0.86rem;">Vendedor Demo</td>
+              <td style="padding:12px 4px;">742</td>
+              <td style="padding:12px 4px;">18</td>
+              <td style="padding:12px 4px;"><span class="badge badge-green">Activo</span></td>
+              <td style="padding:12px 4px; text-align:right;"><button class="btn btn-outline btn-sm" onclick="tlBanearUsuarioDemo('Vendedor Demo')">Banear</button></td>
+            </tr>
+            <tr style="border-top:1px solid var(--tl-grey-200);">
+              <td style="padding:12px 4px; font-weight:700; font-size:0.86rem;">Comprador Demo</td>
+              <td style="padding:12px 4px;">—</td>
+              <td style="padding:12px 4px;">—</td>
+              <td style="padding:12px 4px;"><span class="badge badge-green">Activo</span></td>
+              <td style="padding:12px 4px; text-align:right;"><button class="btn btn-outline btn-sm" onclick="tlBanearUsuarioDemo('Comprador Demo')">Banear</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px;">
+        <div class="panel" style="margin-bottom:0;">
+          <div class="panel-header">
+            <div class="panel-title" style="display:flex; align-items:center; gap:8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--tl-accent)"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+              Distribución de roles
+            </div>
+          </div>
+          <div class="kv-row"><span class="kv-row-label">Compradores</span><span class="kv-row-value">183</span></div>
+          <div class="kv-row"><span class="kv-row-label">Vendedores</span><span class="kv-row-value">62</span></div>
+          <div class="kv-row"><span class="kv-row-label">Superadmin</span><span class="kv-row-value">2</span></div>
+        </div>
+        <div class="panel" style="margin-bottom:0;">
+          <div class="panel-header">
+            <div class="panel-title" style="display:flex; align-items:center; gap:8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--tl-accent)"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              Actividad reciente
+            </div>
+          </div>
+          <div class="kv-row"><span class="kv-row-label">Última acción</span><span class="kv-row-value" style="font-family:monospace; font-size:0.78rem;">PEDIDO_CONFIRMADO</span></div>
+          <div class="kv-row"><span class="kv-row-label">Acciones hoy</span><span class="kv-row-value">37</span></div>
+          <div class="kv-row"><span class="kv-row-label">Usuarios activos hoy</span><span class="kv-row-value">24</span></div>
+          <div class="kv-row"><span class="kv-row-label">Último login</span><span class="kv-row-value">Hoy, 09:12</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="js/data.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script src="js/app.js"></script>
+<script>
+function tlResolverDisputa(destino) {
+  tlShowToast(destino === 'vendedor' ? 'resolverDisputa(): pago liberado al vendedor' : 'resolverDisputa(): pago devuelto al comprador', 'success');
+}
+
+function tlBanearUsuarioDemo(nombre) {
+  const rolDestino = nombre.toLowerCase().includes('vendedor') ? 'vendedor' : 'comprador';
+  tlAgregarNotificacion(rolDestino, 'Cuenta suspendida', 'Tu cuenta fue suspendida por el equipo de TrustLink (simulado).');
+  tlShowToast(`${nombre} fue suspendido (simulado)`, 'success');
+}
+</script>
+</body>
+</html>

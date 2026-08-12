@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solicitudes de vendedor — TrustLink</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="solicitudes" data-active-link="solicitudes.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Solicitudes para ser vendedor</div>
+          <div class="topbar-subtitle">Revisa y aprueba las solicitudes de los compradores</div>
+        </div>
+      </div>
+      <div id="topbarNotifMount" style="position:relative;"></div>
+    </header>
+
+    <div class="content-body">
+      <div class="panel">
+        <div class="panel-header"><div><div class="panel-title">Pendientes</div></div></div>
+        <div id="listaPendientes"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div><div class="panel-title">Historial</div></div></div>
+        <div id="listaResueltas"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app-real.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script>
+function tlSolicitudCardHTML(s, editable) {
+  const badgeCfg = { pendiente: { cls: 'badge-amber', label: 'Pendiente' }, aceptada: { cls: 'badge-green', label: 'Aceptada' }, rechazada: { cls: 'badge-dark', label: 'Rechazada' } }[s.estado];
+  return `
+    <div style="border:1.5px solid var(--tl-grey-200); border-radius:var(--tl-radius-md); padding:16px; margin-bottom:12px;">
+      <div style="display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:10px;">
+        <div>
+          <div style="font-weight:800;">${s.perfiles.nombre}</div>
+          <div style="font-size:0.8rem; color:var(--tl-grey-600);">DNI ${s.dni} · ${s.perfiles.telefono || 'sin teléfono'} · ${s.rubro}</div>
+          <div style="font-size:0.78rem; color:var(--tl-grey-600); margin-top:6px;">${s.descripcion || 'Sin descripción adicional.'}</div>
+        </div>
+        <span class="badge ${badgeCfg.cls}">${badgeCfg.label}</span>
+      </div>
+      ${editable ? `
+      <div style="display:flex; gap:10px; margin-top:14px;">
+        <button class="btn btn-primary btn-sm" onclick="tlDecidirSolicitudUI(${s.id}, true)">Aceptar</button>
+        <button class="btn btn-outline btn-sm" onclick="tlDecidirSolicitudUI(${s.id}, false)">Rechazar</button>
+      </div>` : ''}
+    </div>
+  `;
+}
+
+async function tlRenderSolicitudes() {
+  const lista = await tlListarSolicitudesVendedor();
+  const pendientes = lista.filter(s => s.estado === 'pendiente');
+  const resueltas = lista.filter(s => s.estado !== 'pendiente');
+
+  document.getElementById('listaPendientes').innerHTML = pendientes.length
+    ? pendientes.map(s => tlSolicitudCardHTML(s, true)).join('')
+    : `<div class="empty-state"><div class="empty-state-title">No hay solicitudes pendientes</div></div>`;
+
+  document.getElementById('listaResueltas').innerHTML = resueltas.length
+    ? resueltas.map(s => tlSolicitudCardHTML(s, false)).join('')
+    : `<div class="empty-state"><div class="empty-state-title">Sin historial todavía</div></div>`;
+}
+
+async function tlDecidirSolicitudUI(id, aceptar) {
+  try {
+    await tlDecidirSolicitudVendedor(id, aceptar);
+    tlShowToastReal(aceptar ? 'Solicitud aceptada' : 'Solicitud rechazada', aceptar ? 'success' : 'default');
+    await tlRenderSolicitudes();
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo procesar');
+  }
+}
+
+(async () => {
+  const ctx = await tlInitLayout('solicitudes.html', 'superadmin');
+  if (!ctx) return;
+  await tlRenderSolicitudes();
+})();
+</script>
+</body>
+</html>

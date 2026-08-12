@@ -1,0 +1,66 @@
+:root {
+  /* Paleta TrustLink (azul marino + azul brillante + blanco) */
+  --tl-bg-dark: #0a1128;
+  --tl-bg-dark-2: #0e1836;
+  --tl-accent: #2563eb;
+  --tl-accent-dark: #1d4ed8;
+  --tl-accent-soft: rgba(37, 99, 235, 0.18);
+  --tl-accent-soft-2: rgba(37, 99, 235, 0.08);
+  --tl-white: #FFFFFF;
+  --tl-text-dark: #0f172a;
+  --tl-grey-100: #F5F7FB;
+  --tl-grey-200: #E7EBF3;
+  --tl-grey-300: #CBD3E1;
+  --tl-grey-600: #64748b;
+  --tl-green: #1E9E5A;
+  --tl-amber: #C8891A;
+
+  /* Superficies "siempre oscuras" (sidebar, header de chatbot, toasts):
+     colores independientes del tema para que su texto NUNCA herede
+     los colores del modo oscuro y se vuelva ilegible. */
+  --tl-on-dark: #ffffff;
+  --tl-on-dark-soft: rgba(255, 255, 255, 0.66);
+  --tl-on-dark-faint: rgba(255, 255, 255, 0.42);
+
+  --tl-radius-sm: 8px;
+  --tl-radius-md: 14px;
+  --tl-radius-lg: 20px;
+  --tl-shadow-sm: 0 2px 8px rgba(10, 17, 40, 0.08);
+  --tl-shadow-md: 0 8px 24px rgba(10, 17, 40, 0.12);
+  --tl-shadow-lg: 0 20px 50px rgba(10, 17, 40, 0.18);
+
+  --sidebar-width: 250px;
+  --appheader-height: 64px;
+
+  /* Superficies que cambian con el tema */
+  --tl-body-grad-top: #eef2fc;
+  --tl-header-bg: #ffffff;
+  --tl-sidebar-bg: #0a1128;
+}
+
+/* ============ MODO OSCURO (optimizado, estilo QuintaOla) ============
+ * Redefine las mismas variables que ya usa todo el CSS (--tl-white,
+ * --tl-text-dark, --tl-grey-*) para que cada componente herede el
+ * modo oscuro automáticamente, con contraste alto y consistente.
+ */
+body.dark {
+  --tl-white: #171e33;
+  --tl-text-dark: #eef2fb;
+  --tl-grey-100: #1e2740;
+  --tl-grey-200: #2b3554;
+  --tl-grey-300: #3d4a72;
+  --tl-grey-600: #a5b1d4;
+  --tl-accent: #4f7cf5;
+  --tl-accent-dark: #6f94f7;
+  --tl-accent-soft: rgba(111, 148, 247, 0.26);
+  --tl-accent-soft-2: rgba(111, 148, 247, 0.13);
+  --tl-green: #34c97f;
+  --tl-amber: #e8b04a;
+  --tl-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --tl-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.42);
+  --tl-shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.5);
+
+  --tl-body-grad-top: #0d1326;
+  --tl-header-bg: #101731;
+  --tl-sidebar-bg: #0a0f22;
+}

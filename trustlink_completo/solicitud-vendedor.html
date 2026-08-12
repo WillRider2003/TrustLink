@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ser vendedor — TrustLink</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="solicitud-vendedor" data-active-link="solicitud-vendedor.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Conviértete en vendedor</div>
+          <div class="topbar-subtitle">Completa tus datos para que el superadmin revise tu solicitud</div>
+        </div>
+      </div>
+      <div id="topbarNotifMount" style="position:relative;"></div>
+    </header>
+
+    <div class="content-body">
+      <div class="panel" id="estadoSolicitudPanel" style="display:none;">
+        <div class="panel-header"><div><div class="panel-title">Tu solicitud</div></div></div>
+        <div id="estadoSolicitudBody"></div>
+      </div>
+
+      <div class="panel" id="formSolicitudPanel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Datos para vender en TrustLink</div>
+            <div class="panel-subtitle">Esta información la revisa el superadmin antes de habilitar tu cuenta</div>
+          </div>
+        </div>
+        <form id="solicitudVendedorForm">
+          <div class="field field-icon">
+            <label>DNI</label>
+            <div class="field-input-wrap">
+              <svg class="field-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6"/></svg>
+              <input type="text" id="solDni" inputmode="numeric" maxlength="8" placeholder="8 dígitos" required>
+            </div>
+            <div class="field-hint-msg" id="solDniMsg"></div>
+          </div>
+          <div class="field">
+            <label>¿Qué tipo de productos vendes?</label>
+            <select id="solRubro" required>
+              <option value="" disabled selected>Selecciona una categoría</option>
+              <option>Herramientas y ferretería</option>
+              <option>Ropa y accesorios</option>
+              <option>Electrónica</option>
+              <option>Seguridad industrial</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="field"><label>Cuéntanos sobre tu negocio</label><textarea id="solDescripcion" rows="3"></textarea></div>
+          <button type="submit" class="btn btn-primary btn-block">Enviar solicitud</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app-real.js"></script>
+<script src="js/form-validation.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script>
+async function tlRenderEstadoSolicitud() {
+  const solicitud = await tlMiSolicitudVendedor();
+  const estadoPanel = document.getElementById('estadoSolicitudPanel');
+  const formPanel = document.getElementById('formSolicitudPanel');
+
+  if (!solicitud) { estadoPanel.style.display = 'none'; formPanel.style.display = 'block'; return; }
+
+  const cfg = {
+    pendiente: { badge: 'badge-amber', label: 'Pendiente de revisión', desc: 'El superadmin todavía no revisa tu solicitud.' },
+    aceptada: { badge: 'badge-green', label: 'Aceptada', desc: 'Cierra sesión y vuelve a entrar para ver tu panel de vendedor.' },
+    rechazada: { badge: 'badge-dark', label: 'Rechazada', desc: 'Puedes enviar una nueva solicitud con más detalle.' },
+  }[solicitud.estado];
+
+  estadoPanel.style.display = 'block';
+  document.getElementById('estadoSolicitudBody').innerHTML = `
+    <div style="border:1.5px solid var(--tl-grey-200); border-radius:var(--tl-radius-md); padding:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:start; gap:10px;">
+        <div>
+          <div style="font-weight:800;">${solicitud.rubro}</div>
+          <div style="font-size:0.8rem; color:var(--tl-grey-600);">DNI ${solicitud.dni} · Enviada el ${new Date(solicitud.creado_en).toLocaleDateString('es-PE')}</div>
+        </div>
+        <span class="badge ${cfg.badge}">${cfg.label}</span>
+      </div>
+      <div style="font-size:0.82rem; color:var(--tl-grey-600); margin-top:12px;">${cfg.desc}</div>
+    </div>
+  `;
+  formPanel.style.display = solicitud.estado === 'pendiente' ? 'none' : 'block';
+}
+
+// Solo permite dígitos mientras se escribe (evita que el usuario
+// tenga que enterarse del error recién al enviar el formulario).
+const solDniInput = document.getElementById('solDni');
+solDniInput.addEventListener('input', () => {
+  solDniInput.value = solDniInput.value.replace(/\D/g, '').slice(0, 8);
+});
+tlLiveValidate('solDni', tlValidarDNI, 'solDniMsg', 'El DNI debe tener exactamente 8 dígitos');
+
+document.getElementById('solicitudVendedorForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const dni = document.getElementById('solDni').value.trim();
+  if (!tlValidarDNI(dni)) {
+    tlSetFieldState(solDniInput, false);
+    tlShowToastReal('El DNI debe tener 8 dígitos');
+    return;
+  }
+
+  try {
+    await tlSolicitarSerVendedor({
+      dni, rubro: document.getElementById('solRubro').value,
+      descripcion: document.getElementById('solDescripcion').value.trim(),
+    });
+    tlShowToastReal('Solicitud enviada', 'success');
+    e.target.reset();
+    await tlRenderEstadoSolicitud();
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo enviar la solicitud');
+  }
+});
+
+(async () => {
+  const ctx = await tlInitLayout('solicitud-vendedor.html', 'comprador');
+  if (!ctx) return;
+  await tlRenderEstadoSolicitud();
+})();
+</script>
+</body>
+</html>

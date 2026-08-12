@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi membresía — TrustLink</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <style>
+    /* =========================================================
+       TRUSTLINK — MEMBRESÍA
+       ========================================================= */
+
+    .content-body {
+      padding-top: 28px;
+      padding-bottom: 40px;
+    }
+
+    /* ---------------------------------------------------------
+       HERO
+       --------------------------------------------------------- */
+
+    .membresia-hero {
+      display: grid !important;
+      grid-template-columns: minmax(390px, 430px) minmax(0, 1fr);
+      gap: 54px !important;
+      align-items: stretch !important;
+      width: 100%;
+    }
+
+    #trustiCardMount {
+      width: 100%;
+      min-width: 0;
+    }
+
+    /*
+      La tarjeta principal debe ocupar visualmente el mismo alto
+      que el panel de progreso. Se usa una proporción estable para
+      evitar que la imagen se convierta en una franja.
+    */
+    .membresia-hero .trusti-card-flip {
+      width: 100%;
+      max-width: 430px;
+      height: 268px;
+      aspect-ratio: auto;
+      perspective: 1200px;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .trusti-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.55s cubic-bezier(.4,.2,.2,1);
+      transform-style: preserve-3d;
+    }
+
+    .trusti-card-flip.flipped .trusti-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .trusti-card-face {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 24px;
+      overflow: hidden;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      box-shadow: var(--tl-shadow-lg);
+    }
+
+    /* ---------------------------------------------------------
+       TARJETA PRINCIPAL — FRENTE
+       --------------------------------------------------------- */
+
+    #trustiCardMount .trusti-card-front {
+      position: relative;
+      display: block;
+      padding: 0;
+      background: transparent !important;
+      overflow: hidden;
+    }
+
+    /*
+      object-fit: cover mantiene las proporciones reales de la imagen
+      (fill la deformaba y hacía que la tarjeta se viera desproporcionada).
+    */
+    #trustiCardMount .trusti-card-image {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      max-width: none;
+      max-height: none;
+      object-fit: cover;
+      object-position: center;
+      margin: 0;
+      padding: 0;
+      z-index: 0;
+    }
+
+    #trustiCardMount .trusti-card-front::before {
+      display: none !important;
+    }
+
+    /*
+      Sobre la tarjeta solo va el nombre completo del titular y,
+      debajo, su DNI — sin ningún otro texto encima de la imagen.
+    */
+    #trustiCardMount .trusti-card-name-wrap {
+      position: absolute;
+      left: 26px;
+      /* Bien por encima del "Trusti Blue" que ya viene impreso en la
+         imagen de la tarjeta, para que nunca se superpongan. */
+      bottom: 92px;
+      z-index: 2;
+      margin: 0;
+      max-width: calc(100% - 52px);
+    }
+
+    #trustiCardMount .trusti-card-name {
+      color: #fff;
+      font-size: 1.12rem;
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      text-shadow: 0 1px 4px rgba(0,0,0,.35);
+    }
+
+    #trustiCardMount .trusti-card-dni {
+      display: block;
+      color: rgba(255,255,255,0.92);
+      font-size: 0.84rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      margin-top: 4px;
+      text-shadow: 0 1px 4px rgba(0,0,0,.35);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ---------------------------------------------------------
+       TARJETA PRINCIPAL — REVERSO
+       --------------------------------------------------------- */
+
+    #trustiCardMount .trusti-card-back {
+      transform: rotateY(180deg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+      padding: 28px;
+    }
+
+    /* Reversos con los degradados oficiales (en vez de color sólido) */
+    .trusti-back-blue {
+      background: url('img/membresias/back-blue.jpg') center / cover no-repeat;
+      color: #fff;
+    }
+
+    .trusti-back-silver {
+      background: url('img/membresias/back-silver.jpg') center / cover no-repeat;
+      color: #1f2937;
+    }
+
+    .trusti-back-gold {
+      background: url('img/membresias/back-gold.jpg') center / cover no-repeat;
+      color: #3a2a05;
+    }
+
+    .trusti-back-black {
+      background: url('img/membresias/back-black.jpg') center / cover no-repeat;
+      color: #fff;
+    }
+
+    .trusti-card-back-level {
+      font-size: 1.35rem;
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    .trusti-card-back-umbral {
+      font-size: .9rem;
+      font-weight: 700;
+      opacity: .86;
+      margin-bottom: 4px;
+    }
+
+    .trusti-card-back-desc {
+      font-size: .9rem;
+      line-height: 1.45;
+      opacity: .95;
+    }
+
+    .trusti-card-hint {
+      display: none;
+    }
+
+    /* ---------------------------------------------------------
+       PANEL DE PROGRESO
+       --------------------------------------------------------- */
+
+    .membresia-hero > .membresia-progress-wrap {
+      min-width: 0;
+      width: 100%;
+    }
+
+    /* Proporciones equilibradas: radios y tipografías alineadas con el
+       resto del sitio (antes se veían desproporcionadas). */
+    .membresia-hero .panel {
+      height: 268px;
+      min-height: 268px;
+      border-radius: 24px;
+      padding: 30px 34px;
+      box-sizing: border-box;
+      box-shadow: var(--tl-shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .membresia-hero .panel-header {
+      padding: 0;
+      margin: 0;
+    }
+
+    .membresia-hero .panel-title {
+      font-size: 1.32rem;
+      line-height: 1.2;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .membresia-hero .panel-subtitle {
+      font-size: 0.92rem;
+      line-height: 1.35;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .membresia-hero .trusti-progress-track {
+      width: 100%;
+      height: 14px;
+      border-radius: 999px;
+      background: var(--tl-grey-200);
+      overflow: hidden;
+      margin: 24px 0 20px;
+    }
+
+    .membresia-hero .trusti-progress-fill {
+      width: 0;
+      height: 100%;
+      min-width: 0;
+      border-radius: 999px;
+      transition: width .45s ease;
+    }
+
+    .membresia-hero #progresoTexto {
+      font-size: 0.9rem !important;
+      line-height: 1.4;
+      font-weight: 600;
+      color: var(--tl-grey-600);
+    }
+
+    /* ---------------------------------------------------------
+       BENEFICIOS — TARJETAS FLIP
+       --------------------------------------------------------- */
+
+    .membresia-beneficios-heading {
+      margin-top: 34px !important;
+      margin-bottom: 18px;
+    }
+
+    .trusti-benefits {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 26px;
+      width: 100%;
+      margin-top: 0;
+    }
+
+    /*
+      Cara frontal:
+      muestra únicamente la imagen de la membresía.
+
+      Cara trasera:
+      muestra el fondo correspondiente al nivel y toda la
+      información: nombre, precio y beneficio.
+    */
+    .trusti-benefit-flip {
+      width: 100%;
+      height: 180px;
+      min-width: 0;
+      perspective: 1200px;
+      cursor: pointer;
+    }
+
+    .trusti-benefit-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform .55s cubic-bezier(.4,.2,.2,1);
+    }
+
+    .trusti-benefit-flip.flipped .trusti-benefit-inner {
+      transform: rotateY(180deg);
+    }
+
+    .trusti-benefit-face {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      overflow: hidden;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, .10);
+    }
+
+    /* Frente: imagen completa, sin texto encima */
+    .trusti-benefit-front {
+      background: #e5e7eb;
+    }
+
+    .trusti-benefit-front img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Reverso */
+    .trusti-benefit-back {
+      transform: rotateY(180deg);
+      box-sizing: border-box;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: #fff;
+    }
+
+    /* Reversos de las tarjetas de beneficios con los degradados oficiales.
+       Donde el fondo es claro (silver/gold) el texto pasa a color oscuro
+       para mantener la legibilidad. */
+    .trusti-benefit-back-blue {
+      background: url('img/membresias/back-blue.jpg') center / cover no-repeat;
+      color: #fff;
+    }
+
+    .trusti-benefit-back-silver {
+      background: url('img/membresias/back-silver.jpg') center / cover no-repeat;
+      color: #1f2937;
+    }
+
+    .trusti-benefit-back-gold {
+      background: url('img/membresias/back-gold.jpg') center / cover no-repeat;
+      color: #3a2a05;
+    }
+
+    .trusti-benefit-back-black {
+      background: url('img/membresias/back-black.jpg') center / cover no-repeat;
+      color: #fff;
+    }
+
+    .trusti-benefit-back-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .trusti-benefit-title {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.15;
+      font-weight: 800;
+    }
+
+    .trusti-benefit-price {
+      flex: 0 0 auto;
+      text-align: right;
+      font-size: .98rem;
+      line-height: 1.05;
+      font-weight: 800;
+    }
+
+    .trusti-benefit-price small {
+      display: block;
+      margin-top: 4px;
+      font-size: .65rem;
+      line-height: 1;
+      font-weight: 700;
+      opacity: .9;
+    }
+
+    .trusti-benefit-desc {
+      margin: 0;
+      max-width: 96%;
+      font-size: .76rem;
+      line-height: 1.35;
+      font-weight: 600;
+      opacity: .97;
+    }
+
+    .trusti-benefit-hint {
+      margin-top: 7px;
+      text-align: center;
+      color: var(--tl-grey-600);
+      font-size: .7rem;
+    }
+
+    /* ---------------------------------------------------------
+       RESPONSIVE
+       --------------------------------------------------------- */
+
+    @media (max-width: 1200px) {
+      .membresia-hero {
+        grid-template-columns: minmax(340px, 400px) minmax(0, 1fr);
+        gap: 28px !important;
+      }
+
+      .membresia-hero .trusti-card-flip,
+      .membresia-hero .panel {
+        height: 250px;
+        min-height: 250px;
+      }
+
+      .trusti-benefits {
+        gap: 18px;
+      }
+
+      .trusti-benefit-flip {
+        height: 175px;
+      }
+    }
+
+    @media (max-width: 1050px) {
+      .membresia-hero {
+        grid-template-columns: 1fr;
+        gap: 24px !important;
+      }
+
+      .membresia-hero .trusti-card-flip {
+        max-width: 520px;
+      }
+
+      .membresia-hero .panel {
+        width: 100%;
+      }
+
+      .trusti-benefits {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 650px) {
+      .content-body {
+        padding: 20px 14px 32px;
+      }
+
+      .membresia-hero .trusti-card-flip,
+      .membresia-hero .panel {
+        height: auto;
+        min-height: 0;
+      }
+
+      .membresia-hero .trusti-card-flip {
+        aspect-ratio: 1.58 / 1;
+      }
+
+      .membresia-hero .panel {
+        padding: 24px;
+        min-height: 235px;
+      }
+
+      .trusti-benefits {
+        grid-template-columns: 1fr;
+      }
+
+      .trusti-benefit-flip {
+        height: 190px;
+      }
+    }
+  </style>
+</head>
+
+<body data-page="membresia" data-active-link="membresia.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+  <div class="app-shell">
+
+    <div id="sidebarMount"></div>
+
+    <div class="main-content">
+
+      <header class="topbar">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir menú">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+              <path d="M3 12h18M3 6h18M3 18h18"/>
+            </svg>
+          </button>
+
+          <div>
+            <div class="topbar-title">Mi membresía</div>
+            <div class="topbar-subtitle">
+              Entre más compras seguras hagas, más beneficios desbloqueas
+            </div>
+          </div>
+        </div>
+
+        <div id="topbarNotifMount" style="position:relative;"></div>
+      </header>
+
+      <main class="content-body">
+
+        <!-- =====================================================
+             HERO: TARJETA + PROGRESO
+             ===================================================== -->
+        <section class="membresia-hero" aria-label="Estado de membresía">
+
+          <div id="trustiCardMount"></div>
+
+          <div class="membresia-progress-wrap">
+            <div class="panel">
+
+              <div class="panel-header">
+                <div>
+                  <div class="panel-title" id="siguienteNivelTitulo">
+                    Progreso
+                  </div>
+
+                  <div class="panel-subtitle" id="siguienteNivelSub"></div>
+                </div>
+              </div>
+
+              <div class="trusti-progress-track" aria-label="Progreso hacia el siguiente nivel">
+                <div
+                  class="trusti-progress-fill"
+                  id="progresoFill"
+                  style="width:0%;"
+                ></div>
+              </div>
+
+              <div id="progresoTexto"></div>
+
+            </div>
+          </div>
+
+        </section>
+
+        <!-- =====================================================
+             BENEFICIOS POR NIVEL
+             ===================================================== -->
+        <div class="section-heading membresia-beneficios-heading">
+          Beneficios por nivel
+        </div>
+
+        <section class="trusti-benefits" aria-label="Beneficios de cada nivel">
+
+          <!-- TRUSTI BLUE -->
+          <div
+            class="trusti-benefit-flip"
+            onclick="this.classList.toggle('flipped')"
+            role="button"
+            tabindex="0"
+            aria-label="Ver información de Trusti Blue"
+          >
+            <div class="trusti-benefit-inner">
+
+              <div class="trusti-benefit-face trusti-benefit-front">
+                <img
+                  src="img/membresias/trusti-blue.jpg"
+                  alt="Trusti Blue"
+                >
+              </div>
+
+              <div class="trusti-benefit-face trusti-benefit-back trusti-benefit-back-blue">
+
+                <div class="trusti-benefit-back-top">
+                  <h3 class="trusti-benefit-title">Trusti Blue</h3>
+
+                  <div class="trusti-benefit-price">
+                    Nivel base
+                  </div>
+                </div>
+
+                <p class="trusti-benefit-desc">
+                  Nivel base. Escrow verificado y S/ 230 de crédito de bienvenida si te vuelves vendedor.
+                </p>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- TRUSTI SILVER -->
+          <div
+            class="trusti-benefit-flip"
+            onclick="this.classList.toggle('flipped')"
+            role="button"
+            tabindex="0"
+            aria-label="Ver información de Trusti Silver"
+          >
+            <div class="trusti-benefit-inner">
+
+              <div class="trusti-benefit-face trusti-benefit-front">
+                <img
+                  src="img/membresias/trusti-silver.jpg"
+                  alt="Trusti Silver"
+                >
+              </div>
+
+              <div class="trusti-benefit-face trusti-benefit-back trusti-benefit-back-silver">
+
+                <div class="trusti-benefit-back-top">
+                  <h3 class="trusti-benefit-title">Trusti Silver</h3>
+
+                  <div class="trusti-benefit-price">
+                    S/ 300.00
+                    <small>en compras</small>
+                  </div>
+                </div>
+
+                <p class="trusti-benefit-desc">
+                  Soporte prioritario en incidencias y resolución más rápida de disputas.
+                </p>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- TRUSTI GOLD -->
+          <div
+            class="trusti-benefit-flip"
+            onclick="this.classList.toggle('flipped')"
+            role="button"
+            tabindex="0"
+            aria-label="Ver información de Trusti Gold"
+          >
+            <div class="trusti-benefit-inner">
+
+              <div class="trusti-benefit-face trusti-benefit-front">
+                <img
+                  src="img/membresias/trusti-gold.jpg"
+                  alt="Trusti Gold"
+                >
+              </div>
+
+              <div class="trusti-benefit-face trusti-benefit-back trusti-benefit-back-gold">
+
+                <div class="trusti-benefit-back-top">
+                  <h3 class="trusti-benefit-title">Trusti Gold</h3>
+
+                  <div class="trusti-benefit-price">
+                    S/ 800.00
+                    <small>en compras</small>
+                  </div>
+                </div>
+
+                <p class="trusti-benefit-desc">
+                  Envíos destacados de tus vendedores favoritos y badge de comprador confiable.
+                </p>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- TRUSTI BLACK -->
+          <div
+            class="trusti-benefit-flip"
+            onclick="this.classList.toggle('flipped')"
+            role="button"
+            tabindex="0"
+            aria-label="Ver información de Trusti Black"
+          >
+            <div class="trusti-benefit-inner">
+
+              <div class="trusti-benefit-face trusti-benefit-front">
+                <img
+                  src="img/membresias/trusti-black.jpg"
+                  alt="Trusti Black"
+                >
+              </div>
+
+              <div class="trusti-benefit-face trusti-benefit-back trusti-benefit-back-black">
+
+                <div class="trusti-benefit-back-top">
+                  <h3 class="trusti-benefit-title">Trusti Black</h3>
+
+                  <div class="trusti-benefit-price">
+                    S/ 2,000.00
+                    <small>en compras</small>
+                  </div>
+                </div>
+
+                <p class="trusti-benefit-desc">
+                  Línea de soporte directa y prioridad máxima en disputas y devoluciones.
+                </p>
+
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <div class="toast-stack" id="toastStack"></div>
+  <div id="chatbotMount"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/app-real.js"></script>
+  <script src="js/chatbot.js"></script>
+  <script src="js/chatbot-widget.js"></script>
+
+  <script>
+    /* =========================================================
+       DATOS DE MEMBRESÍA
+       ========================================================= */
+
+    const NIVEL_INFO = {
+      trusti_blue: {
+        clase: 'trusti-blue-bg',
+        claseBack: 'trusti-back-blue',
+        label: 'Trusti Blue',
+        umbral: 300,
+        img: 'img/membresias/trusti-blue.jpg',
+        barra: '#1d3ec7',
+        desc: 'Nivel base. Escrow verificado y S/ 230 de crédito de bienvenida si te vuelves vendedor.'
+      },
+
+      trusti_silver: {
+        clase: 'trusti-silver-bg',
+        claseBack: 'trusti-back-silver',
+        label: 'Trusti Silver',
+        umbral: 800,
+        img: 'img/membresias/trusti-silver.jpg',
+        barra: '#9aa3ad',
+        desc: 'Soporte prioritario en incidencias y resolución más rápida de disputas.'
+      },
+
+      trusti_gold: {
+        clase: 'trusti-gold-bg',
+        claseBack: 'trusti-back-gold',
+        label: 'Trusti Gold',
+        umbral: 2000,
+        img: 'img/membresias/trusti-gold.jpg',
+        barra: '#d4a72c',
+        desc: 'Envíos destacados de tus vendedores favoritos y badge de comprador confiable.'
+      },
+
+      trusti_black: {
+        clase: 'trusti-black-bg',
+        claseBack: 'trusti-back-black',
+        label: 'Trusti Black',
+        umbral: null,
+        img: 'img/membresias/trusti-black.jpg',
+        barra: '#111114',
+        desc: 'Línea de soporte directa y prioridad máxima en disputas y devoluciones.'
+      }
+    };
+
+    let tlMembresiaFlipped = false;
+
+    /* ---------------------------------------------------------
+       Seguridad básica para datos que vienen de Supabase
+       --------------------------------------------------------- */
+    function tlEscapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    /* ---------------------------------------------------------
+       Flip de la tarjeta principal
+       --------------------------------------------------------- */
+    function tlToggleFlipTarjeta() {
+      tlMembresiaFlipped = !tlMembresiaFlipped;
+
+      const el = document.getElementById('trustiCardFlip');
+
+      if (el) {
+        el.classList.toggle('flipped', tlMembresiaFlipped);
+      }
+    }
+
+    /* ---------------------------------------------------------
+       Render de tarjeta + progreso
+       --------------------------------------------------------- */
+    /* ---------------------------------------------------------
+       Nivel efectivo según el total comprado.
+       Es la garantía de que la membresía SÍ cambia al cumplir la
+       meta (S/300 → Silver, S/800 → Gold, S/2000 → Black) aunque
+       el campo `nivel` de la base de datos aún no se haya
+       recalculado tras la última compra confirmada.
+       --------------------------------------------------------- */
+    function tlNivelEfectivo(m) {
+      const total = Number(m.total_comprado) || 0;
+      const porTotal =
+        total >= 2000 ? 'trusti_black' :
+        total >= 800  ? 'trusti_gold'  :
+        total >= 300  ? 'trusti_silver' :
+        'trusti_blue';
+
+      const orden = ['trusti_blue', 'trusti_silver', 'trusti_gold', 'trusti_black'];
+      const idxBd = orden.indexOf(m.nivel);
+      const idxTotal = orden.indexOf(porTotal);
+      // Se usa el mayor de los dos (nunca degradar lo que diga la BD)
+      return orden[Math.max(idxBd, idxTotal)] || 'trusti_blue';
+    }
+
+    const SIGUIENTE_NIVEL = {
+      trusti_blue: 'trusti_silver',
+      trusti_silver: 'trusti_gold',
+      trusti_gold: 'trusti_black',
+      trusti_black: null,
+    };
+
+    function tlRenderTarjetaTrusti(m) {
+      // Normaliza nivel y siguiente nivel con el nivel efectivo
+      const nivelEfectivo = tlNivelEfectivo(m);
+      if (nivelEfectivo !== m.nivel) {
+        m = { ...m, nivel: nivelEfectivo, siguiente_nivel: SIGUIENTE_NIVEL[nivelEfectivo] };
+        const infoSig = m.siguiente_nivel ? NIVEL_INFO[nivelEfectivo] : null;
+        m.falta_para_siguiente = infoSig && infoSig.umbral
+          ? Math.max(0, infoSig.umbral - (Number(m.total_comprado) || 0))
+          : 0;
+      }
+
+      const info = NIVEL_INFO[m.nivel] || NIVEL_INFO.trusti_blue;
+
+      const nombreCompleto = [m.nombre, m.apellido]
+        .filter(Boolean)
+        .join(' ');
+
+      const umbralTexto = info.umbral
+        ? `Nivel desde S/ ${Number(info.umbral).toFixed(2)} en compras`
+        : 'Nivel máximo de TrustLink';
+
+      const cardMount = document.getElementById('trustiCardMount');
+
+      cardMount.innerHTML = `
+        <div
+          class="trusti-card-flip"
+          id="trustiCardFlip"
+          onclick="tlToggleFlipTarjeta()"
+          role="button"
+          tabindex="0"
+          aria-label="Ver beneficios de ${tlEscapeHtml(info.label)}"
+        >
+          <div class="trusti-card-inner">
+
+            <div class="trusti-card-face trusti-card-front">
+              <img
+                class="trusti-card-image"
+                src="${tlEscapeHtml(info.img)}"
+                alt="Tarjeta ${tlEscapeHtml(info.label)}"
+              >
+
+              <div class="trusti-card-name-wrap">
+                <div class="trusti-card-name">
+                  ${tlEscapeHtml(nombreCompleto)}
+                </div>
+                ${m.dni ? `<div class="trusti-card-dni">DNI ${tlEscapeHtml(m.dni)}</div>` : ''}
+              </div>
+            </div>
+
+            <div class="trusti-card-face trusti-card-back ${info.claseBack}">
+              <div class="trusti-card-back-level">
+                ${tlEscapeHtml(info.label)}
+              </div>
+
+              <div class="trusti-card-back-umbral">
+                ${tlEscapeHtml(umbralTexto)}
+              </div>
+
+              <div class="trusti-card-back-desc">
+                ${tlEscapeHtml(info.desc)}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      `;
+
+      const card = document.getElementById('trustiCardFlip');
+
+      if (card) {
+        card.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            tlToggleFlipTarjeta();
+          }
+        });
+      }
+
+      /* -------------------------------------------------------
+         Progreso
+         ------------------------------------------------------- */
+
+      const titulo = document.getElementById('siguienteNivelTitulo');
+      const sub = document.getElementById('siguienteNivelSub');
+      const texto = document.getElementById('progresoTexto');
+      const fill = document.getElementById('progresoFill');
+
+      if (!titulo || !sub || !texto || !fill) return;
+
+      fill.style.background = info.barra;
+
+      const totalComprado = Number(m.total_comprado) || 0;
+
+      if (m.siguiente_nivel) {
+        const siguienteInfo =
+          NIVEL_INFO[m.siguiente_nivel] || NIVEL_INFO.trusti_silver;
+
+        /*
+          Umbral donde EMPIEZA cada nivel (blue 0, silver 300,
+          gold 800, black 2000). El avance se calcula entre el
+          inicio del nivel actual y el inicio del siguiente.
+          (Antes se usaba por error el umbral del siguiente nivel
+          como base y la barra quedaba en 0% en Silver/Gold.)
+        */
+        const INICIO_NIVEL = {
+          trusti_blue: 0,
+          trusti_silver: 300,
+          trusti_gold: 800,
+          trusti_black: 2000,
+        };
+
+        const base = INICIO_NIVEL[m.nivel] ?? 0;
+        const umbralSiguiente = INICIO_NIVEL[m.siguiente_nivel] ?? Number(info.umbral) ?? 0;
+
+        const rango = umbralSiguiente - base;
+
+        const progreso = rango > 0
+          ? Math.max(
+              0,
+              Math.min(
+                100,
+                ((totalComprado - base) / rango) * 100
+              )
+            )
+          : 0;
+
+        titulo.textContent =
+          `Camino a ${siguienteInfo.label}`;
+
+        sub.textContent =
+          `Llevas S/ ${totalComprado.toFixed(2)} en compras confirmadas`;
+
+        fill.style.width = `${progreso}%`;
+
+        const falta = Number(m.falta_para_siguiente) || 0;
+
+        texto.textContent = falta > 0
+          ? `Te faltan S/ ${falta.toFixed(2)} para llegar a ${siguienteInfo.label}`
+          : `¡Ya alcanzaste el siguiente nivel! Se actualizará en tu próxima compra confirmada.`;
+
+      } else {
+
+        titulo.textContent = 'Nivel máximo alcanzado';
+
+        sub.textContent =
+          `Llevas S/ ${totalComprado.toFixed(2)} en compras confirmadas`;
+
+        fill.style.width = '100%';
+
+        texto.textContent =
+          'Estás en Trusti Black, el nivel más alto de TrustLink.';
+      }
+    }
+
+    /* =========================================================
+       ACCESIBILIDAD — FLIP CON TECLADO
+       ========================================================= */
+
+    document.querySelectorAll('.trusti-benefit-flip').forEach((card) => {
+      card.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          card.classList.toggle('flipped');
+        }
+      });
+    });
+
+    /* =========================================================
+       INICIALIZACIÓN
+       ========================================================= */
+
+    (async () => {
+      const ctx = await tlInitLayout('membresia.html');
+
+      if (!ctx) return;
+
+      const m = await tlGetMiMembresia();
+
+      if (m) {
+        tlRenderTarjetaTrusti(m);
+      }
+    })();
+  </script>
+
+</body>
+</html>

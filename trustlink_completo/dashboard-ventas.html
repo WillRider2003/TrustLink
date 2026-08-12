@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard de ventas — TrustLink</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="dashboard-ventas" data-active-link="dashboard-ventas.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Dashboard de ventas</div>
+          <div class="topbar-subtitle">Cuánto y qué estás vendiendo en TrustLink (datos reales de tus pedidos)</div>
+        </div>
+      </div>
+      <div id="topbarNotifMount" style="position:relative;"></div>
+    </header>
+
+    <div class="content-body">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-card-value" id="statIngresoTotal">S/ 0</div>
+          <div class="stat-card-label">Ingresos confirmados (histórico)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-value" id="statPedidosConfirmados">0</div>
+          <div class="stat-card-label">Pedidos confirmados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-value" id="statPedidosPendientes">0</div>
+          <div class="stat-card-label">Pedidos en proceso</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-value" id="statTicketProm">S/ 0</div>
+          <div class="stat-card-label">Ticket promedio</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Productos más vendidos</div>
+            <div class="panel-subtitle">Por número de pedidos confirmados</div>
+          </div>
+        </div>
+        <div id="productosRanking"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app-real.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script>
+(async () => {
+  const ctx = await tlInitLayout('dashboard-ventas.html', 'vendedor');
+  if (!ctx) return;
+
+  const pedidos = await tlListarMisPedidos('vendedor');
+  const confirmados = pedidos.filter(p => p.estado === 'confirmado');
+  const pendientes = pedidos.filter(p => !['confirmado', 'reembolsado', 'cancelado'].includes(p.estado));
+
+  const ingresoTotal = confirmados.reduce((sum, p) => sum + Number(p.monto_total), 0);
+
+  document.getElementById('statIngresoTotal').textContent = 'S/ ' + ingresoTotal.toFixed(2);
+  document.getElementById('statPedidosConfirmados').textContent = confirmados.length;
+  document.getElementById('statPedidosPendientes').textContent = pendientes.length;
+  document.getElementById('statTicketProm').textContent = 'S/ ' + (confirmados.length ? (ingresoTotal / confirmados.length).toFixed(2) : '0.00');
+
+  // Ranking por producto (agrupa pedidos confirmados por nombre de producto)
+  const porProducto = {};
+  confirmados.forEach(p => {
+    const nombre = p.productos.nombre;
+    if (!porProducto[nombre]) porProducto[nombre] = { unidades: 0, monto: 0 };
+    porProducto[nombre].unidades += p.cantidad;
+    porProducto[nombre].monto += Number(p.monto_total);
+  });
+  const ranking = Object.entries(porProducto).sort((a, b) => b[1].monto - a[1].monto);
+  const maxMonto = ranking.length ? ranking[0][1].monto : 1;
+
+  document.getElementById('productosRanking').innerHTML = ranking.length
+    ? ranking.map(([nombre, d], i) => `
+        <div class="ranking-row">
+          <div class="ranking-pos">${i + 1}</div>
+          <div class="ranking-body">
+            <div class="ranking-name">${nombre}</div>
+            <div class="ranking-track"><div class="ranking-fill" style="width:${Math.round((d.monto / maxMonto) * 100)}%"></div></div>
+          </div>
+          <div class="ranking-stats">
+            <div class="ranking-monto">S/ ${d.monto.toFixed(2)}</div>
+            <div class="ranking-unidades">${d.unidades} unid.</div>
+          </div>
+        </div>
+      `).join('')
+    : `<div class="empty-state"><div class="empty-state-title">Todavía no tienes ventas confirmadas</div></div>`;
+})();
+</script>
+</body>
+</html>
