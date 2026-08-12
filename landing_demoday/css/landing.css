@@ -100,13 +100,13 @@ body.tl-landing {
 /* ============ HERO ============ */
 .tl-hero {
   position: relative;
-  padding: 90px 0 110px;
-  background:
-    radial-gradient(ellipse 900px 500px at 15% 0%, rgba(37,99,235,0.16), transparent 60%),
-    radial-gradient(ellipse 700px 500px at 100% 30%, rgba(37,99,235,0.08), transparent 55%);
-  border-bottom: 1px solid var(--tl-line);
   overflow: hidden;
+  padding: 140px 0 110px !important; /* Añadimos espacio arriba para que el menú fijo no tape el tag de Arbitrum */
+  background: var(--tl-bg); 
+  border-bottom: 1px solid var(--tl-line);
 }
+
+
 .tl-hero::after {
   content: '';
   position: absolute; inset: 0;
@@ -114,8 +114,14 @@ body.tl-landing {
   background-size: 46px 46px;
   mask-image: radial-gradient(ellipse 900px 500px at 20% 10%, black, transparent 70%);
   pointer-events: none;
+  z-index: 1;
 }
-.tl-hero-inner { position: relative; z-index: 1; }
+
+.tl-hero-inner {
+  position: relative;
+  z-index: 2;
+}
+
 .tl-hero-tag {
   display: inline-flex; align-items: center; gap: 8px;
   font-family: var(--font-mono);
@@ -126,30 +132,36 @@ body.tl-landing {
   background: rgba(255,255,255,0.03);
   color: var(--tl-grey);
   margin-bottom: 26px;
+  margin-top: 0 !important;
+  margin-bottom: 24px !important;
 }
 .tl-hero-tag .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--tl-green); animation: tl-pulse 1.6s infinite; }
 @keyframes tl-pulse { 0%,100%{opacity:1;} 50%{opacity:.35;} }
 
 .tl-hero-title {
-  font-family: var(--font-display);
-  font-size: clamp(2.6rem, 6.4vw, 5rem);
-  font-weight: 700;
-  line-height: 1.03;
-  letter-spacing: -0.02em;
-  max-width: 850px;
+  /* Usamos clamp para que sea responsivo, pero con un máximo de 3.2rem (antes seguro estaba en 4 o 5) */
+  font-size: clamp(2rem, 3.5vw, 3.2rem) !important; 
+  line-height: 1.2 !important; /* Le damos un poco más de aire entre líneas */
+  letter-spacing: -0.02em !important;
+  max-width: 580px !important; /* Controlamos dónde hace el salto de línea */
+  margin-bottom: 20px !important;
 }
+
 .tl-hero-title em { font-style: normal; color: var(--tl-accent); }
 
 .tl-hero-sub {
-  margin-top: 24px;
-  font-size: 1.08rem;
-  color: var(--tl-grey);
-  line-height: 1.6;
-  max-width: 620px;
+  font-size: 1.05rem !important; /* Un tamaño de lectura natural */
+  line-height: 1.6 !important;
+  max-width: 520px !important;
+  margin-bottom: 32px !important;
+  color: #94a3b8 !important; /* Un gris sutil para que el título destaque sin esfuerzo */
 }
+
 .tl-hero-sub b { color: var(--tl-cream); font-weight: 700; }
 
-.tl-hero-actions { display: flex; gap: 14px; margin-top: 36px; flex-wrap: wrap; }
+.tl-hero-actions {
+  margin-top: 0 !important;
+}
 
 .tl-hero-meta {
   display: flex; gap: 34px; flex-wrap: wrap;
@@ -351,3 +363,7087 @@ body.tl-landing {
 
 /* ============ COUNT UP UTILITY CLASS ============ */
 .tl-countup { font-variant-numeric: tabular-nums; }
+
+/* ============ HERO IMAGE & FLOATING BADGE ============ */
+.tl-image-container {
+  padding: 0; /* Quitamos el padding para que la foto llene el marco */
+  overflow: visible; /* Permitimos que la tarjeta flote fuera del marco */
+  display: flex;
+  position: relative;
+}
+
+.hero-vendor-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 24px; /* Mismo radio que la ventana */
+  opacity: 0.85; /* Ligera transparencia para que no deslumbre */
+  transition: transform 0.6s ease;
+}
+
+.tl-mockup-window:hover .hero-vendor-img {
+  transform: scale(1.03); /* Efecto zoom sutil al pasar el mouse */
+}
+
+/* Tarjeta flotante sobre la imagen */
+.floating-badge {
+  position: absolute;
+  bottom: -20px;
+  left: -20px;
+  background: rgba(10, 17, 40, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--tl-line-strong);
+  padding: 16px 20px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+  z-index: 10;
+  animation: float-up-down 4s ease-in-out infinite;
+}
+
+.floating-badge .badge-icon {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--tl-green);
+  color: var(--tl-white);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.floating-badge .badge-text { display: flex; flex-direction: column; line-height: 1.3; }
+.floating-badge .badge-text strong { font-size: 0.95rem; font-weight: 700; color: var(--tl-white); }
+.floating-badge .badge-text span { font-size: 0.8rem; font-weight: 600; color: var(--tl-green); }
+
+@keyframes float-up-down {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@media (max-width: 960px) {
+  .floating-badge { bottom: 10px; left: 10px; right: 10px; }
+}
+
+/* ============ FIX HERO GRID & IMAGEN ============ */
+
+/* 1. Forzamos las dos columnas en el contenedor principal */
+.tl-hero-inner {
+  display: grid !important;
+  grid-template-columns: 1.1fr 0.9fr !important; /* Izquierda un poco más ancha, derecha para la foto */
+  gap: 60px;
+  align-items: center;
+}
+
+/* 2. Controlamos el ancho de la columna derecha */
+.tl-hero-visual {
+  width: 100%;
+  max-width: 550px; /* Límite máximo para que no sea gigante */
+  justify-self: end; /* Lo empuja a la derecha */
+  position: relative;
+}
+
+/* 3. Ajustamos el marco de cristal (mockup window) */
+.tl-mockup-window.tl-image-container {
+  width: 100%;
+  aspect-ratio: 4 / 3; /* Proporción perfecta para fotos */
+  height: auto;
+  padding: 0;
+  border-radius: 24px;
+  overflow: visible; /* Para que salga el badge flotante */
+  position: relative;
+}
+
+/* 4. Forzamos a la imagen a respetar el marco sin deformarse */
+.tl-mockup-window.tl-image-container .hero-vendor-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Corta los excesos sin aplastar la foto */
+  border-radius: 24px;
+}
+
+/* 5. Comportamiento en pantallas pequeñas (Móviles/Tablets) */
+@media (max-width: 960px) {
+  .tl-hero-inner {
+    grid-template-columns: 1fr !important; /* Se apila en 1 columna */
+    gap: 40px;
+  }
+  
+  .tl-hero-visual {
+    justify-self: center;
+    margin-top: 20px;
+    display: block !important; /* Aseguramos que se vea en móvil */
+  }
+  
+  .tl-mockup-window.tl-image-container {
+    aspect-ratio: 16 / 9; /* Más apaisado en celular */
+  }
+}
+
+/* ============ REFINAMIENTO VISUAL DEL HERO (TEXTOS Y ESPACIOS) ============ */
+
+/* 1. Controlamos el ancho del texto para mejorar la lectura y dar respiro */
+.tl-hero-title {
+  max-width: 650px; 
+  line-height: 1.1;
+  margin-bottom: 24px;
+}
+
+.tl-hero-sub {
+  max-width: 520px;
+  margin-bottom: 40px; /* Más aire antes de los botones */
+  font-size: 1.15rem; /* Un pelín más grande para equilibrar con el título */
+}
+
+/* 2. Ajustamos la grilla para que la imagen tenga más protagonismo */
+.tl-hero-inner {
+  display: grid !important;
+  grid-template-columns: 1.2fr 1fr !important; /* Mejor proporción */
+  gap: 40px;
+  align-items: center;
+}
+
+/* ============ REFINAMIENTO DE LA IMAGEN Y GLASSMORPHISM ============ */
+
+/* 3. Posicionamiento del contenedor de la derecha */
+.tl-hero-visual {
+  display: flex;
+  justify-content: flex-end; /* Alineamos la foto a la derecha */
+  width: 100%;
+}
+
+/* 4. Le damos forma premium a la imagen (más alta y con un resplandor sutil) */
+.tl-mockup-window.tl-image-container {
+  width: 100%;
+  max-width: 440px; /* Evita que crezca desproporcionadamente */
+  aspect-ratio: 4 / 5; /* Formato ligeramente vertical (retrato), más moderno */
+  padding: 0;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08); /* Borde de cristal muy sutil */
+  /* Sombra oscura para profundidad + resplandor azul sutil de fondo */
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5), 0 0 80px rgba(37, 99, 235, 0.15); 
+  position: relative;
+}
+
+.tl-mockup-window.tl-image-container .hero-vendor-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 24px;
+}
+
+/* 5. Mejoramos la tarjeta flotante: Efecto cristal y romper el marco */
+.floating-badge {
+  position: absolute;
+  bottom: 40px; /* Lo subimos un poco */
+  left: -50px; /* Lo sacamos del marco agresivamente para dar efecto 3D */
+  
+  /* Efecto Glassmorphism real */
+  background: rgba(10, 17, 40, 0.65) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  
+  padding: 16px 24px !important;
+  border-radius: 16px !important;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4) !important;
+  z-index: 10;
+}
+
+/* Responsive para que en móviles no se rompa */
+@media (max-width: 960px) {
+  .tl-hero-inner {
+    grid-template-columns: 1fr !important;
+  }
+  .tl-hero-visual {
+    justify-content: center;
+    margin-top: 30px;
+  }
+  .tl-mockup-window.tl-image-container {
+    aspect-ratio: 16 / 9; /* En móviles vuelve a ser horizontal */
+  }
+  .floating-badge {
+    left: 50%;
+    transform: translateX(-50%); /* Centrado en móviles */
+    bottom: -20px;
+    width: max-content;
+  }
+}
+
+/* Contenedor Principal de la sección interactiva */
+.tl-interactive-container {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 50px;
+  margin-top: 50px;
+  align-items: center;
+}
+
+/* Columna Izquierda: Línea de Tiempo */
+.tl-timeline-steps {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* La línea vertical de fondo */
+.tl-progress-line-bg {
+  position: absolute;
+  left: 24px;
+  top: 20px;
+  bottom: 20px;
+  width: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+}
+
+/* El relleno que crecerá con JS */
+.tl-progress-line-fill {
+  width: 100%;
+  height: 0%; /* Controlado por JS */
+  background: linear-gradient(to bottom, var(--tl-accent), #60a5fa);
+  border-radius: 2px;
+  transition: height 0.4s ease;
+}
+
+/* Tarjetas individuales de pasos */
+.tl-interactive-step {
+  display: flex;
+  gap: 20px;
+  cursor: pointer;
+  padding: 16px;
+  border-radius: 12px;
+  transition: background 0.3s, transform 0.2s;
+  position: relative;
+  z-index: 2;
+}
+
+.tl-interactive-step:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.tl-interactive-step.active {
+  background: rgba(37, 99, 235, 0.06);
+  border: 1px solid rgba(37, 99, 235, 0.15);
+}
+
+/* Círculo indicador del número */
+.tl-step-indicator {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--tl-bg-2);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--tl-grey);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.tl-interactive-step.active .tl-step-indicator {
+  background: var(--tl-accent);
+  border-color: #60a5fa;
+  color: var(--tl-white);
+  box-shadow: 0 0 15px var(--tl-accent-glow);
+}
+
+.tl-interactive-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--tl-grey);
+  transition: color 0.3s;
+}
+
+.tl-interactive-step.active .tl-interactive-title {
+  color: var(--tl-white);
+}
+
+.tl-interactive-desc {
+  font-size: 0.88rem;
+  color: var(--tl-grey-dim);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+/* LADO DERECHO: Teléfono inteligente tipo Apple de Senthora */
+.tl-phone-mockup {
+  width: 100%;
+  max-width: 320px;
+  height: 560px;
+  background: #000000;
+  border: 10px solid #1e293b;
+  border-radius: 40px;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7), 0 0 40px rgba(37, 99, 235, 0.1);
+  margin: 0 auto;
+  overflow: hidden;
+  position: relative;
+}
+
+.tl-phone-screen {
+  width: 100%;
+  height: 100%;
+  background: #0b1329;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Barra superior de status de cel */
+.tl-phone-header {
+  height: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.6);
+  z-index: 10;
+}
+.tl-phone-notch {
+  width: 110px;
+  height: 25px;
+  background: #000;
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Control de las vistas dinámicas interactivas */
+.tl-phone-content {
+  flex: 1;
+  padding: 20px;
+  position: relative;
+}
+
+.tl-step-view {
+  position: absolute;
+  inset: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  opacity: 0;
+  transform: translateY(15px);
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.tl-step-view.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Burbujas de diálogo del Asistente Alpaca */
+.tl-avatar-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 140px; 
+  height: 85px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.15); 
+  background: #ffffff; /* Fondo blanco para que unifique con el fondo de la foto */
+  overflow: hidden; /* Corta drásticamente todo lo que se salga del óvalo */
+  margin: 0 auto;
+  position: relative;
+}
+
+.tl-mascot-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Estira y escala la foto para rellenar el óvalo al 100% */
+  object-position: center 25%; /* Sube un poco la foto para centrar la cara y no cortar las orejas */
+  display: block;
+  transform: scale(1.15); /* Agrandamos un poco la imagen para asegurar que cubra los extremos del óvalo */
+}
+
+
+
+.tl-bubble-chat {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  border-top-left-radius: 4px;
+  padding: 12px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: #cbd5e1;
+}
+
+/* Tarjetas y componentes internos simulados en la app */
+.tl-mini-card {
+  background: var(--tl-bg-3);
+  border: 1px solid var(--tl-line-strong);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+.tl-mini-card strong { font-size: 1.1rem; color: #fff; }
+.badge-lock { color: #f59e0b; font-size: 0.7rem; font-weight: bold; }
+
+.tl-code-input-demo {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.code-box {
+  width: 35px; height: 35px;
+  border: 2px solid var(--tl-accent);
+  background: rgba(37,99,235,0.1);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: bold; font-size: 0.9rem; color: #fff;
+}
+
+.success-card { border-color: var(--tl-green); }
+.progress-bar-mini { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 5px; overflow: hidden; }
+.progress-bar-mini .fill { height: 100%; background: var(--tl-green); }
+
+/* Responsivo para móviles */
+@media (max-width: 850px) {
+  .tl-interactive-container { grid-template-columns: 1fr; gap: 40px; }
+  .tl-phone-mockup { max-width: 290px; height: 500px; }
+}
+
+/* Iconos del status bar superior */
+.tl-phone-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tl-phone-icon-svg {
+  width: 13px !important;
+  height: 13px !important;
+  display: inline-block;
+  /* Atributo clave para pintar las líneas de Lucide */
+  stroke: rgba(255, 255, 255, 0.6) !important; 
+  stroke-width: 2.5;
+  fill: none; 
+}
+
+/* Icono de candado en la mini-tarjeta de bloqueo */
+.badge-lock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #f59e0b;
+  font-size: 0.72rem;
+  font-weight: bold;
+}
+
+/* Forzamos estilos al candado interactivo */
+.badge-lock [data-lucide="lock"],
+.badge-lock svg {
+  width: 12px !important;
+  height: 12px !important;
+  stroke: #f59e0b !important;
+  stroke-width: 2.5;
+  fill: none;
+  display: inline-block;
+}
+
+
+/* Icono de premio/medalla en el paso 3 */
+.success-card span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 0.75rem;
+}
+
+.success-card svg {
+  width: 14px;
+  height: 14px;
+  color: var(--tl-green);
+  stroke-width: 2.5;
+}
+
+/* Centrado simétrico del encabezado */
+.tl-how-header-centered {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 60px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tl-how-header-centered .tl-eyebrow {
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Transición optimizada para cambios milimétricos continuos */
+.tl-progress-line-fill {
+  width: 100%;
+  height: 0%; 
+  background: linear-gradient(to bottom, var(--tl-accent), #60a5fa);
+  border-radius: 2px;
+  /* Eliminamos el retraso (ease) para que se pegue al scroll de forma orgánica */
+  transition: height 0.05s linear; 
+}
+
+/* --- CORRECCIÓN INTEGRACIÓN PREMIUM DEL TOPBAR (.tl-nav) --- */
+.tl-nav {
+  position: sticky !important; /* Mantiene su espacio físico para que NADA se encime al cargar */
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 32px !important;
+  
+  /* Estado inicial: Fondo transparente, sin bordes, completamente invisible */
+  background: transparent !important;
+  border-bottom: 1px solid transparent !important;
+  backdrop-filter: blur(0px) !important;
+  -webkit-backdrop-filter: blur(0px) !important;
+  box-shadow: none !important;
+  
+  /* Transición suave para cuando se active el efecto */
+  transition: background 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease, padding 0.3s ease !important;
+}
+
+/* Esta clase se activará dinámicamente con JavaScript solo al bajar la página */
+.tl-nav.scrolled {
+  position: fixed !important; /* Cambia a flotante fijo solo cuando bajas */
+  width: 100%;
+  background: rgba(10, 17, 40, 0.75) !important; /* Fondo oscuro sutil */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important; /* Línea cristalina de división */
+  backdrop-filter: blur(14px) !important; /* Efecto vidrio premium de Senthora */
+  -webkit-backdrop-filter: blur(14px) !important;
+  padding: 12px 32px !important; /* Se hace más compacto y elegante */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* --- OPTIMIZACIÓN DEL HERO Y CAPA PARALLAX (.tl-hero) --- */
+.tl-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 40px 0 110px !important; /* Regresamos a tu padding original para que no haya espacios gigantes */
+  background: var(--tl-bg) !important;
+  margin-top: 0 !important;
+}
+
+.tl-hero-bg-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 130%; /* Margen para el movimiento */
+  z-index: 0;
+  background: 
+    radial-gradient(ellipse 900px 500px at 15% 0%, rgba(37,99,235,0.16), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 100% 30%, rgba(37,99,235,0.08), transparent 55%) !important;
+  pointer-events: none;
+  will-change: transform, filter;
+}
+
+.tl-hero-inner {
+  position: relative;
+  z-index: 2 !important; /* Asegura que textos y fotos queden sobre las luces */
+}
+
+
+/* --- SECCIÓN CREMA DE INSIGHTS --- */
+.tl-data-insights-section {
+  background-color: #fcfbfa; /* Fondo crema premium */
+  color: #0f172a; /* Textos oscuros de alta legibilidad */
+  padding: 120px 0;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  position: relative;
+}
+
+.tl-insights-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 60px auto;
+}
+
+.tl-insights-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--tl-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.tl-insights-title {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.tl-insights-desc {
+  font-size: 1.05rem;
+  color: #475569;
+  margin-top: 14px;
+}
+
+/* Grilla de Tarjetas Gráficas */
+.tl-insights-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+@media (max-width: 960px) {
+  .tl-insights-grid { grid-template-columns: 1fr; }
+}
+
+.tl-insight-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.02);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.tl-insight-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.05);
+}
+
+.tl-card-num {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--tl-grey-dim);
+  font-weight: bold;
+}
+
+.tl-card-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 10px 0 6px 0;
+  color: #0f172a;
+}
+
+.tl-card-text {
+  font-size: 0.9rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin-bottom: 30px;
+}
+
+/* --- INTERACTIVIDAD GRÁFICA 1: BARRAS --- */
+.tl-bar-chart-container {
+  margin-top: auto;
+}
+
+.tl-main-bar {
+  height: 45px;
+  width: 100%;
+  background: #f1f5f9;
+  border-radius: 12px;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+
+.tl-bar-segment {
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: bold;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tl-bar-segment.formal {
+  background-color: #cbd5e1;
+  color: #334155;
+}
+
+.tl-bar-segment.informal {
+  background-color: #3b82f6;
+  color: #ffffff;
+}
+
+/* Efecto Hover: Al pasar el mouse por la tarjeta, el 70.2% informal se resalta y desenfoca el resto */
+.tl-insight-card:hover .tl-bar-segment.formal {
+  filter: blur(2px);
+  opacity: 0.4;
+}
+
+.tl-insight-card:hover .tl-bar-segment.informal {
+  background-color: #1d4ed8;
+  transform: scaleY(1.05);
+  box-shadow: 0 0 20px rgba(29, 78, 216, 0.3);
+}
+
+.tl-chart-meta {
+  margin-top: 16px;
+  font-size: 0.85rem;
+  color: #334155;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tl-source-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+/* --- INTERACTIVIDAD GRÁFICA 2: BURBUJAS --- */
+.tl-bubble-chart-container {
+  margin-top: auto;
+}
+
+.tl-bubble-wrapper {
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  position: relative;
+}
+
+.tl-bubble {
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.formal-bubble {
+  width: 100px;
+  height: 100px;
+  background: rgba(15, 23, 42, 0.05);
+  border: 2px dashed #94a3b8;
+  color: #475569;
+}
+
+.informal-bubble {
+  width: 55px; /* Proporcionalmente 3 veces más pequeña en área visual */
+  height: 55px;
+  background: rgba(37, 99, 235, 0.1);
+  border: 2px solid var(--tl-accent);
+  color: var(--tl-accent);
+}
+
+.bubble-pct { font-weight: 700; font-size: 1.2rem; }
+.informal-bubble .bubble-pct { font-size: 0.95rem; }
+.bubble-label { font-size: 0.65rem; font-family: var(--font-body); font-weight: 600; margin-top: 2px; }
+
+/* Efecto hover burbujas */
+.tl-insight-card:hover .formal-bubble {
+  transform: scale(0.9);
+  opacity: 0.5;
+}
+.tl-insight-card:hover .informal-bubble {
+  transform: scale(1.2);
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
+}
+
+/* --- INTERACTIVIDAD GRÁFICA 3: FLUJO SANKEY --- */
+.tl-flow-chart-container {
+  margin-top: auto;
+  height: 120px;
+  display: grid;
+  grid-template-columns: 80px 1fr 100px;
+  grid-template-rows: 1fr 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.tl-flow-node {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 6px;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+}
+.tl-flow-node small { font-size: 0.6rem; color: #64748b; font-weight: normal; }
+
+.tl-flow-node.source { grid-row: 1 / span 2; border-color: #cbd5e1; }
+.tl-flow-node.target-safe { grid-column: 3; grid-row: 1; border-color: rgba(34, 197, 94, 0.3); color: #16a34a; }
+.tl-flow-node.target-leak { grid-column: 3; grid-row: 2; border-color: rgba(239, 68, 68, 0.3); color: #dc2626; }
+
+.tl-flow-pipes {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  position: relative;
+  height: 100%;
+}
+
+.tl-pipe-line {
+  position: absolute;
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.tl-pipe-line.main-flow {
+  top: 30%; left: 0; width: 100%; height: 8px;
+  background: linear-gradient(to right, #cbd5e1, #22c55e);
+  transform: rotate(12deg);
+  transform-origin: left center;
+}
+
+.tl-pipe-line.leak-flow {
+  top: 55%; left: 0; width: 100%; height: 4px;
+  background: linear-gradient(to right, #cbd5e1, #ef4444);
+  transform: rotate(32deg);
+  transform-origin: left center;
+  animation: pulse-leak 2s infinite;
+}
+
+@keyframes pulse-leak {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* --- LA CALCULADORA DE USURA CONTRA EL GOTA A GOTA --- */
+.tl-calculator-box {
+  margin-top: 60px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 24px;
+  padding: 40px;
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 50px;
+  align-items: center;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.03);
+}
+
+@media (max-width: 850px) {
+  .tl-calculator-box { grid-template-columns: 1fr; gap: 30px; padding: 30px; }
+}
+
+.badge-alert {
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.tl-calc-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.tl-calc-desc {
+  font-size: 0.92rem;
+  color: #475569;
+  line-height: 1.6;
+  margin-top: 10px;
+}
+
+.tl-calc-inputs-results {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.tl-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tl-input-group label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.tl-input-group input {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  font-family: var(--font-mono);
+  transition: border-color 0.2s;
+}
+
+.tl-input-group input:focus {
+  outline: none;
+  border-color: var(--tl-accent);
+}
+
+.input-tip {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.tl-calc-results {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 500px) {
+  .tl-calc-results { grid-template-columns: 1fr; }
+}
+
+.result-item {
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+.result-item.usury {
+  border-color: rgba(239, 68, 68, 0.15);
+  background: rgba(239, 68, 68, 0.01);
+}
+
+.result-label {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.result-item strong {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.result-item.usury strong {
+  color: #ef4444;
+}
+
+.result-sub {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* --- ESTILOS DE LA SECCIÓN DE INSIGHTS PREMIUM (FONDO CREMA) --- */
+.tl-premium-insights {
+  background-color: #f7f6f0; /* Fondo crema limpio y elegante */
+  color: #0b1329;
+  padding: 120px 0;
+  border-top: 1px solid rgba(11, 19, 41, 0.05);
+  border-bottom: 1px solid rgba(11, 19, 41, 0.05);
+  font-family: var(--font-body);
+}
+
+.tl-ins-header {
+  text-align: center;
+  margin-bottom: 70px;
+}
+
+.tl-ins-tag {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--tl-accent);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tl-ins-h2 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-top: 8px;
+  color: #0b1329;
+}
+
+/* Grilla de gráficos de alta fidelidad */
+.tl-ins-showcase {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-bottom: 60px;
+}
+
+@media (max-width: 950px) {
+  .tl-ins-showcase { grid-template-columns: 1fr; }
+}
+
+/* Tarjetas de Gráficos */
+.tl-chart-card {
+  background: #ffffff;
+  border: 1px solid rgba(11, 19, 41, 0.04);
+  border-radius: 24px;
+  padding: 36px;
+  box-shadow: 0 12px 40px rgba(11, 19, 41, 0.02);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+
+.tl-chart-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 48px rgba(11, 19, 41, 0.06);
+}
+
+/* Área Visual interna del gráfico */
+.tl-chart-visual {
+  width: 100%;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 30px;
+}
+
+/* --- GRÁFICO 1: DONUT CHART SVG --- */
+.tl-donut-chart {
+  width: 140px;
+  height: 140px;
+  transform: rotate(-90deg); /* Arranca desde el tope superior vertical */
+}
+
+.donut-bg {
+  fill: none;
+  stroke: #f1f5f9;
+  stroke-width: 16;
+}
+
+.donut-segment {
+  fill: none;
+  stroke-width: 16;
+  stroke-linecap: round;
+  transition: stroke-dasharray 1s ease-out;
+}
+
+.formal-seg {
+  stroke: #cbd5e1;
+  stroke-dasharray: 408.4; /* Perímetro total 2 * PI * r */
+  stroke-dashoffset: 408.4; /* Se llena dinámicamente */
+}
+
+.informal-seg {
+  stroke: var(--tl-accent); /* Color azul eléctrico de TrustLink */
+  stroke-dasharray: 408.4;
+  stroke-dashoffset: 408.4;
+}
+
+.tl-donut-center {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tl-donut-center strong { font-size: 1.6rem; font-weight: 700; font-family: var(--font-display); }
+.tl-donut-center span { font-size: 0.72rem; color: var(--tl-grey-dim); text-transform: uppercase; font-family: var(--font-mono); }
+
+/* --- GRÁFICO 2: BARRAS ALINEADAS --- */
+.tl-chart-visual.split-bars {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  align-items: flex-end;
+  padding-bottom: 10px;
+}
+
+.tl-bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.tl-bar-track {
+  width: 32px;
+  height: 120px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.tl-bar-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0; /* Animado con JS o CSS dinámico */
+  border-radius: 8px;
+  display: flex;
+  align-items: top;
+  justify-content: center;
+  padding-top: 8px;
+  transition: height 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.formal-bar { background-color: #cbd5e1; }
+.informal-bar { background-color: var(--tl-accent); }
+
+.tl-bar-val {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #0b1329;
+}
+.informal-bar .tl-bar-val { color: #fff; }
+.tl-bar-axis { font-size: 0.75rem; font-weight: 600; color: #475569; margin-top: 8px; }
+
+/* --- GRÁFICO 3: FLUJO VECTORIAL (PATH ANIMADO) --- */
+.flow-vector {
+  width: 100%;
+}
+
+.tl-vector-path {
+  width: 100%;
+  height: 100%;
+}
+
+.path-bg { stroke: #e2e8f0; stroke-width: 4; fill: none; }
+.path-success { stroke: var(--tl-green); stroke-width: 4; fill: none; stroke-dasharray: 200; stroke-dashoffset: 200; transition: stroke-dashoffset 1.2s ease; }
+.path-leak { stroke: #ef4444; stroke-width: 3; fill: none; stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset 1.2s ease 0.3s; }
+
+.flow-badge {
+  position: absolute;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  background: #fff;
+  border: 1px solid #e2e8f0;
+}
+
+.safe-node { top: 45%; left: 0; border-color: #cbd5e1; }
+.leak-node { top: 0; right: 0; border-color: rgba(34, 197, 94, 0.3); color: var(--tl-green); }
+.danger-node { bottom: 0; right: 0; border-color: rgba(239, 68, 68, 0.3); color: #ef4444; }
+
+/* Textos informativos de las tarjetas */
+.tl-chart-info { width: 100%; }
+.tl-chart-info h3 { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; color: #0b1329; margin-bottom: 8px; }
+.tl-chart-info p { font-size: 0.88rem; color: #475569; line-height: 1.5; min-height: 45px; }
+.tl-ins-source { font-family: var(--font-mono); font-size: 0.68rem; color: #94a3b8; text-transform: uppercase; display: block; margin-top: 14px; }
+
+/* --- CALCULADORA ESTILO STRIPE INTERACTIVA --- */
+.tl-premium-calc {
+  background: #ffffff;
+  border-radius: 28px;
+  border: 1px solid rgba(11, 19, 41, 0.05);
+  padding: 44px;
+  box-shadow: 0 30px 60px rgba(11, 19, 41, 0.03);
+}
+
+.tl-calc-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 16px;
+}
+
+.tl-alert-dot { width: 8px; height: 8px; background: #ef4444; border-radius: 50%; display: inline-block; }
+.tl-calc-header h3 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; }
+
+.tl-calc-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+@media (max-width: 800px) {
+  .tl-calc-body { grid-template-columns: 1fr; gap: 30px; }
+}
+
+.tl-calc-input-box label { font-size: 0.9rem; font-weight: 600; color: #475569; display: block; margin-bottom: 10px; }
+
+.tl-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 4px 16px;
+}
+
+.tl-input-wrapper span { font-family: var(--font-mono); font-weight: 700; color: #94a3b8; font-size: 1.2rem; }
+.tl-input-wrapper input {
+  background: transparent; border: none; width: 100%; padding: 10px;
+  font-size: 1.3rem; font-weight: 700; font-family: var(--font-mono); color: #0b1329;
+}
+.tl-input-wrapper input:focus { outline: none; }
+
+.tl-calc-display-box { display: flex; flex-direction: column; gap: 16px; }
+.calc-metric { background: #f8fafc; border-radius: 14px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #e2e8f0; }
+.calc-metric.usury { border-color: rgba(239, 68, 68, 0.12); background: rgba(239, 68, 68, 0.005); }
+
+.metric-lbl { font-size: 0.85rem; font-weight: 500; color: #475569; }
+.calc-metric strong { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; }
+.calc-metric.usury strong { color: #ef4444; }
+
+.green-tag { background: rgba(34, 197, 94, 0.1); color: var(--tl-green); padding: 2px 8px; border-radius: 6px; font-size: 0.68rem; font-family: var(--font-mono); }
+
+.flow-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tl-ins-icon {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.danger-node .tl-ins-icon {
+  stroke: #ef4444; /* Color rojo para el icono de advertencia */
+}
+
+.leak-node .tl-ins-icon {
+  stroke: var(--tl-green); /* Color verde para el candado seguro de escrow */
+}
+
+/* --- CORRECCIÓN DE COLOR PARA EL SIMULADOR EN EL MODO OSCURO --- */
+#problema .tl-premium-calc {
+  background: #ffffff !important; /* Mantenemos la tarjeta blanca para que resalte del fondo azul */
+}
+
+#problema .tl-premium-calc h3 {
+  color: #0f172a !important; /* Fuerza el color del título principal a gris muy oscuro */
+  font-weight: 700;
+}
+
+#problema .tl-premium-calc label {
+  color: #475569 !important; /* Ajusta el texto "¿Qué capital necesitas simular?" */
+  font-weight: 600;
+}
+
+#problema .tl-input-wrapper input {
+  color: #0f172a !important; /* Asegura que el número digitado por el usuario sea legible */
+}
+
+#problema .metric-lbl {
+  color: #475569 !important; /* Forzamos la legibilidad de las etiquetas de costos a la derecha */
+}
+
+/* --- CONTENEDOR MAESTRO DEL EFECTO --- */
+.tl-hero-scroll-container {
+  min-height: 240vh; /* Espacio de tracción del scroll */
+  background: var(--tl-bg);
+}
+
+/* Forzado de proporciones de la vista inicial completa */
+.tl-hero-fullscreen-viewport {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--tl-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* --- TARJETAS QUE APARECEN A LOS EXTREMOS (INSIGHTS) --- */
+.tl-grid-insight-card {
+  background: rgba(14, 24, 54, 0.45);
+  border: 1px solid var(--tl-line);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 24px;
+  border-radius: 20px;
+  text-align: left;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.tl-grid-card-num {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--tl-accent);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.tl-grid-insight-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--tl-white);
+  margin-bottom: 8px;
+}
+
+.tl-grid-insight-card p {
+  font-size: 0.85rem;
+  color: var(--tl-grey);
+  line-height: 1.5;
+}
+
+.tl-grid-card-source {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--tl-grey-dim);
+  text-transform: uppercase;
+  margin-top: 14px;
+  display: block;
+}
+
+/* --- MEDALLAS TÉCNICAS INTERMEDIAS --- */
+.tl-grid-technical-badge {
+  background: var(--tl-bg-2);
+  border: 1px solid var(--tl-line-strong);
+  padding: 16px 20px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.badge-tech-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--tl-accent);
+}
+
+.tl-grid-technical-badge strong {
+  font-family: var(--font-display);
+  color: var(--tl-white);
+  font-size: 0.95rem;
+}
+
+.tl-grid-technical-badge small {
+  font-size: 0.78rem;
+  color: var(--tl-grey);
+}
+
+/* --- CONTENEDOR DE CADA IMAGEN EN LA CUADRÍCULA --- */
+.tl-grid-image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--tl-line-strong);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+.tl-grid-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.tl-grid-image-wrapper:hover img {
+  transform: scale(1.05);
+}
+
+/* Capa de degradado oscuro y texto flotante sobre la foto */
+.tl-grid-image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10, 17, 40, 0.95) 15%, rgba(10, 17, 40, 0.2) 60%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 18px;
+  text-align: left;
+}
+
+.tl-grid-image-overlay h3 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--tl-white);
+  font-weight: 700;
+}
+
+/* Estilo para las etiquetas técnicas on-chain */
+.tl-grid-image-overlay.technical {
+  background: linear-gradient(to top, rgba(37, 99, 235, 0.85) 10%, rgba(10, 17, 40, 0.4) 70%);
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.tl-grid-image-overlay.technical span {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--tl-white);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.tl-grid-image-overlay.technical svg {
+  color: var(--tl-white);
+  margin-bottom: 2px;
+}
+
+/* Altura de tracción del scroll global de la sección */
+.tl-hero-scroll-container {
+  min-height: 240vh;
+  background: var(--tl-bg);
+}
+
+/* Forzado simétrico de tu bloque de Hero actual */
+.tl-hero-fullscreen-viewport {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--tl-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* Encapsulado estricto para las imágenes que vuelan a los lados */
+.grid img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 1px solid var(--tl-line);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* ============================================================
+   TRUSTLINK — HERO SCROLL + SUBGRID
+   ============================================================ */
+
+/* Contenedor que genera el recorrido del scroll */
+.tl-hero-scroll-container {
+  position: relative;
+  min-height: 300vh;
+  background: var(--tl-bg);
+
+  /* View Timeline nativo */
+  view-timeline-name: --trustlink-hero;
+  view-timeline-axis: block;
+
+  overflow: clip;
+}
+
+
+/* ============================================================
+   ZONA STICKY
+   ============================================================ */
+
+.tl-hero-scroll-container > .content {
+  position: sticky;
+  top: 0;
+
+  width: 100%;
+  height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* ============================================================
+   GRID PRINCIPAL 5 x 3
+   ============================================================ */
+
+.tl-hero-scroll-container .grid {
+  position: relative;
+
+  width: min(94vw, 1400px);
+  height: min(88vh, 820px);
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+
+  grid-template-rows:
+    repeat(3, minmax(0, 1fr));
+
+  gap: clamp(8px, 1.4vw, 20px);
+
+  align-items: stretch;
+  justify-items: stretch;
+}
+
+
+/* ============================================================
+   CAPAS
+   Cada layer utiliza exactamente las mismas líneas del grid
+   gracias a CSS SUBGRID.
+   ============================================================ */
+
+.tl-hero-scroll-container .layer {
+  position: relative;
+
+  display: grid;
+
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+
+  grid-template-columns: subgrid;
+  grid-template-rows: subgrid;
+
+  gap: inherit;
+
+  pointer-events: none;
+
+  z-index: 1;
+
+  opacity: 1;
+}
+
+
+/* Cada celda */
+.tl-hero-scroll-container .layer > div {
+  min-width: 0;
+  min-height: 0;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+
+  border-radius: clamp(10px, 1.2vw, 20px);
+
+  background: var(--tl-bg-2);
+
+  border: 1px solid var(--tl-line-strong);
+
+  box-shadow:
+    0 20px 45px rgba(0, 0, 0, 0.35);
+}
+
+
+/* Imágenes */
+.tl-hero-scroll-container .layer img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
+  border-radius: inherit;
+
+  transition: transform .4s ease;
+}
+
+
+/* ============================================================
+   POSICIONES — CAPA 1
+   ============================================================ */
+
+/* 1 → esquina superior izquierda */
+.tl-hero-scroll-container .layer:nth-child(1) > div:nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+/* 2 → esquina superior derecha */
+.tl-hero-scroll-container .layer:nth-child(1) > div:nth-child(2) {
+  grid-column: 5;
+  grid-row: 1;
+}
+
+/* 3 → izquierda centro */
+.tl-hero-scroll-container .layer:nth-child(1) > div:nth-child(3) {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+/* 4 → derecha centro */
+.tl-hero-scroll-container .layer:nth-child(1) > div:nth-child(4) {
+  grid-column: 5;
+  grid-row: 2;
+}
+
+/* 5 → izquierda inferior */
+.tl-hero-scroll-container .layer:nth-child(1) > div:nth-child(5) {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+/* 6 → derecha inferior */
+.tl-hero-scroll-container .layer:nth-child(1) > div:nth-child(6) {
+  grid-column: 5;
+  grid-row: 3;
+}
+
+
+/* ============================================================
+   POSICIONES — CAPA 2
+   ============================================================ */
+
+.tl-hero-scroll-container .layer:nth-child(2) > div:nth-child(1) {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.tl-hero-scroll-container .layer:nth-child(2) > div:nth-child(2) {
+  grid-column: 4;
+  grid-row: 1;
+}
+
+.tl-hero-scroll-container .layer:nth-child(2) > div:nth-child(3) {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.tl-hero-scroll-container .layer:nth-child(2) > div:nth-child(4) {
+  grid-column: 4;
+  grid-row: 2;
+}
+
+.tl-hero-scroll-container .layer:nth-child(2) > div:nth-child(5) {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.tl-hero-scroll-container .layer:nth-child(2) > div:nth-child(6) {
+  grid-column: 4;
+  grid-row: 3;
+}
+
+
+/* ============================================================
+   POSICIONES — CAPA 3
+   ============================================================ */
+
+.tl-hero-scroll-container .layer:nth-child(3) > div:nth-child(1) {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.tl-hero-scroll-container .layer:nth-child(3) > div:nth-child(2) {
+  grid-column: 3;
+  grid-row: 3;
+}
+
+
+/* ============================================================
+   ANIMACIÓN DE LAS CAPAS
+   ============================================================ */
+
+.tl-hero-scroll-container .layer {
+  animation-name: trustlinkLayers;
+  animation-duration: 1ms;
+  animation-fill-mode: both;
+  animation-timing-function: linear;
+
+  animation-timeline: --trustlink-hero;
+
+  animation-range: entry 0% exit 100%;
+}
+
+
+/* Capa lejana */
+.tl-hero-scroll-container .layer:nth-child(1) {
+  animation-name: trustlinkLayerFar;
+}
+
+
+/* Capa intermedia */
+.tl-hero-scroll-container .layer:nth-child(2) {
+  animation-name: trustlinkLayerMiddle;
+}
+
+
+/* Capa central */
+.tl-hero-scroll-container .layer:nth-child(3) {
+  animation-name: trustlinkLayerCenter;
+}
+
+
+/* ============================================================
+   KEYFRAMES DE LAS CAPAS
+   ============================================================ */
+
+@keyframes trustlinkLayerFar {
+
+  0% {
+    opacity: 0;
+    transform: scale(.15);
+  }
+
+  25% {
+    opacity: .15;
+    transform: scale(.35);
+  }
+
+  60% {
+    opacity: .85;
+    transform: scale(.85);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+}
+
+
+@keyframes trustlinkLayerMiddle {
+
+  0% {
+    opacity: 0;
+    transform: scale(.1);
+  }
+
+  35% {
+    opacity: 0;
+    transform: scale(.25);
+  }
+
+  65% {
+    opacity: .9;
+    transform: scale(.85);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+}
+
+
+@keyframes trustlinkLayerCenter {
+
+  0% {
+    opacity: 0;
+    transform: scale(.1);
+  }
+
+  50% {
+    opacity: 0;
+    transform: scale(.25);
+  }
+
+  75% {
+    opacity: .8;
+    transform: scale(.9);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+}
+
+
+/* ============================================================
+   SCALER CENTRAL
+   ============================================================ */
+
+.tl-hero-scroll-container .scaler {
+
+  position: relative;
+
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  place-items: center;
+
+  z-index: 20;
+
+  transform-origin: center center;
+
+  animation-name: trustlinkHeroShrink;
+  animation-duration: 1ms;
+  animation-fill-mode: both;
+  animation-timing-function: linear;
+
+  animation-timeline: --trustlink-hero;
+
+  animation-range: entry 0% exit 100%;
+}
+
+
+/*
+   El hero comienza ocupando prácticamente toda la pantalla
+   y termina convertido en una celda central.
+*/
+
+@keyframes trustlinkHeroShrink {
+
+  0% {
+    transform: scale(1);
+  }
+
+  15% {
+    transform: scale(.95);
+  }
+
+  45% {
+    transform: scale(.75);
+  }
+
+  70% {
+    transform: scale(.48);
+  }
+
+  100% {
+    transform: scale(.27);
+  }
+
+}
+
+
+/* ============================================================
+   VIEWPORT DEL HERO
+   ============================================================ */
+
+.tl-hero-scroll-container .tl-hero-fullscreen-viewport {
+
+  position: relative;
+
+  top: auto;
+  left: auto;
+
+  width: 100vw;
+  height: 100vh;
+
+  transform: none;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background: var(--tl-bg);
+
+  overflow: hidden;
+}
+
+
+/* El hero ocupa todo el viewport */
+.tl-hero-scroll-container .tl-hero {
+
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+
+  overflow: hidden;
+}
+
+
+/* ============================================================
+   EL TEXTO DESAPARECE PROGRESIVAMENTE
+   PARA QUE AL FINAL QUEDE LA IMAGEN
+   ============================================================ */
+
+.tl-hero-scroll-container .tl-hero-content {
+
+  animation: trustlinkHeroTextOut 1ms linear both;
+
+  animation-timeline: --trustlink-hero;
+
+  animation-range: entry 0% exit 100%;
+}
+
+
+@keyframes trustlinkHeroTextOut {
+
+  0%,
+  45% {
+    opacity: 1;
+  }
+
+  65% {
+    opacity: .4;
+  }
+
+  78%,
+  100% {
+    opacity: 0;
+  }
+
+}
+
+
+/* ============================================================
+   IMAGEN CENTRAL
+   ============================================================ */
+
+.tl-hero-scroll-container .tl-hero-visual {
+
+  position: relative;
+  z-index: 2;
+}
+
+
+/* ============================================================
+   CAPA SUPERIOR
+   ============================================================ */
+
+.tl-hero-scroll-container .scaler {
+  pointer-events: none;
+}
+
+.tl-hero-scroll-container .scaler a,
+.tl-hero-scroll-container .scaler button {
+  pointer-events: auto;
+}
+
+
+/* ============================================================
+   FALLBACK PARA NAVEGADORES SIN SCROLL-TIMELINE
+   ============================================================ */
+
+@supports not (animation-timeline: view()) {
+
+  .tl-hero-scroll-container {
+    min-height: 300vh;
+  }
+
+}
+
+/* ============================================================
+   TRUSTLINK — SCROLL MORPHING HERO
+   HERO → GRID CENTRAL
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   1. CONTENEDOR DEL RECORRIDO
+   ------------------------------------------------------------ */
+
+.tl-hero-scroll-container {
+    position: relative;
+
+    height: 300vh;
+
+    view-timeline-name: --trustlink-scroll;
+    view-timeline-axis: block;
+
+    overflow: clip;
+}
+
+/* ------------------------------------------------------------
+   2. ESCENARIO FIJO
+   ------------------------------------------------------------ */
+
+.tl-hero-scroll-container > .content {
+    position: sticky;
+
+    top: 0;
+
+    width: 100%;
+    height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* ------------------------------------------------------------
+   3. GRID 5 × 3
+   ------------------------------------------------------------ */
+
+.tl-hero-scroll-container .grid {
+
+    position: relative;
+
+    width: min(94vw, 1400px);
+    height: min(86vh, 800px);
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    grid-template-rows:
+        repeat(3, minmax(0, 1fr));
+
+    gap: clamp(8px, 1.2vw, 18px);
+
+    align-items: stretch;
+    justify-items: stretch;
+}
+
+
+/* ------------------------------------------------------------
+   4. TODAS LAS CAPAS COMPARTEN EL MISMO GRID
+   SUBGRID
+   ------------------------------------------------------------ */
+
+.tl-hero-scroll-container .layer {
+
+    position: relative;
+
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+
+    display: grid;
+
+    grid-template-columns: subgrid;
+    grid-template-rows: subgrid;
+
+    gap: inherit;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 5;
+
+    pointer-events: none;
+}
+
+
+/* ------------------------------------------------------------
+   5. TARJETAS DE LAS IMÁGENES
+   ------------------------------------------------------------ */
+
+.tl-hero-scroll-container .layer > div {
+
+    width: 100%;
+    height: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    overflow: hidden;
+
+    border-radius: 18px;
+
+    border: 1px solid var(--tl-line-strong);
+
+    background: var(--tl-bg-2);
+
+    box-shadow:
+        0 20px 45px rgba(0, 0, 0, .32);
+}
+
+
+.tl-hero-scroll-container .layer img {
+
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    border-radius: inherit;
+}
+
+
+/* ------------------------------------------------------------
+   6. POSICIONES DE LA CAPA EXTERIOR
+   ------------------------------------------------------------ */
+
+.tl-hero-scroll-container .layer:nth-child(1) > div:nth-child(1) {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.tl-hero-scroll-container .layer:nth-child(1) > div:nth-child(2) {
+    grid-column: 5;
+    grid-row: 1;
+}
+
+.tl-hero-scroll-container .layer:nth-child(1) > div:nth-child(3) {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.tl-hero-scroll-container .layer:nth-child(1) > div:nth-child(4) {
+    grid-column: 5;
+    grid-row: 2;
+}
+
+.tl-hero-scroll-container .layer:nth-child(1) > div:nth-child(5) {
+    grid-column: 1;
+    grid-row: 3;
+}
+
+.tl-hero-scroll-container .layer:nth-child(1) > div:nth-child(6) {
+    grid-column: 5;
+    grid-row: 3;
+}
+
+
+/* ------------------------------------------------------------
+   7. POSICIONES DE LA CAPA INTERMEDIA
+   ------------------------------------------------------------ */
+
+.tl-hero-scroll-container .layer:nth-child(2) > div:nth-child(1) {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.tl-hero-scroll-container .layer:nth-child(2) > div:nth-child(2) {
+    grid-column: 4;
+    grid-row: 1;
+}
+
+.tl-hero-scroll-container .layer:nth-child(2) > div:nth-child(3) {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.tl-hero-scroll-container .layer:nth-child(2) > div:nth-child(4) {
+    grid-column: 4;
+    grid-row: 2;
+}
+
+.tl-hero-scroll-container .layer:nth-child(2) > div:nth-child(5) {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+.tl-hero-scroll-container .layer:nth-child(2) > div:nth-child(6) {
+    grid-column: 4;
+    grid-row: 3;
+}
+
+
+/* ------------------------------------------------------------
+   8. POSICIONES DE LA CAPA CENTRAL
+   ------------------------------------------------------------ */
+
+.tl-hero-scroll-container .layer:nth-child(3) > div:nth-child(1) {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+.tl-hero-scroll-container .layer:nth-child(3) > div:nth-child(2) {
+    grid-column: 3;
+    grid-row: 3;
+}
+
+
+/* ============================================================
+   9. ANIMACIÓN DE LAS IMÁGENES
+   ============================================================ */
+
+.tl-hero-scroll-container .layer:nth-child(1) {
+
+    opacity: 0;
+
+    transform: scale(.18);
+
+    animation:
+        trustlink-layer-outer 1ms linear both;
+
+    animation-timeline: --trustlink-scroll;
+
+    animation-range: entry 5% exit 90%;
+}
+
+
+.tl-hero-scroll-container .layer:nth-child(2) {
+
+    opacity: 0;
+
+    transform: scale(.12);
+
+    animation:
+        trustlink-layer-middle 1ms linear both;
+
+    animation-timeline: --trustlink-scroll;
+
+    animation-range: entry 20% exit 90%;
+}
+
+
+.tl-hero-scroll-container .layer:nth-child(3) {
+
+    opacity: 0;
+
+    transform: scale(.08);
+
+    animation:
+        trustlink-layer-inner 1ms linear both;
+
+    animation-timeline: --trustlink-scroll;
+
+    animation-range: entry 35% exit 90%;
+}
+
+
+/* ------------------------------------------------------------
+   CAPA EXTERIOR
+   ------------------------------------------------------------ */
+
+@keyframes trustlink-layer-outer {
+
+    0% {
+        opacity: 0;
+        transform: scale(.18);
+    }
+
+    25% {
+        opacity: .15;
+        transform: scale(.35);
+    }
+
+    55% {
+        opacity: .75;
+        transform: scale(.82);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+/* ------------------------------------------------------------
+   CAPA INTERMEDIA
+   ------------------------------------------------------------ */
+
+@keyframes trustlink-layer-middle {
+
+    0% {
+        opacity: 0;
+        transform: scale(.12);
+    }
+
+    25% {
+        opacity: 0;
+        transform: scale(.20);
+    }
+
+    60% {
+        opacity: .8;
+        transform: scale(.85);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+/* ------------------------------------------------------------
+   CAPA CENTRAL
+   ------------------------------------------------------------ */
+
+@keyframes trustlink-layer-inner {
+
+    0% {
+        opacity: 0;
+        transform: scale(.08);
+    }
+
+    30% {
+        opacity: 0;
+        transform: scale(.15);
+    }
+
+    65% {
+        opacity: .8;
+        transform: scale(.88);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+/* ============================================================
+   10. SCALER
+   ============================================================ */
+
+.tl-hero-scroll-container .scaler {
+
+    position: relative;
+
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+
+    z-index: 50;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    transform-origin: center center;
+
+    pointer-events: none;
+
+    animation:
+        trustlink-scaler-morph 1ms linear both;
+
+    animation-timeline: --trustlink-scroll;
+
+    animation-range: entry 0% exit 90%;
+}
+
+
+/* ============================================================
+   11. EL HERO COMPLETO SE REDUCE
+   ============================================================ */
+
+@keyframes trustlink-scaler-morph {
+
+    0% {
+
+        transform:
+            scale(1)
+            translate3d(0, 0, 0);
+
+    }
+
+    20% {
+
+        transform:
+            scale(.92)
+            translate3d(0, 0, 0);
+
+    }
+
+    45% {
+
+        transform:
+            scale(.72)
+            translate3d(0, 0, 0);
+
+    }
+
+    65% {
+
+        transform:
+            scale(.48)
+            translate3d(0, 0, 0);
+
+    }
+
+    82% {
+
+        transform:
+            scale(.30)
+            translate3d(0, 0, 0);
+
+    }
+
+    100% {
+
+        transform:
+            scale(.255)
+            translate3d(0, 0, 0);
+
+    }
+}
+
+
+/* ============================================================
+   12. EL TEXTO DESAPARECE
+   ============================================================ */
+
+.tl-hero-scroll-container .tl-hero-content {
+
+    animation:
+        trustlink-content-disappear 1ms linear both;
+
+    animation-timeline: --trustlink-scroll;
+
+    animation-range: entry 0% exit 55%;
+}
+
+
+@keyframes trustlink-content-disappear {
+
+    0% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    35% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    55% {
+        opacity: .15;
+        transform: translateX(-35px);
+    }
+
+    65%,
+    100% {
+        opacity: 0;
+        transform: translateX(-80px);
+    }
+}
+
+
+/* ============================================================
+   13. LA FOTO SE MUEVE HACIA EL CENTRO
+   ============================================================ */
+
+.tl-hero-scroll-container .tl-hero-visual {
+
+    position: relative;
+
+    z-index: 100;
+
+    transform-origin: center center;
+
+    animation:
+        trustlink-photo-center 1ms linear both;
+
+    animation-timeline: --trustlink-scroll;
+
+    animation-range: entry 0% exit 90%;
+}
+
+
+@keyframes trustlink-photo-center {
+
+    0% {
+
+        transform:
+            translate3d(0, 0, 0)
+            scale(1);
+
+    }
+
+    30% {
+
+        transform:
+            translate3d(-3vw, 0, 0)
+            scale(1);
+
+    }
+
+    55% {
+
+        transform:
+            translate3d(-8vw, 0, 0)
+            scale(1.05);
+
+    }
+
+    75% {
+
+        transform:
+            translate3d(-12vw, 0, 0)
+            scale(1.08);
+
+    }
+
+    100% {
+
+        transform:
+            translate3d(-17vw, 0, 0)
+            scale(1.15);
+
+    }
+}
+
+
+/* ============================================================
+   14. EL CONTENEDOR DE LA FOTO
+   ============================================================ */
+
+.tl-hero-scroll-container
+.tl-mockup-window.tl-image-container {
+
+    overflow: hidden;
+
+    border-radius: 24px;
+
+    transition: border-radius .2s linear;
+}
+
+
+/* ============================================================
+   15. EL BADGE DESAPARECE
+   ============================================================ */
+
+.tl-hero-scroll-container .floating-badge {
+
+    animation:
+        trustlink-badge-disappear 1ms linear both;
+
+    animation-timeline: --trustlink-scroll;
+
+    animation-range: entry 20% exit 50%;
+}
+
+
+@keyframes trustlink-badge-disappear {
+
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    60% {
+        opacity: .5;
+        transform: scale(.8);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(.5);
+    }
+}
+
+
+/* ============================================================
+   16. FONDO DEL HERO SE APAGA
+   ============================================================ */
+
+.tl-hero-scroll-container .tl-hero-bg-glow {
+
+    animation:
+        trustlink-glow-disappear 1ms linear both;
+
+    animation-timeline: --trustlink-scroll;
+
+    animation-range: entry 25% exit 65%;
+}
+
+
+@keyframes trustlink-glow-disappear {
+
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .5;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+
+/* ============================================================
+   17. AL FINAL, EL HERO YA NO DEBE INTERFERIR
+   ============================================================ */
+
+.tl-hero-scroll-container
+.tl-hero-fullscreen-viewport {
+
+    overflow: visible;
+}
+
+
+/* ============================================================
+   18. MOBILE
+   ============================================================ */
+
+@media (max-width: 960px) {
+
+    .tl-hero-scroll-container {
+        height: 280vh;
+        min-height: 280vh;
+    }
+
+    .tl-hero-scroll-container .grid {
+
+        width: 94vw;
+        height: 75vh;
+
+        gap: 7px;
+    }
+
+    .tl-hero-scroll-container .tl-hero-inner {
+
+        grid-template-columns: 1fr !important;
+
+        gap: 20px;
+    }
+
+    .tl-hero-scroll-container .tl-hero-content {
+
+        text-align: center;
+    }
+
+    .tl-hero-scroll-container .tl-hero-visual {
+
+        justify-self: center;
+    }
+
+    .tl-hero-scroll-container .tl-mockup-window.tl-image-container {
+
+        width: min(80vw, 500px);
+    }
+
+    @keyframes trustlink-photo-center {
+
+        0% {
+            transform: scale(1);
+        }
+
+        60% {
+            transform: scale(.9);
+        }
+
+        100% {
+            transform: scale(.8);
+        }
+    }
+}
+
+/* ============================================================
+   HERO NORMAL
+   ============================================================ */
+
+.tl-hero-section {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+}
+
+
+/* ============================================================
+   FOTO PUENTE
+   ============================================================ */
+
+.tl-photo-intro {
+
+    position: relative;
+
+    width: 100%;
+
+    min-height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 8vh 5vw;
+
+    background: var(--tl-bg);
+
+    overflow: hidden;
+}
+
+
+.tl-photo-intro-inner {
+
+    width: min(1100px, 90vw);
+
+    height: min(75vh, 700px);
+
+    border-radius: 28px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 30px 80px rgba(0, 0, 0, .35);
+}
+
+
+.tl-photo-intro-inner img {
+
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+/* ============================================================
+   TRUSTLINK — SCROLL GALLERY / SUBGRID
+   Cambios para el efecto
+   ============================================================ */
+
+   .tl-hero-scroll-container .scaler {
+
+    position: relative;
+
+    grid-column: 3;
+    grid-row: 2;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 50;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transform-origin: center center;
+
+    animation:
+        trustlink-gallery-image 1ms linear both;
+
+    animation-timeline: --trustlink-scroll;
+
+    animation-range: entry 0% exit 100%;
+}
+
+
+.gallery-main-image {
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    border-radius: 22px;
+
+    box-shadow:
+        0 30px 70px rgba(0, 0, 0, .45);
+}
+
+
+.gallery-main-image img {
+
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+@keyframes trustlink-gallery-image {
+
+    0% {
+        transform: scale(4.2);
+        opacity: 1;
+    }
+
+    25% {
+        transform: scale(3.2);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(2.2);
+        opacity: 1;
+    }
+
+    75% {
+        transform: scale(1.35);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.tl-hero-scroll-container .layer:nth-child(1) {
+
+    animation:
+        trustlink-gallery-outer 1ms linear both;
+
+    animation-timeline: --trustlink-scroll;
+
+    animation-range: entry 0% exit 100%;
+}
+
+
+@keyframes trustlink-gallery-outer {
+
+    0% {
+        opacity: 0;
+        transform: scale(.25);
+    }
+
+    30% {
+        opacity: .3;
+        transform: scale(.55);
+    }
+
+    60% {
+        opacity: .75;
+        transform: scale(.85);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.tl-hero-scroll-container .layer:nth-child(2) {
+
+    animation:
+        trustlink-gallery-middle 1ms linear both;
+
+    animation-timeline: --trustlink-scroll;
+
+    animation-range: entry 15% exit 100%;
+}
+
+
+@keyframes trustlink-gallery-middle {
+
+    0% {
+        opacity: 0;
+        transform: scale(.2);
+    }
+
+    40% {
+        opacity: .1;
+        transform: scale(.45);
+    }
+
+    70% {
+        opacity: .7;
+        transform: scale(.82);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.tl-hero-scroll-container .layer:nth-child(3) {
+
+    animation:
+        trustlink-gallery-inner 1ms linear both;
+
+    animation-timeline: --trustlink-scroll;
+
+    animation-range: entry 30% exit 100%;
+}
+
+
+@keyframes trustlink-gallery-inner {
+
+    0% {
+        opacity: 0;
+        transform: scale(.15);
+    }
+
+    45% {
+        opacity: 0;
+        transform: scale(.35);
+    }
+
+    75% {
+        opacity: .8;
+        transform: scale(.85);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ============================================================
+   SECCIONES — STICKY / CARD EXPERIENCE
+   ============================================================ */
+
+.tl-section {
+
+    position: relative;
+
+    min-height: 100svh;
+
+    padding: 120px 6vw;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    scroll-snap-align: start;
+}
+
+/* ============================================================
+   TRUSTLINK — HERO PRINCIPAL
+   ============================================================ */
+
+.tl-hero-section {
+
+    position: relative;
+
+    min-height: 100svh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    isolation: isolate;
+}
+
+
+/* ------------------------------------------------------------
+   BRILLO DE FONDO
+   ------------------------------------------------------------ */
+
+.tl-hero-bg-glow {
+
+    position: absolute;
+
+    width: 750px;
+    height: 750px;
+
+    left: 50%;
+    top: 45%;
+
+    transform: translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(139, 92, 246, .14) 0%,
+            rgba(139, 92, 246, .06) 35%,
+            transparent 70%
+        );
+
+    filter: blur(12px);
+
+    pointer-events: none;
+
+    z-index: -1;
+}
+
+
+/* ------------------------------------------------------------
+   CONTENEDOR PRINCIPAL
+   ------------------------------------------------------------ */
+
+.tl-hero {
+
+    width: 100%;
+
+    min-height: 100svh;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+/* ------------------------------------------------------------
+   CONTENIDO
+   ------------------------------------------------------------ */
+
+.tl-hero-minimal {
+
+    width: min(950px, 90vw);
+
+    padding: 120px 0 90px;
+
+    text-align: center;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+}
+
+
+/* ------------------------------------------------------------
+   ETIQUETA SUPERIOR
+   ------------------------------------------------------------ */
+
+.tl-hero-tag {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    margin-bottom: 34px;
+
+    font-size: .72rem;
+
+    font-weight: 500;
+
+    letter-spacing: .15em;
+
+    text-transform: uppercase;
+
+    color: var(--tl-muted);
+
+    opacity: .9;
+}
+
+
+.tl-hero-tag .dot {
+
+    width: 7px;
+    height: 7px;
+
+    flex: 0 0 auto;
+
+    border-radius: 50%;
+
+    background: #55d68a;
+
+    box-shadow:
+        0 0 12px rgba(85, 214, 138, .7);
+}
+
+
+/* ------------------------------------------------------------
+   TITULAR
+   ------------------------------------------------------------ */
+
+.tl-hero-title {
+
+    max-width: 900px;
+
+    margin: 0;
+
+    font-size: clamp(
+        3.4rem,
+        7vw,
+        6.8rem
+    );
+
+    line-height: .94;
+
+    letter-spacing: -.065em;
+
+    font-weight: 700;
+}
+
+
+.tl-hero-title em {
+
+    display: block;
+
+    margin-top: .08em;
+
+    font-style: normal;
+
+    color: var(--tl-accent);
+}
+
+
+/* ------------------------------------------------------------
+   DESCRIPCIÓN
+   ------------------------------------------------------------ */
+
+.tl-hero-sub {
+
+    max-width: 650px;
+
+    margin: 36px auto 0;
+
+    font-size: clamp(
+        1rem,
+        1.5vw,
+        1.18rem
+    );
+
+    line-height: 1.7;
+
+    color: var(--tl-muted);
+}
+
+
+.tl-hero-sub strong {
+
+    color: inherit;
+
+    font-weight: 600;
+}
+
+
+/* ------------------------------------------------------------
+   BOTONES
+   ------------------------------------------------------------ */
+
+.tl-hero-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 14px;
+
+    margin-top: 42px;
+}
+
+
+.tl-hero-actions .tl-btn-primary,
+.tl-hero-actions .tl-btn-secondary {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+}
+
+
+.tl-hero-actions .tl-btn-primary span {
+
+    font-size: 1.05em;
+
+    transition:
+        transform .25s ease;
+}
+
+
+.tl-hero-actions .tl-btn-primary:hover span {
+
+    transform: translateX(4px);
+}
+
+
+.tl-hero-actions .tl-btn-secondary span {
+
+    font-size: 1rem;
+
+    opacity: .65;
+
+    transition:
+        transform .25s ease;
+}
+
+
+.tl-hero-actions .tl-btn-secondary:hover span {
+
+    transform: translateY(3px);
+}
+
+
+/* ------------------------------------------------------------
+   CONCEPTOS CLAVE
+   ------------------------------------------------------------ */
+
+.tl-hero-proof {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-top: 68px;
+
+    font-size: .73rem;
+
+    letter-spacing: .02em;
+
+    color: var(--tl-muted);
+
+    opacity: .65;
+}
+
+
+.tl-hero-proof .separator {
+
+    opacity: .4;
+}
+
+/* ============================================================
+   HERO — RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 700px) {
+
+    .tl-hero-minimal {
+
+        width: min(92vw, 600px);
+
+        padding:
+            110px 0
+            70px;
+    }
+
+
+    .tl-hero-title {
+
+        font-size: clamp(
+            3rem,
+            15vw,
+            4.8rem
+        );
+
+        line-height: .96;
+    }
+
+
+    .tl-hero-sub {
+
+        margin-top: 28px;
+
+        font-size: 1rem;
+
+        line-height: 1.65;
+    }
+
+
+    .tl-hero-actions {
+
+        flex-direction: column;
+
+        width: 100%;
+
+        margin-top: 34px;
+    }
+
+
+    .tl-hero-actions a {
+
+        width: min(
+            100%,
+            320px
+        );
+    }
+
+
+    .tl-hero-proof {
+
+        margin-top: 48px;
+
+        gap: 8px;
+
+        line-height: 1.8;
+    }
+}
+
+
+/* 1. Volvemos a acomodar el layout principal */
+.tl-hero {
+    display: flex;
+    /* ¡Magia! row-reverse pasa la mascota a la izquierda y el texto a la derecha sin tocar tu HTML */
+    flex-direction: row-reverse; 
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1300px; /* Un poco más ancho para que respire */
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* 2. El texto vuelve a su formato original (centrado en su propia columna) */
+.tl-hero-minimal {
+    flex: 1.2; /* Le damos un poquito más de espacio al texto */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centra los botones y textos internamente */
+    text-align: center;
+    z-index: 10;
+}
+
+/* 3. Le devolvemos el tamaño gigante a la mascota */
+.tl-hero-mascot {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/* 4. Forzamos a la imagen a ser protagonista */
+.layer-mascot-full {
+    width: 100%;
+    min-width: 500px; /* Evita que se haga miniatura */
+    max-width: 700px; /* Le da permiso de ser enorme */
+    height: auto;
+    /* Si el PNG tiene mucho borde transparente, súbele al scale (ej. 1.2) */
+    transform: scale(1.1); 
+    will-change: transform;
+}
+
+/* Responsive para que en celular no se rompa */
+@media (max-width: 992px) {
+    .tl-hero {
+        flex-direction: column; /* Apila todo normal en móviles */
+    }
+    .layer-mascot-full {
+        min-width: 300px; /* Más pequeño en celular */
+    }
+}
+
+
+.mascot-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#llamaVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Contenedor total de scroll */
+.tl-hero-mascot-sticky-wrap {
+  height: 300vh;
+  position: relative;
+  width: 100%;
+}
+
+/* Pantalla fijada durante el scroll */
+.tl-hero-mascot-sticky {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 1. Mover el personaje hacia la izquierda del marco */
+#llamaVideo.tl-hero-video-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center; /* Alinea el foco del video a la izquierda */
+  z-index: 1;
+  pointer-events: none;
+/* --- AJUSTE DE TAMAÑO --- */
+  transform: scale(0.95) translateX(20px) translateY(-70px); /* Reduz al 88% de su tamaño original */
+  transform-origin: left center; /* Ancla la escala a la izquierda para que no se mueva de lugar */
+
+}
+
+/* 2. Contenedor: Empujar la caja de contenido a la derecha */
+.tl-hero-content-overlay {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1280px;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: flex-end; /* Alinea los hijos a la derecha */
+}
+
+/* 3. Bloque de texto: Definir ancho y alineación */
+.tl-hero-minimal {
+  max-width: 480px; /* Limita el ancho para mantener el texto compacto */
+  margin-left: auto;
+  text-align: left; /* Mantiene la lectura cómoda a la izquierda */
+
+  /* --- SUBIR EL BLOQUE COMPLETO DE TEXTO --- */
+  transform: translateX(-80px) translateY(-30px); /* Valor negativo sube el texto */
+}
+
+/* Opcional: Centrar los botones e indicadores dentro de la columna derecha */
+.tl-hero-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* ============================================================
+   ESTILOS DE TEXTO E INTERLINEADO (HERO)
+   ============================================================ */
+
+.tl-hero-title {
+  font-size: clamp(2.2rem, 3.5vw, 3.2rem);
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--tl-white, #ffffff);
+  margin-bottom: 0.8rem; /* Distancia corta con el subtítulo */
+  letter-spacing: -0.02em;
+}
+
+.tl-hero-title em {
+  color: #3b82f6; /* Azul brillante de acento */
+  font-style: normal;
+}
+
+.tl-hero-sub {
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.75); /* Color suave para jerarquía visual */
+  margin-top: 0;
+  margin-bottom: 2rem; /* Separación cómoda con los botones */
+  max-width: 480px;
+}
+
+/* ============================================================
+   BOTONES REDONDEADOS (TIPO PÍLDORA COMO 'INICIAR SESIÓN')
+   ============================================================ */
+
+.tl-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* Botón Principal (Empezar ahora) */
+.tl-hero-actions .tl-btn-primary,
+.tl-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #2563eb; /* Azul de marca */
+  color: #ffffff;
+  padding: 12px 28px;
+  border-radius: 9999px; /* Redondeado completo tipo píldora */
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  transition: all 0.25s ease;
+}
+
+.tl-hero-actions .tl-btn-primary:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+}
+
+/* Botón Secundario (Cómo funciona) */
+.tl-hero-actions .tl-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 9999px; /* Mismo redondeado completo */
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+  transition: all 0.25s ease;
+}
+
+.tl-hero-actions .tl-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.tl-hero-actions .tl-btn-secondary span,
+.tl-hero-actions .tl-btn-primary span {
+  font-size: 1rem;
+  transition: transform 0.25s ease;
+}
+
+.tl-hero-actions .tl-btn-primary:hover span {
+  transform: translateX(3px);
+}
+
+.tl-hero-actions .tl-btn-secondary:hover span {
+  transform: translateY(2px);
+}
+
+/* Difuminado de entrada para la galería */
+.tl-hero-scroll-container {
+  position: relative;
+  padding-top: 60px; /* Le da espacio de aire antes de animar */
+}
+
+.tl-hero-scroll-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 140px; /* Altura de la sombra de transición */
+  background: linear-gradient(to bottom, #060913 0%, transparent 100%); /* Reemplaza #060913 por el color exacto de tu fondo */
+  z-index: 5;
+  pointer-events: none;
+}
+
+.tl-hero-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 120px;
+  background: linear-gradient(to bottom, transparent, #060913); /* Suaviza el borde inferior del Hero */
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Fade-out inferior ultra-suave para el Hero */
+.tl-hero-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 230px; /* Aumentamos la altura del degradado para que sea más progresivo */
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(6, 9, 19, 0.2) 20%,
+    rgba(6, 9, 19, 0.6) 50%,
+    rgba(6, 9, 19, 0.9) 80%,
+    #060913 100% /* Reemplaza #060913 por el color exacto del fondo de tu página */
+  );
+  z-index: 3;
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   RESPONSIVE: ADAPTACIÓN DE LA LLAMA A DISTINTOS PANTALLAS
+   ============================================================ */
+
+/* 1. Laptops pequeñas y Tablets horizontales (pantallas menores a 1024px) */
+@media (max-width: 1024px) {
+  #llamaVideo.tl-hero-video-bg {
+    /* Reducimos la escala y los desplazamientos */
+    transform: scale(0.75) translateX(10px) translateY(-20px);
+    transform-origin: left center;
+  }
+}
+
+/* 2. Tablets verticales y celulares grandes (pantallas menores a 768px) */
+@media (max-width: 768px) {
+  #llamaVideo.tl-hero-video-bg {
+    /* Alineamos al centro para que sirva de fondo detrás del texto */
+    object-position: center 30%;
+    transform: scale(0.65) translateX(0) translateY(-10px);
+    transform-origin: center center;
+    opacity: 0.45; /* Bajamos la opacidad para que el texto siga siendo legible encima */
+  }
+
+  /* Ajustamos el contenedor para que el texto se centre en móviles */
+  .tl-hero-content-overlay {
+    justify-content: center;
+  }
+
+  .tl-hero-minimal {
+    max-width: 100%;
+    text-align: center;
+    margin: 0 auto;
+    transform: translateY(0); /* Reseteamos la subida en celular */
+  }
+
+  .tl-hero-actions {
+    justify-content: center;
+  }
+}
+
+/* 3. Celulares pequeños (pantallas menores a 480px) */
+@media (max-width: 480px) {
+  #llamaVideo.tl-hero-video-bg {
+    transform: scale(0.55) translateY(-20px);
+    opacity: 0.35;
+  }
+}
+
+/* ============================================================
+   TEXTO FLUIDO Y RESPONSIVO (HERO)
+   ============================================================ */
+
+/* 1. Título con tamaño flexible automático */
+.tl-hero-title {
+  /* clamp(Mínimo, Ideal según pantalla, Máximo) */
+  font-size: clamp(1.6rem, 2.8vw + 0.5rem, 3rem);
+  line-height: 1.15;
+  margin-bottom: 0.8rem;
+  font-weight: 800;
+}
+
+/* 2. Subtítulo flexible */
+.tl-hero-sub {
+  font-size: clamp(0.85rem, 1.1vw, 1.05rem);
+  line-height: 1.45;
+  margin-bottom: 1.8rem;
+}
+
+/* ============================================================
+   AJUSTES POR PANTALLA (MEDIA QUERIES)
+   ============================================================ */
+
+/* Tablets / Laptops pequeñas (como iPad Pro / 1024px o menos) */
+@media (max-width: 1100px) {
+  .tl-hero-minimal {
+    max-width: 400px; /* Reduce la caja para que el texto sea más compacto */
+    transform: translateY(-20px);
+  }
+
+  .tl-hero-actions {
+    gap: 0.75rem;
+  }
+
+  /* Ajuste ligero de botones para que no ocupen tanto espacio */
+  .tl-hero-actions .tl-btn-primary,
+  .tl-hero-actions .tl-btn-secondary {
+    padding: 10px 20px;
+    font-size: 0.88rem;
+  }
+}
+
+/* Tablets en vertical y pantallas reducidas (868px o menos) */
+@media (max-width: 868px) {
+  .tl-hero-minimal {
+    max-width: 340px;
+  }
+
+  .tl-hero-title {
+    font-size: 1.6rem; /* Fuerza un tamaño más pequeño si se acerca a la llama */
+  }
+}
+
+/* ============================================================
+   SECCIÓN: RADIOGRAFÍA DEL MERCADO (TEMA OSCURO)
+   ============================================================ */
+
+.tl-premium-insights {
+  background-color: #0a1128;/* Mismo azul oscuro del fondo general */
+  padding: 1rem 0;
+  color: #ffffff;
+}
+
+/* Encabezado */
+.tl-ins-header .tl-ins-tag {
+  color: #3b82f6; /* Azul brillante de acento */
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.tl-ins-header .tl-ins-h2 {
+  color: #ffffff;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+}
+
+/* Tarjetas de gráficos */
+.tl-chart-card {
+  background: rgba(255, 255, 255, 0.03); /* Fondo oscuro traslúcido con efecto cristal */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 2rem;
+  backdrop-filter: blur(12px);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.tl-chart-card:hover {
+  border-color: rgba(59, 130, 246, 0.4);
+  transform: translateY(-4px);
+}
+
+/* Textos de las tarjetas */
+.tl-chart-info h3 {
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.tl-chart-info p {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.tl-chart-info p strong {
+  color: #ffffff;
+}
+
+.tl-ins-source {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Ajustes de contraste para los gráficos SVG y barras */
+.donut-bg {
+  stroke: rgba(255, 255, 255, 0.1);
+}
+
+.tl-donut-center strong {
+  color: #ffffff;
+}
+
+.tl-donut-center span {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.tl-bar-track {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tl-bar-axis {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* --- GRÁFICO DE ÁREAS (La Paradoja) --- */
+.area-chart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.tl-area-svg {
+  width: 100%;
+  max-height: 140px;
+  overflow: visible;
+}
+
+/* --- GRÁFICO DE BARRAS (El Costo) --- */
+.comparison-bars {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1rem 0;
+}
+.bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.mt-4 { margin-top: 1rem; }
+.bar-label-group {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+.text-blue { color: #2563EB; }
+.text-danger { color: #EF4444; }
+.font-bold { font-weight: bold; }
+
+.bar-track {
+  width: 100%;
+  height: 12px;
+  background-color: #1E293B;
+  border-radius: 6px;
+  overflow: hidden;
+}
+/* Efecto para que la barra roja parezca salirse de los límites */
+.broken-track {
+  overflow: visible;
+  position: relative;
+}
+.normal-bar {
+  height: 100%;
+  background-color: #2563EB;
+  border-radius: 6px;
+}
+.danger-bar {
+  height: 100%;
+  background-color: #EF4444;
+  border-radius: 6px 0 0 6px; /* Sin borde derecho para dar efecto de continuidad */
+  position: relative;
+}
+/* Gradiente difuminado que sale a la derecha de la barra roja */
+.danger-bar::after {
+  content: '';
+  position: absolute;
+  right: -20px;
+  top: 0;
+  width: 20px;
+  height: 100%;
+  background: linear-gradient(to right, #EF4444, transparent);
+}
+.featured-danger-card {
+  border: 1px solid rgba(239, 68, 68, 0.2) !important; /* Resalta levemente la tarjeta en rojo */
+}
+
+/* --- GRÁFICO DE DONA (Ajustes) --- */
+.tl-donut-chart {
+  transform: rotate(-90deg); /* Para que inicie desde arriba */
+}
+
+/* --- GRÁFICO 1: DONUT CHART SVG (PREMIUM DARK) --- */
+.tl-donut-chart {
+  width: 160px; /* Un poco más grande para mayor impacto */
+  height: 160px;
+  transform: rotate(-90deg);
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5)); /* Sombra base para dar profundidad */
+}
+
+.donut-bg {
+  fill: none;
+  stroke: #1E293B; /* Gris azulado muy oscuro (estilo Tailwind slate-800) */
+  stroke-width: 14; /* Un poco más delgado se ve más elegante */
+}
+
+.donut-segment {
+  fill: none;
+  stroke-width: 14;
+  stroke-linecap: round;
+  transition: stroke-dasharray 1.5s cubic-bezier(0.4, 0, 0.2, 1); /* Animación más fluida */
+}
+
+/* La parte que no nos interesa destacar (Formal) */
+.formal-seg {
+  stroke: transparent; /* En tu imagen no se ve, dejamos solo el fondo oscuro */
+}
+
+/* El dato protagonista (Informal) */
+.informal-seg {
+  stroke: #2563EB; /* Tu azul principal */
+  stroke-dasharray: 408.4;
+  stroke-dashoffset: 122; /* Ajusta este valor según el % */
+  filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.6)); /* EFECTO GLOW AZUL */
+}
+
+.tl-donut-center {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centrado perfecto absoluto */
+}
+
+.tl-donut-center strong { 
+  font-size: 1.5rem; 
+  font-weight: 700; 
+  color: #FFFFFF; /* Blanco puro para contraste */
+}
+
+.tl-donut-center span { 
+  font-size: 0.75rem; 
+  color: #9CA3AF; 
+  text-transform: uppercase; 
+  letter-spacing: 1px; /* Separar letras da toque premium */
+}
+
+/* --- ESTILO DE LAS TARJETAS --- */
+.tl-chart-card {
+  background: linear-gradient(145deg, #111827 0%, #0B0E17 100%); /* Degradado muy sutil */
+  border: 1px solid rgba(255, 255, 255, 0.05); /* Borde casi invisible */
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); /* Sombra suave */
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+/* Efecto Hover para que se sienta interactivo */
+.tl-chart-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(37, 99, 235, 0.2); 
+}
+
+/* La tarjeta central roja (Usura) */
+.featured-danger-card {
+  border: 1px solid rgba(239, 68, 68, 0.15) !important;
+  box-shadow: 0 10px 30px -10px rgba(239,68,68,0.1); /* Resplandor rojo muy sutil */
+}
+
+/* --- BARRAS HORIZONTALES (PREMIUM) --- */
+.bar-track {
+  width: 100%;
+  height: 8px; /* Más delgadas se ven más modernas */
+  background: #1E293B; /* Fondo oscuro */
+  border-radius: 4px;
+}
+
+.normal-bar {
+  height: 100%;
+  background: #2563EB;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.5); /* Glow azul */
+}
+
+/* El efecto "roto" de la barra de usura */
+.danger-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #EF4444 0%, rgba(239,68,68,0) 100%); /* Se desvanece hacia la derecha */
+  border-radius: 4px 0 0 4px;
+  width: 120%; /* Se sale deliberadamente de su contenedor */
+}
+
+/* --- ESTADO INICIAL (VACÍO) --- */
+
+/* Dona inicial */
+.informal-seg {
+  stroke-dashoffset: 408.4; /* Perímetro completo = invisible */
+  transition: stroke-dashoffset 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Barras iniciales */
+.normal-bar {
+  width: 0% !important;
+  transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.danger-bar {
+  width: 0% !important;
+  transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Área inicial (Línea trazada) */
+.area-fill, .area-line {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 1.2s ease-out;
+}
+
+
+/* --- ESTADO ANIMADO (CUANDO APARECE EN PANTALLA) --- */
+
+/* Cuando la sección recibe la clase .animate-in */
+.tl-premium-insights.animate-in .informal-seg {
+  stroke-dashoffset: 122; /* Se llena hasta el 70.2% */
+}
+
+.tl-premium-insights.animate-in .normal-bar {
+  width: 15% !important;
+}
+
+.tl-premium-insights.animate-in .danger-bar {
+  width: 100% !important;
+}
+
+.tl-premium-insights.animate-in .area-fill,
+.tl-premium-insights.animate-in .area-line {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================================
+   1. ELIMINAR EL MARCO/GLOBO EXTERIOR DE LA SECCIÓN
+   ============================================================ */
+#simulador.tl-section,
+#simulador .tl-wrap {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+/* ============================================================
+   2. CONVERTIR CALCULADORA A DARK MODE Y VISIBILIZAR TEXTOS
+   ============================================================ */
+.tl-premium-calc {
+  background: linear-gradient(145deg, #111827 0%, #0B0E17 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  padding: 2.5rem !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important;
+  color: #FFFFFF !important;
+  max-width: 850px;
+  margin: 0 auto;
+}
+
+/* Título que estaba invisible */
+.tl-calc-header h3 {
+  color: #FFFFFF !important;
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  margin: 0 !important;
+}
+
+/* Etiquetas del formulario */
+.tl-calc-body label {
+  color: #9CA3AF !important;
+  font-size: 0.9rem !important;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* Input del Monto (S/ 1000) */
+.tl-input-wrapper {
+  background: #1E293B !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
+  color: #FFFFFF !important;
+  padding: 0.5rem 1rem !important;
+}
+
+.tl-input-wrapper span {
+  color: #9CA3AF !important;
+  font-weight: bold;
+}
+
+.tl-input-wrapper input {
+  background: transparent !important;
+  color: #FFFFFF !important;
+  font-weight: bold;
+  border: none !important;
+  outline: none !important;
+}
+
+/* --- TARJETAS DE RESULTADO --- */
+
+/* Caso Gota a Gota (Rojo) */
+.calc-metric.usury {
+  background: rgba(239, 68, 68, 0.08) !important;
+  border: 1px solid rgba(239, 68, 68, 0.25) !important;
+  border-radius: 12px !important;
+  padding: 1rem 1.2rem !important;
+}
+
+.calc-metric.usury .metric-lbl {
+  color: #F87171 !important;
+  font-size: 0.85rem;
+}
+
+.calc-metric.usury strong {
+  color: #EF4444 !important;
+  font-size: 1.4rem;
+}
+
+/* Caso TrustLink (Verde On-Chain - Cifra ahora visible) */
+.calc-metric.trustlink {
+  background: rgba(16, 185, 129, 0.08) !important;
+  border: 1px solid rgba(16, 185, 129, 0.25) !important;
+  border-radius: 12px !important;
+  padding: 1rem 1.2rem !important;
+}
+
+.calc-metric.trustlink .metric-lbl {
+  color: #9CA3AF !important;
+  font-size: 0.85rem;
+}
+
+.calc-metric.trustlink strong {
+  color: #10B981 !important; /* Verde Neón resplandeciente para el S/ 0.00 */
+  font-size: 1.4rem;
+}
+
+.green-tag {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #34D399 !important;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+}
+
+/* ============================================================
+   ELIMINAR MARCO EXTERIOR EN EL SIMULADOR
+   ============================================================ */
+#simulador, 
+#problema,
+#simulador .tl-wrap, 
+#problema .tl-wrap {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Asegura que solo la tarjeta de la calculadora sea visible */
+.tl-premium-calc {
+  background: #0D111C !important; /* Fondo oscuro elegante */
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  max-width: 800px;
+  margin: 0 auto !important; /* Centrado en pantalla */
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* ============================================================
+   ELIMINAR MARCO EXTERIOR EN EL SIMULADOR
+   ============================================================ */
+#simulador, 
+#problema,
+#simulador .tl-wrap, 
+#problema .tl-wrap {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Asegura que solo la tarjeta de la calculadora sea visible */
+.tl-premium-calc {
+  background: #0D111C !important; /* Fondo oscuro elegante */
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  max-width: 800px;
+  margin: 0 auto !important; /* Centrado en pantalla */
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* ============================================================
+   SOLUCIÓN DEFINITIVA: ELIMINAR GLOBO Y APLICAR DARK MODE
+   ============================================================ */
+
+/* 1. Destruye el marco/globo (pseudo-elemento ::before) en la calculadora */
+#simulador::before,
+#problema::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* 2. Quita bordes y fondos al contenedor externo */
+#simulador,
+#problema,
+#simulador .tl-wrap,
+#problema .tl-wrap {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+}
+
+/* 3. Estilo único para la tarjeta de la calculadora (Dark Mode) */
+#simulador .tl-premium-calc,
+#problema .tl-premium-calc {
+  background: linear-gradient(145deg, #0f172a 0%, #080d1a 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px !important;
+  padding: 2.5rem !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
+  max-width: 820px !important;
+  margin: 0 auto !important;
+}
+
+/* 4. Visibilidad total de los textos e insumos */
+#simulador .tl-calc-header h3,
+#problema .tl-calc-header h3 {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+
+#simulador label,
+#problema label {
+  color: #94A3B8 !important;
+}
+
+#simulador .tl-input-wrapper,
+#problema .tl-input-wrapper {
+  background: #1E293B !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+#simulador .tl-input-wrapper input,
+#problema .tl-input-wrapper input {
+  color: #FFFFFF !important;
+}
+
+#simulador .metric-lbl,
+#problema .metric-lbl {
+  color: #94A3B8 !important;
+}
+
+#simulador .calc-metric.trustlink strong,
+#problema .calc-metric.trustlink strong {
+  color: #10B981 !important; /* Verde Neón visible */
+}
+
+/* ============================================================
+   ESTILOS DE LA LLAMA Y CALCULADORA INTEGRADOS
+   ============================================================ */
+
+/* Contenedor que junta a la llama y la calculadora */
+.tl-calc-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 1000px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Columna de la Mascota */
+.tl-mascot-box {
+  flex: 0 0 260px;
+  z-index: 5; /* Queda por encima del borde de la tarjeta */
+  margin-right: -35px; /* Superposición ligera estilo 3D */
+  position: relative;
+}
+
+/* Video de la Llama */
+.tl-mascot-video {
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+}
+
+/* Ajuste de flex para la tarjeta de la calculadora */
+.tl-calc-wrapper .tl-premium-calc {
+  flex: 1;
+  margin: 0 !important;
+}
+
+/* Adaptación para pantallas móviles */
+@media (max-width: 850px) {
+  .tl-calc-wrapper {
+    flex-direction: column;
+  }
+
+  .tl-mascot-box {
+    flex: none;
+    width: 190px;
+    margin-right: 0;
+    margin-bottom: -25px; /* La llama se coloca arriba de la tarjeta en celular */
+  }
+}
+
+/* ============================================================
+   AJUSTE DE TAMAÑO Y ESCALA DE LA LLAMA
+   ============================================================ */
+
+/* 1. Agrandamos el contenedor del espacio */
+.tl-mascot-box {
+  flex: 0 0 380px !important; /* Subimos de 260px a 380px */
+  z-index: 5;
+  margin-right: -70px !important; /* La acercamos más a la tarjeta */
+  position: relative;
+}
+
+/* 2. Agrandamos el personaje dentro del video */
+.tl-mascot-video {
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+  
+  /* Agranda la imagen de la llama un 35% extra */
+  transform: scale(1.35) translateY(-10px); 
+  transform-origin: center right; /* Mantiene el dedo apuntando a la derecha */
+}
+
+/* ============================================================
+   ESTILOS PARA VIDEO DE FONDO + CALCULADORA FLOTANTE
+   ============================================================ */
+
+/* Contenedor padre de la sección */
+/* ============================================================
+   MOSTRAR PATITAS + CALCULADORA MÁS A LA DERECHA
+   ============================================================ */
+
+/* 1. Damos más altura al contenedor para que quepan las patas completas */
+#simulador {
+  position: relative !important;
+  overflow: hidden !important;
+  width: 100%;
+  min-height: 620px !important; /* 👈 Le da espacio vertical al cuerpo completo */
+  display: flex;
+  align-items: center;
+  background-color: #0a1128 !important;
+}
+
+/* 2. Anclamos la alineación ABAJO a la izquierda */
+.tl-simulador-bg-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain !important;
+  object-position: left bottom !important; /* 👈 Muestra las patitas asentadas abajo */
+  z-index: 1;
+  pointer-events: none;
+
+  transform: scale(0.70); /*  Tamaño ideal para ver cuerpo completo */
+  transform-origin: left bottom; /*  El zoom crece desde la esquina inferior izquierda */
+}
+
+/* 3. Rodamos la calculadora bien a la derecha */
+.tl-simulador-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 2% !important; /*  La pega casi al borde derecho */
+}
+
+/* 4. Tamaño compacto para que no tape el pecho/mano de la llamita */
+.tl-simulador-content .tl-premium-calc {
+  max-width: 550px !important;
+  margin: 0 !important;
+}
+
+/* Adaptación para pantallas de celular */
+@media (max-width: 850px) {
+  .tl-simulador-content {
+    justify-content: center;
+  }
+  .tl-simulador-bg-video {
+    opacity: 0.35; /* Oscurece la llama en móvil para que no estorbe al texto */
+  }
+}
+
+/* ============================================================
+   CONTROL DE TAMAÑO Y POSICIÓN DE LA LLAMA DE FONDO
+   ============================================================ */
+.tl-simulador-bg-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
+  z-index: 1;
+  pointer-events: none;
+
+  /* --- AQUÍ REGLAMOS EL TAMAÑO DE LA LLAMA --- */
+  transform: scale(0.75); /* Reduce el tamaño al 75% */
+  transform-origin: left center; /* Mantiene a la llama alineada a la izquierda */
+}
+
+/* ============================================================
+   VIDEO ENTERO (SIN RECORTE) + CALCULADORA A LA DERECHA
+   ============================================================ */
+
+/* 1. Contenedor adaptado a la proporción del video */
+#simulador {
+  position: relative !important;
+  overflow: hidden !important;
+  width: 100%;
+  min-height: 550px;
+  display: flex;
+  align-items: center;
+  background-color: #0a1127 !important;
+}
+
+/* 2. 'contain' muestra el video completo sin Zoom ni recortes */
+/* ============================================================
+   AGRANDAR LA LLAMA MANTENIENDO EL ALINEADO A LA IZQUIERDA
+   ============================================================ */
+
+.tl-simulador-bg-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain !important;
+  object-position: left center;
+  z-index: 1;
+  pointer-events: none;
+
+  /* --- AQUÍ REGLAMOS EL TAMAÑO --- */
+  transform: scale(1.25); /* 👈 Agranda el video y la llama un 25% */
+  transform-origin: left center; /* 👈 Fija el zoom a la izquierda para que no se ruede */
+}
+
+/* 3. Empuja la calculadora más hacia la derecha */
+.tl-simulador-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 3% !important; /* Margen desde el borde derecho */
+}
+
+/* 4. Ajusta el ancho para que no choque con la mano */
+.tl-simulador-content .tl-premium-calc {
+  max-width: 580px !important; 
+  margin: 0 !important;
+}
+
+/* ============================================================
+   SOLUCIÓN DEFINITIVA: VIDEO ENTERO (PATITAS VISIBLES) + CALCU A LA DERECHA
+   ============================================================ */
+
+/* 1. Contenedor con altura suficiente para el cuerpo entero */
+#simulador {
+  position: relative !important;
+  overflow: hidden !important;
+  width: 100%;
+  min-height: 620px !important; /* Espacio vertical para que quepa completa */
+  display: flex;
+  align-items: center;
+  padding: 0 !important;
+   background-color: #0a1128 !important;
+
+}
+
+/* 2. Video ENTERO sin zoom ni recortes (Muestra orejas y patitas) */
+.tl-simulador-bg-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain !important; /* Muestra el encuadre 100% original */
+  object-position: left center !important; /* Pegado al borde izquierdo */
+  z-index: 1;
+  pointer-events: none;
+  transform: none !important; /* Elimina cualquier zoom accidental */
+}
+
+/* 3. Rodar la calculadora BIEN a la derecha */
+.tl-simulador-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end; /* La empuja al extremo derecho */
+  padding-right: 25px !important; /* Borde mínimo a la derecha */
+}
+
+/* 4. Tarjeta más compacta para no tapar la mano ni el cuerpo */
+.tl-simulador-content .tl-premium-calc {
+  max-width: 520px !important; /* Ancho perfecto para la zona oscura */
+  margin: 0 !important;
+}
+
+/* 5. Adaptación para pantallas móviles */
+@media (max-width: 850px) {
+  .tl-simulador-content {
+    justify-content: center;
+    padding-right: 0 !important;
+  }
+  .tl-simulador-bg-video {
+    opacity: 0.3;
+  }
+}
+
+/* ============================================================
+   DESPLAZAR CALCULADORA AL EXTREMO DERECHO
+   ============================================================ */
+
+/* 1. Ampliamos el contenedor para permitir que llegue hasta la derecha */
+.tl-simulador-content {
+  max-width: 100% !important; /* Rompe el límite horizontal previo */
+  width: 100% !important;
+  display: flex !important;
+  justify-content: flex-end !important; /* Empuja todo al fondo a la derecha */
+  padding-right: 60px !important; /* Margen desde la orilla derecha de la pantalla */
+  box-sizing: border-box !important;
+}
+
+/* 2. Alineación estricta de la tarjeta */
+#simulador .tl-premium-calc {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  max-width: 580px !important; /* Ancho ideal para la calculadora */
+}
+
+/* ============================================================
+   POSICIÓN EXACTA EN EL CUADRO ROSA (AL LADO DE LA LLAMA)
+   ============================================================ */
+
+/* 1. Desplazamos el contenido para que empiece justo en la mano de la llamada */
+.tl-simulador-content {
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: flex-start !important; /* Alinea hacia la izquierda */
+  padding-left: 25% !important; /* 👈 Nace justo donde termina la llamita */
+  box-sizing: border-box !important;
+}
+
+/* 2. Ancho y ajuste de la calculadora */
+#simulador .tl-premium-calc {
+  width: 100% !important;
+  max-width: 660px !important; /* Cubre el ancho perfecto del cuadro rosa */
+  margin: 0 !important;
+}
+
+/* ============================================================
+   POSICIÓN EN EL CUADRO ROSA + CALCULADORA SBT PREDICTOR
+   ============================================================ */
+
+/* 2. Ancho del cuadro rosa (740px) */
+#simulador .tl-premium-calc {
+  width: 100% !important;
+  max-width: 740px !important;
+  background: rgba(13, 20, 36, 0.92) !important;
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 24px !important;
+  padding: 1.8rem !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* 3. Estilos de las Pestañas (Tabs) */
+.tl-calc-nav {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.8rem;
+}
+
+.tl-tab-btn {
+  background: transparent;
+  border: none;
+  color: #94A3B8;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tl-tab-btn:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tl-tab-btn.active {
+  color: #FFFFFF;
+  background: #1E293B;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Ocultar/Mostrar pestañas */
+.tl-tab-pane {
+  display: none;
+}
+.tl-tab-pane.active {
+  display: block;
+  animation: fadeInTab 0.4s ease;
+}
+
+@keyframes fadeInTab {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 4. Grid e Inputs para el Predictor SBT */
+.tl-sbt-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 20px;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.tl-sbt-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tl-slider-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.tl-slider-num {
+  color: #10B981;
+  font-weight: 700;
+}
+
+.tl-range-slider {
+  width: 100%;
+  accent-color: #3B82F6;
+  cursor: pointer;
+}
+
+/* 5. Tarjeta del Score SBT */
+.tl-sbt-result-box {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 16px;
+  padding: 1.2rem;
+  text-align: center;
+}
+
+.tl-score-title {
+  font-size: 0.8rem;
+  color: #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tl-score-value {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin: 4px 0;
+}
+
+.tl-score-value small {
+  font-size: 1.2rem;
+  color: #64748B;
+}
+
+.tl-score-badge {
+  display: inline-block;
+  background: rgba(16, 185, 129, 0.15);
+  color: #10B981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.tl-value-prop {
+  font-size: 0.82rem;
+  color: #CBD5E1;
+  line-height: 1.4;
+  text-align: left;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  padding-top: 10px;
+  margin: 0;
+}
+
+.tl-alert-dot.blue {
+  background: #3B82F6;
+  box-shadow: 0 0 10px #3B82F6;
+}
+
+/* Responsive para celulares */
+@media (max-width: 850px) {
+  #simulador .tl-wrap {
+    padding-left: 0 !important;
+    justify-content: center !important;
+  }
+  .tl-sbt-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   EXPANDIR CALCULADORA AL TAMAÑO COMPLETO DEL CUADRO ROSA
+   ============================================================ */
+
+
+/* 2. Tarjeta ampliada en ancho y alto */
+#simulador .tl-premium-calc {
+  width: 100% !important;
+  max-width: 860px !important; /* 👈 Cubre exactamente el ancho del cuadro rosa */
+  padding: 2.5rem 2.8rem !important; /* 👈 Le da más altura y presencia vertical */
+  background: rgba(13, 20, 36, 0.94) !important;
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* ============================================================
+   CORRECCIÓN: EVITAR QUE EL SÍMBOLO S/ SE SEPARE DEL NÚMERO
+   ============================================================ */
+
+/* 1. Alineación de las cajas de métricas */
+#simulador .calc-metric {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 15px !important;
+  padding: 14px 18px !important;
+}
+
+/* 2. Forzar a que S/ y el número vayan SIEMPRE en la misma línea */
+#simulador .calc-metric strong {
+  white-space: nowrap !important; /* 👈 Evita que el texto se rompa en 2 líneas */
+  font-size: 1.3rem !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+/* 3. Ajuste fino de la etiqueta verde On-Chain */
+#simulador .calc-metric .green-tag {
+  font-size: 0.68rem !important;
+  padding: 2px 7px !important;
+  white-space: nowrap !important;
+}
+
+/* ============================================================
+   ANIMACIÓN DEL GRÁFICO CIRCULAR (DONUT)
+   ============================================================ */
+
+/* 1. Definir la longitud total del trazo y ocultarlo al inicio */
+.informal-seg, 
+.formal-seg {
+  stroke-dasharray: 408.4; /* 2 * PI * 65 (El radio de tu círculo) */
+  stroke-dashoffset: 408.4; /* Empieza en 408.4 para estar 100% invisible */
+  transition: stroke-dashoffset 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); /* Curva de aceleración Fintech */
+  stroke-linecap: round; /* Puntas redondeadas estéticas */
+}
+
+/* 2. Estilo base del SVG (opcional si ya lo tienes) */
+.tl-donut-svg {
+  transform: rotate(-90deg); /* Gira el SVG para que la animación empiece desde las 12 en punto */
+  width: 150px;
+  height: 150px;
+  overflow: visible;
+}
+
+/* ============================================================
+   ANIMACIÓN DEL GRÁFICO DONUT (MOTOR INVISIBLE)
+   ============================================================ */
+
+/* Giramos el SVG para que empiece desde arriba (12 en punto) */
+.tl-donut-chart {
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+
+/* Transición fluida cuando JS cambia el dasharray */
+.donut-segment {
+  transition: stroke-dasharray 1.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  stroke-linecap: round; /* Opcional: hace que las puntas de los colores sean redondeadas */
+}
+
+/* Sombra azul brillante para el sector informal */
+.informal-seg {
+  filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.5));
+}
+
+/* ============================================================
+   ENCABEZADOS CENTRADOS (CÓMO FUNCIONA)
+   ============================================================ */
+
+/* Agrupamos y centramos el bloque completo */
+.tl-header-centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 750px; /* Evita que el texto se estire de borde a borde en pantallas grandes */
+  margin: 0 auto 4rem auto; /* Centrado horizontal y margen inferior para separarlo del contenido */
+}
+
+/* Centrar el texto interno de los elementos */
+.tl-header-centered .tl-h2,
+.tl-header-centered .tl-lede {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Centrar el Eyebrow ("CÓMO FUNCIONA") y quitar flex start */
+.tl-header-centered .tl-eyebrow {
+  justify-content: center;
+}
+
+/* ELIMINAR LA RAYA AZUL */
+.tl-eyebrow.no-line::before,
+.tl-eyebrow.no-line::after {
+  display: none !important;
+}
+
+/* ============================================================
+   MOCKUP CELULAR REALISTA (ALTURA AJUSTADA Y BOTONES)
+   ============================================================ */
+
+/* 1. El chasis del teléfono (Más corto y con marco metálico) */
+.tl-phone-mockup {
+  position: relative;
+  width: 320px; /* Ancho ideal */
+  height: 520px; /* ALTURA REDUCIDA (antes 640px) para eliminar el vacío */
+  margin: 0 auto;
+  background: #000; /* Borde interno negro de la pantalla */
+  border-radius: 42px; /* Curvatura exterior del iPhone */
+  
+  /* Sombras mágicas: 
+     1. Borde fino interior negro
+     2. Borde metálico exterior (el chasis de titanio)
+     3. Sombra 3D suave para que flote sobre el fondo azul */
+  box-shadow: 
+    inset 0 0 0 2px #000, 
+    0 0 0 4px #1e293b, 
+    0 25px 50px -12px rgba(0, 0, 0, 0.8); 
+  
+  z-index: 1;
+}
+
+/* 🔥 TRUCO DE REALISMO: Botones físicos laterales con ::before y ::after */
+.tl-phone-mockup::before {
+  content: '';
+  position: absolute;
+  top: 110px;
+  left: -11px; /* Sobresale a la izquierda */
+  width: 3px;
+  height: 45px;
+  background: #334155; /* Color metálico */
+  border-radius: 4px 0 0 4px;
+  /* El segundo botón de volumen usando la sombra del primero */
+  box-shadow: 0 60px 0 0 #334155; 
+}
+
+.tl-phone-mockup::after {
+  content: '';
+  position: absolute;
+  top: 130px;
+  right: -11px; /* Sobresale a la derecha */
+  width: 3px;
+  height: 65px;
+  background: #334155;
+  border-radius: 0 4px 4px 0;
+}
+
+/* 2. La pantalla (El cristal) */
+.tl-phone-screen {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  right: 1px;
+  bottom: 1px;
+  background: #0a101d; /* Fondo oscuro de la app */
+  border-radius: 38px; /* Curvatura interna */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 3. Brillo de pantalla (Reflejo diagonal de cristal) */
+.tl-phone-screen::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 200%;
+  height: 100%;
+  /* Gradiente diagonal semitransparente para efecto cristal */
+  background: linear-gradient(to bottom right, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 35%, rgba(255,255,255,0) 100%);
+  pointer-events: none; 
+  z-index: 50; 
+}
+
+/* 4. Barra de estado superior y Dynamic Island (se mantienen igual, solo asegúrate de tener este z-index) */
+.tl-phone-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px 0 24px;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 15;
+}
+
+/* 5. Ajuste del contenido para la nueva altura */
+.tl-phone-content {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 👇 Centra el contenido verticalmente para que no quede pegado arriba */
+  position: relative;
+  z-index: 5;
+}
+
+/* ============================================================
+   UTILIDADES PARA ENCABEZADOS CENTRADOS
+   ============================================================ */
+
+/* Centra el contenedor principal (Título y párrafo) */
+.tl-header-centered {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 48px; /* Espaciado con las tarjetas de abajo */
+}
+
+/* Limita el ancho del párrafo para que se lea mejor centrado */
+.tl-header-centered .tl-lede {
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Quita la rayita lateral del eyebrow */
+.tl-eyebrow-clean::before {
+  display: none !important; 
+}
+
+/* Asegura que el eyebrow esté centrado si usas flexbox en su clase base */
+.tl-eyebrow-clean {
+  justify-content: center;
+  margin-bottom: 16px; /* Espaciado entre "REPUTACIÓN" y el título <h2> */
+}
+
+/* ============================================================
+   MEJORAS VISUALES: SECCIÓN REPUTACIÓN
+   ============================================================ */
+
+/* 1. Efectos Hover en las Tarjetas */
+.tl-formula-card, 
+.tl-contract-box {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  background: rgba(15, 23, 42, 0.4); /* Fondo un poco más transparente */
+  backdrop-filter: blur(10px);
+}
+
+.tl-formula-card:hover, 
+.tl-contract-box:hover {
+  transform: translateY(-5px); /* Se levanta al pasar el mouse */
+  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.4); /* Borde azul sutil */
+}
+
+/* 2. Mejorar las Barras de Progreso */
+.tl-formula-track {
+  background: #1e293b;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.tl-formula-fill {
+  background: linear-gradient(90deg, #2563eb, #3b82f6, #60a5fa); /* Gradiente más vivo */
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); /* Brillo (Glow) */
+  position: relative;
+}
+
+/* Brillo animado infinito en las barras */
+.tl-formula-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* 3. Transformar los textos en listas visualmente atractivas */
+.tl-contract-fn-row {
+  position: relative;
+  padding-left: 28px; /* Espacio para el ícono */
+  margin-bottom: 12px;
+  color: #cbd5e1; /* Texto un poco más brillante */
+  line-height: 1.5;
+  border: none; /* Quitamos las rayas feas si las había */
+  font-family: inherit; /* Quitamos la fuente de código si la tenía */
+}
+
+/* El ícono de viñeta brillante */
+.tl-contract-fn-row::before {
+  content: '✦'; /* Puedes cambiarlo por '✓' o '▹' */
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #3b82f6;
+  font-size: 1.1rem;
+  text-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+}
+
+/* Resaltar partes clave del texto de la fórmula para que no sea un bloque gris */
+.tl-formula-note b {
+  color: #ef4444; /* Rojo suave para la advertencia de "fraude" */
+  font-weight: 600;
+}
+
+/* ============================================================
+   NUEVA SECCIÓN REPUTACIÓN (MÉTRICAS + CHAT IA CON SVG)
+   ============================================================ */
+
+/* 1. Grid Principal (2 columnas en PC, 1 en móvil) */
+.tl-reputation-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .tl-reputation-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 2. Tarjetas Base con Efecto Hover Premium */
+.tl-score-card, 
+.tl-ai-assistant-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  backdrop-filter: blur(10px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.tl-score-card:hover, 
+.tl-ai-assistant-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.tl-card-title {
+  color: #fff;
+  font-size: 1.25rem;
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+/* 3. Barras de Progreso Animadas */
+.tl-metric-group {
+  margin-bottom: 24px;
+}
+
+.tl-micro-copy {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-top: 8px;
+  line-height: 1.4;
+}
+
+.tl-formula-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.tl-formula-label {
+  width: 140px; /* Ancho fijo para alinear las barras */
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #e2e8f0;
+}
+
+.tl-formula-track {
+  flex: 1;
+  height: 8px;
+  background: #1e293b;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+}
+
+/* Color de la barra 1 (Azul) */
+.tl-formula-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb, #3b82f6, #60a5fa);
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  position: relative;
+}
+
+/* Color de la barra 2 (Verde alternativo) */
+.tl-fill-alt {
+  background: linear-gradient(90deg, #10b981, #34d399);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+/* Brillo que recorre las barras */
+.tl-formula-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.tl-formula-pct {
+  font-weight: 700;
+  color: #fff;
+  font-size: 0.9rem;
+  width: 40px;
+  text-align: right;
+}
+
+/* 4. Sello de Confianza Digital (Adaptado para SVG) */
+.tl-trust-badge {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(30, 41, 59, 0.8);
+  padding: 16px;
+  border-radius: 16px;
+  margin-top: 32px;
+  border-left: 4px solid #f59e0b;
+}
+
+.tl-badge-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tl-badge-text strong {
+  display: block;
+  color: #f8fafc;
+  font-size: 1rem;
+}
+
+.tl-badge-text span {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+/* 5. Diseño del Chat IA */
+.tl-ai-assistant-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0; /* Quitamos padding para extender la cabecera */
+  overflow: hidden;
+}
+
+.tl-ai-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #1e293b;
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Círculo para el ícono de IA */
+.tl-ai-avatar {
+  width: 40px;
+  height: 40px;
+  background: #2563eb;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tl-ai-title-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.tl-ai-title {
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.tl-ai-status {
+  color: #34d399;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Punto verde parpadeante de "En línea" */
+.tl-ai-status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: #34d399;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #34d399;
+}
+
+.tl-ai-chat-body {
+  padding: 32px 24px;
+  flex: 1;
+}
+
+.tl-ai-message {
+  background: rgba(37, 99, 235, 0.15);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  padding: 16px 20px;
+  border-radius: 0 16px 16px 16px;
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.tl-ai-chat-footer {
+  padding: 16px 24px 24px 24px;
+}
+
+.tl-ai-action-btn {
+  width: 100%;
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between; /* Separa el texto de la flecha */
+  align-items: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tl-ai-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+}
+
+/* ============================================================
+   TRUSTLINK — COPILOTO FINANCIERO
+   Diseño integrado con la identidad visual de TrustLink
+   ============================================================ */
+
+
+/* ============================================================
+   1. CARD PRINCIPAL
+   ============================================================ */
+
+.tl-ai-assistant-card {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 0;
+
+  background: rgba(15, 23, 42, 0.60);
+
+  border: 1px solid rgba(59, 130, 246, 0.20);
+
+  border-radius: 24px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.20),
+    0 0 40px rgba(37, 99, 235, 0.04);
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  color: var(--tl-white);
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+
+/* Hover muy sutil, igual que el resto de tus tarjetas */
+
+.tl-ai-assistant-card:hover {
+  transform: translateY(-3px);
+
+  border-color: rgba(59, 130, 246, 0.35);
+
+  box-shadow:
+    0 15px 35px -10px rgba(0, 0, 0, 0.5),
+    0 0 25px rgba(37, 99, 235, 0.08);
+}
+
+
+/* ============================================================
+   2. HEADER
+   ============================================================ */
+
+.tl-ai-header {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 16px 24px;
+
+  background: #1e293b;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+
+/* ============================================================
+   3. AVATAR
+   ============================================================ */
+
+.tl-ai-avatar {
+  width: 40px;
+  height: 40px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+
+  border-radius: 50%;
+
+  color: var(--tl-white);
+
+  overflow: hidden;
+
+  box-shadow:
+    0 0 18px rgba(37, 99, 235, 0.25);
+}
+
+
+.tl-ai-avatar-img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  border-radius: 50%;
+}
+
+
+/* Avatar pequeño para las respuestas */
+
+.tl-ai-avatar-small {
+  width: 28px;
+  height: 28px;
+
+  border-radius: 50%;
+}
+
+
+/* ============================================================
+   4. TÍTULO
+   ============================================================ */
+
+.tl-ai-title-wrap {
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+
+  min-width: 0;
+}
+
+
+.tl-ai-title {
+  color: var(--tl-white);
+
+  font-family: var(--font-display);
+
+  font-weight: 600;
+
+  font-size: 1rem;
+
+  line-height: 1.2;
+}
+
+
+/* ============================================================
+   5. ESTADO "EN LÍNEA"
+   ============================================================ */
+
+.tl-ai-status {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  color: #34d399;
+
+  font-size: 0.75rem;
+
+  line-height: 1.2;
+}
+
+
+/* Punto verde */
+
+.tl-ai-status-dot {
+  width: 6px;
+  height: 6px;
+
+  flex-shrink: 0;
+
+  background: #34d399;
+
+  border-radius: 50%;
+
+  box-shadow:
+    0 0 6px #34d399;
+
+  animation: tl-ai-pulse 2s ease-in-out infinite;
+}
+
+
+@keyframes tl-ai-pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.45;
+  }
+}
+
+
+/* ============================================================
+   6. CUERPO DEL CHAT
+   ============================================================ */
+
+.tl-ai-chat-body {
+  flex: 1;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 14px;
+
+  padding: 24px;
+
+  background:
+    radial-gradient(
+      circle at 90% 0%,
+      rgba(37, 99, 235, 0.06),
+      transparent 35%
+    );
+
+  /* Altura fija: el chat crece con scroll interno,
+     nunca empuja el layout de la página. */
+
+  height: 560px;
+
+  max-height: 560px;
+
+  overflow-y: auto;
+
+  scroll-behavior: smooth;
+
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    rgba(59, 130, 246, 0.35)
+    transparent;
+}
+
+
+/* Scrollbar Chrome / Edge */
+
+.tl-ai-chat-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.tl-ai-chat-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tl-ai-chat-body::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.35);
+
+  border-radius: 10px;
+}
+
+
+/* ============================================================
+   7. MENSAJE DE BIENVENIDA
+   ============================================================ */
+
+.tl-ai-message {
+  max-width: 94%;
+
+  flex-shrink: 0;
+
+  padding: 16px 20px;
+
+  background: rgba(37, 99, 235, 0.15);
+
+  border: 1px solid rgba(37, 99, 235, 0.30);
+
+  border-radius:
+    0
+    16px
+    16px
+    16px;
+
+  color: #e2e8f0;
+
+  font-size: 0.9rem;
+
+  line-height: 1.55;
+}
+
+
+.tl-ai-message strong {
+  color: #ffffff;
+}
+
+
+/* ============================================================
+   8. CATEGORÍAS
+   ============================================================ */
+
+.tl-ai-categories {
+  display: flex;
+
+  flex-direction: column;
+
+  flex-shrink: 0;
+
+  gap: 9px;
+}
+
+
+/* ============================================================
+   9. BOTÓN DE CATEGORÍA
+   ============================================================ */
+
+.tl-ai-category-btn {
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 11px 13px;
+
+  background: rgba(14, 24, 54, 0.72);
+
+  border: 1px solid var(--tl-line);
+
+  border-radius: 12px;
+
+  color: var(--tl-white);
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+/* Hover */
+
+.tl-ai-category-btn:hover {
+  background: rgba(37, 99, 235, 0.10);
+
+  border-color: rgba(37, 99, 235, 0.45);
+
+  transform: translateX(2px);
+
+  box-shadow:
+    0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+
+/* Active */
+
+.tl-ai-category-btn:active {
+  transform: translateX(2px) scale(0.99);
+}
+
+
+/* ============================================================
+   10. ICONO DE CATEGORÍA
+   ============================================================ */
+
+.tl-ai-category-icon {
+  width: 36px;
+  height: 36px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(37, 99, 235, 0.12);
+
+  border: 1px solid rgba(37, 99, 235, 0.18);
+
+  border-radius: 10px;
+
+  font-size: 16px;
+}
+
+
+/* ============================================================
+   11. TEXTO DE CATEGORÍA
+   ============================================================ */
+
+.tl-ai-category-content {
+  flex: 1;
+
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+
+.tl-ai-category-content strong {
+  color: #f8fafc;
+
+  font-size: 0.82rem;
+
+  font-weight: 600;
+
+  line-height: 1.3;
+}
+
+
+.tl-ai-category-content small {
+  color: var(--tl-grey);
+
+  font-size: 0.70rem;
+
+  line-height: 1.3;
+}
+
+
+/* ============================================================
+   12. FLECHA DE CATEGORÍA
+   ============================================================ */
+
+.tl-ai-category-btn > svg {
+  flex-shrink: 0;
+
+  color: var(--tl-grey-dim);
+
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.tl-ai-category-btn:hover > svg {
+  color: var(--tl-accent);
+
+  transform: translateX(3px);
+}
+
+
+/* ============================================================
+   12.1 MENSAJE DEL USUARIO (categoría o pregunta elegida)
+   ============================================================ */
+
+.tl-ai-msg-user {
+  align-self: flex-end;
+
+  flex-shrink: 0;
+
+  max-width: 82%;
+
+  padding: 12px 18px;
+
+  background: var(--tl-accent);
+
+  color: #ffffff;
+
+  border-radius:
+    16px
+    0
+    16px
+    16px;
+
+  font-size: 0.86rem;
+
+  font-weight: 500;
+
+  line-height: 1.5;
+
+  box-shadow:
+    0 4px 14px rgba(37, 99, 235, 0.25);
+}
+
+
+/* ============================================================
+   12.2 INDICADOR "ESCRIBIENDO..."
+   ============================================================ */
+
+.tl-ai-typing {
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  width: fit-content;
+
+  padding: 14px 18px;
+}
+
+.tl-ai-typing span {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: rgba(226, 232, 240, 0.65);
+
+  animation: tl-ai-typing-bounce 1.2s ease-in-out infinite;
+}
+
+.tl-ai-typing span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.tl-ai-typing span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes tl-ai-typing-bounce {
+
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+
+/* ============================================================
+   12.3 BURBUJA DE PREGUNTAS DE UNA CATEGORÍA
+   ============================================================ */
+
+.tl-ai-questions-bubble {
+  align-self: flex-start;
+
+  flex-shrink: 0;
+
+  width: 100%;
+
+  max-width: 94%;
+}
+
+
+/* ============================================================
+   13. LISTA DE PREGUNTAS
+   ============================================================ */
+
+.tl-ai-questions {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin-top: 14px;
+}
+
+
+/* ============================================================
+   14. CABECERA DE CATEGORÍA
+   ============================================================ */
+
+.tl-ai-question-category-title {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom: 4px;
+
+  color: #e2e8f0;
+
+  font-family: var(--font-display);
+
+  font-size: 0.82rem;
+
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   15. BOTÓN "VOLVER"
+   ============================================================ */
+
+.tl-ai-back-btn {
+  flex-shrink: 0;
+
+  padding: 5px 8px;
+
+  background: transparent;
+
+  border: 1px solid var(--tl-line);
+
+  border-radius: 7px;
+
+  color: var(--tl-grey);
+
+  font-family: var(--font-body);
+
+  font-size: 0.68rem;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+
+.tl-ai-back-btn:hover {
+  color: var(--tl-white);
+
+  background: rgba(37, 99, 235, 0.08);
+
+  border-color: rgba(37, 99, 235, 0.35);
+}
+
+
+/* ============================================================
+   16. BOTÓN DE PREGUNTA
+   ============================================================ */
+
+.tl-ai-question-btn {
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 11px 12px;
+
+  background: rgba(14, 24, 54, 0.65);
+
+  border: 1px solid var(--tl-line);
+
+  border-radius: 11px;
+
+  color: #e2e8f0;
+
+  text-align: left;
+
+  font-family: var(--font-body);
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.tl-ai-question-btn:hover {
+  background: rgba(37, 99, 235, 0.10);
+
+  border-color: rgba(37, 99, 235, 0.35);
+
+  transform: translateX(2px);
+}
+
+
+/* ============================================================
+   17. ICONO DE PREGUNTA
+   ============================================================ */
+
+.tl-ai-question-icon {
+  width: 26px;
+  height: 26px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(37, 99, 235, 0.14);
+
+  border: 1px solid rgba(37, 99, 235, 0.22);
+
+  border-radius: 7px;
+
+  color: #60a5fa;
+
+  font-family: var(--font-mono);
+
+  font-size: 0.72rem;
+
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   18. TEXTO DE PREGUNTA
+   ============================================================ */
+
+.tl-ai-question-text {
+  flex: 1;
+
+  color: #cbd5e1;
+
+  font-size: 0.76rem;
+
+  line-height: 1.45;
+}
+
+
+/* Flecha */
+
+.tl-ai-question-btn > svg {
+  flex-shrink: 0;
+
+  color: var(--tl-grey-dim);
+
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.tl-ai-question-btn:hover > svg {
+  color: var(--tl-accent);
+
+  transform: translateX(3px);
+}
+
+
+/* ============================================================
+   19. RESPUESTA DEL COPILOTO
+   ============================================================ */
+
+.tl-ai-answer {
+  margin-top: 16px;
+
+  padding: 15px 16px;
+
+  background: rgba(37, 99, 235, 0.10);
+
+  border: 1px solid rgba(37, 99, 235, 0.25);
+
+  border-left: 3px solid var(--tl-accent);
+
+  border-radius: 0 13px 13px 13px;
+
+  animation: tl-ai-fade-in 0.25s ease;
+}
+
+
+.tl-ai-answer[hidden] {
+  display: none;
+}
+
+
+/* Cabecera */
+
+.tl-ai-answer-header {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin-bottom: 9px;
+
+  color: #ffffff;
+
+  font-size: 0.75rem;
+
+  font-weight: 600;
+}
+
+
+/* Texto */
+
+.tl-ai-answer-text {
+  color: #cbd5e1;
+
+  font-size: 0.78rem;
+
+  line-height: 1.6;
+}
+
+
+/* ============================================================
+   20. ANIMACIÓN
+   ============================================================ */
+
+@keyframes tl-ai-fade-in {
+
+  from {
+    opacity: 0;
+
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+
+}
+
+
+/* ============================================================
+   21. FOOTER
+   ============================================================ */
+
+.tl-ai-chat-footer {
+  padding: 16px 24px 24px;
+
+  background: rgba(10, 17, 40, 0.25);
+
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+
+/* ============================================================
+   22. BOTÓN PRINCIPAL
+   ============================================================ */
+
+.tl-ai-action-btn {
+  width: 100%;
+
+  min-height: 48px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 10px;
+
+  padding: 14px 16px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #2563eb,
+      #3b82f6
+    );
+
+  border: none;
+
+  border-radius: 12px;
+
+  color: var(--tl-white);
+
+  font-family: var(--font-body);
+
+  font-size: 0.84rem;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 6px 18px rgba(37, 99, 235, 0.20);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+
+.tl-ai-action-btn:hover {
+  transform: translateY(-2px);
+
+  background:
+    linear-gradient(
+      90deg,
+      #1d4ed8,
+      #2563eb
+    );
+
+  box-shadow:
+    0 8px 22px rgba(37, 99, 235, 0.35);
+}
+
+
+.tl-ai-action-btn:active {
+  transform: translateY(0);
+}
+
+
+/* Flecha */
+
+.tl-ai-action-btn svg {
+  flex-shrink: 0;
+
+  transition: transform 0.2s ease;
+}
+
+
+.tl-ai-action-btn:hover svg {
+  transform: translateX(3px);
+}
+
+
+/* ============================================================
+   23. RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  .tl-ai-chat-body {
+    height: 480px;
+    max-height: 480px;
+  }
+
+}
+
+
+@media (max-width: 480px) {
+
+  .tl-ai-header {
+    padding: 14px 16px;
+  }
+
+  .tl-ai-chat-body {
+    padding: 18px 16px;
+  }
+
+  .tl-ai-chat-footer {
+    padding: 14px 16px 18px;
+  }
+
+  .tl-ai-avatar {
+    width: 38px;
+    height: 38px;
+  }
+
+  .tl-ai-category-btn {
+    padding: 10px;
+  }
+
+  .tl-ai-category-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .tl-ai-question-text {
+    font-size: 0.72rem;
+  }
+
+  .tl-ai-action-btn {
+    font-size: 0.78rem;
+  }
+
+}
+
+/* ============================================================
+   WEB3 INVISIBLE (ARQUITECTURA)
+   ============================================================ */
+
+.tl-web3-testnet-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  margin: 32px auto 0;
+  padding: 8px 18px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  border-radius: 999px;
+  color: #34d399;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.tl-web3-testnet-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  background: #34d399;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #34d399;
+  animation: tl-ai-pulse 2s ease-in-out infinite;
+}
+
+.tl-web3-flow {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 40px 24px;
+  margin-top: 64px;
+}
+
+.tl-web3-connector {
+  position: absolute;
+  top: 34px;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  background-image: linear-gradient(
+    to right,
+    rgba(59, 130, 246, 0.35) 0%,
+    rgba(59, 130, 246, 0.35) 50%,
+    transparent 50%
+  );
+  background-size: 12px 1px;
+  background-repeat: repeat-x;
+  z-index: 0;
+}
+
+.tl-web3-step {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 200px;
+  min-width: 190px;
+  text-align: center;
+  padding: 0 8px;
+}
+
+.tl-web3-step-icon {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Estado apagado por defecto: relleno sólido oscuro, ícono gris */
+  background: var(--tl-bg-2);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 50%;
+  color: var(--tl-grey-dim);
+  box-shadow: none;
+
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+/* Estado "encendido" — relleno sólido en azul, ícono blanco */
+.tl-web3-step.is-lit .tl-web3-step-icon {
+  background: var(--tl-accent);
+  border-color: var(--tl-accent);
+  color: #ffffff;
+  box-shadow:
+    0 0 28px rgba(37, 99, 235, 0.55),
+    0 0 0 5px rgba(37, 99, 235, 0.10);
+  transform: scale(1.08);
+}
+
+.tl-web3-step-num {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--tl-grey-dim);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.tl-web3-step h3 {
+  color: #f8fafc;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.tl-web3-step p {
+  color: var(--tl-grey);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.tl-web3-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 48px;
+}
+
+.tl-web3-chip {
+  padding: 10px 18px;
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  border-radius: 999px;
+  color: var(--tl-cream);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .tl-web3-connector {
+    display: none;
+  }
+  .tl-web3-flow {
+    flex-direction: column;
+    align-items: center;
+  }
+  .tl-web3-step {
+    max-width: 320px;
+  }
+}
+
+.tl-roadmap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 56px;
+}
+
+.tl-roadmap-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-top: 3px solid var(--tl-accent);
+  border-radius: 20px;
+  padding: 28px;
+  backdrop-filter: blur(10px);
+}
+
+.tl-roadmap-phase {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--tl-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.tl-roadmap-time {
+  display: block;
+  margin-bottom: 16px;
+  color: var(--tl-grey-dim);
+  font-size: 0.78rem;
+}
+
+.tl-roadmap-card h3 {
+  color: #f8fafc;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.tl-roadmap-card p {
+  color: var(--tl-grey);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .tl-roadmap-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tl-roadmap-card {
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.tl-roadmap-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--tl-accent);
+  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.5), 0 0 25px rgba(37, 99, 235, 0.15);
+}
+
+/* ============================================================
+   MEJORAS PREMIUM — TARJETAS DE RADIOGRAFÍA DEL MERCADO
+   ============================================================ */
+
+.tl-chart-card {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+/* Brillo diagonal que aparece en hover */
+.tl-chart-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.10), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.tl-chart-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(37, 99, 235, 0.5);
+  box-shadow:
+    0 20px 45px -15px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(37, 99, 235, 0.12);
+}
+
+.tl-chart-card:hover::before {
+  opacity: 1;
+}
+
+.featured-danger-card:hover {
+  border-color: rgba(239, 68, 68, 0.5) !important;
+  box-shadow:
+    0 20px 45px -15px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(239, 68, 68, 0.15);
+}
+
+/* Gráfico de área: línea con glow + punto final pulsante */
+.tl-area-svg .area-line {
+  filter: drop-shadow(0 0 6px rgba(37, 99, 235, 0.6));
+}
+
+.tl-area-svg circle {
+  animation: tl-chart-pulse-dot 2s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+@keyframes tl-chart-pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.65; }
+}
+
+/* Barras: valores con más jerarquía tipográfica */
+.bar-value-text {
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+/* Dona: más glow al pasar el mouse por la tarjeta */
+.tl-chart-card:hover .informal-seg {
+  filter: drop-shadow(0 0 16px rgba(37, 99, 235, 0.9));
+}
+
+.tl-donut-center strong {
+  text-shadow: 0 0 20px rgba(37, 99, 235, 0.35);
+}
+
+/* ============================================================
+   LLAMA FLOTANTE — CTA FINAL
+   ============================================================ */
+
+.tl-cta {
+  --tl-cta-line-y: 70px;      /* posición de la línea (no la toques para mover solo la llama) */
+
+  --tl-cta-llama-x: 0px;      /* mueve la llama horizontalmente: negativo = izquierda, positivo = derecha */
+  --tl-cta-llama-y: -18px;      /* mueve la llama verticalmente: negativo = arriba, positivo = abajo */
+
+  position: relative;
+  overflow: visible;
+
+  border-top: none !important;
+}
+
+.tl-cta::before {
+  content: '';
+  position: absolute;
+  top: var(--tl-cta-line-y);
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--tl-line);
+  z-index: 1;
+}
+
+.tl-cta-llama {
+  position: absolute;
+  top: calc(var(--tl-cta-line-y) + var(--tl-cta-llama-y));
+  left: calc(50% + var(--tl-cta-llama-x));
+  transform: translate(-50%, -100%);
+
+  width: 400px;
+  height: auto;
+
+  z-index: 2;
+
+  pointer-events: none;
+
+  filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.35));
+}
+
+@media (max-width: 640px) {
+  .tl-cta {
+    --tl-cta-line-y: 50px;
+  }
+
+  .tl-cta-llama {
+    width: 170px;
+  }
+}
+
+.tl-roadmap-section {
+  padding-bottom: 300px;
+}
+
+/* ============================================================
+   FRASE DE TRANSICIÓN — ENTRE HERO Y GALERÍA
+   ============================================================ */
+
+.tl-hero-bridge {
+  padding: 100px 0 30px;
+  text-align: center;
+}
+
+.tl-hero-bridge-text {
+  max-width: 780px;
+  margin: 0 auto;
+
+  color: var(--tl-grey);
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.6vw, 1.8rem);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.tl-hero-bridge-text em {
+  font-style: normal;
+  color: var(--tl-accent);
+}
+
+@media (max-width: 640px) {
+  .tl-hero-bridge {
+    padding: 70px 0;
+  }
+}
+/* Ya no hace falta este difuminado: ahora la frase de transición
+   separa al Hero de la galería, así que este degradado sobra. */
+.tl-hero-scroll-container::before {
+  display: none;
+}
+
+/* ============================================================
+   ENCABEZADO DEL SIMULADOR — flota encima de la calculadora
+   ============================================================ */
+
+.tl-simulador-header {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
+  z-index: 5;
+
+  text-align: center;
+  padding: 0 24px;
+}
+
+#simulador .tl-premium-calc {
+  margin-top: 20px !important;
+}
+
+/* ============================================================
+   OFFSET PARA QUE EL NAV STICKY NO TAPE LOS TÍTULOS AL SALTAR
+   ============================================================ */
+
+#problema,
+#como-funciona,
+#reputacion,
+#arquitectura,
+#roadmap {
+  scroll-margin-top: 100px;
+}
+
+#simulador {
+  scroll-margin-top: 20px;
+}
+/* ============================================================
+   OFFSET PARA QUE EL NAV STICKY NO TAPE LOS TÍTULOS AL SALTAR
+   ============================================================ */
+
+/* Estas secciones tienen poco aire natural arriba: necesitan más offset */
+#problema,
+#simulador {
+  scroll-margin-top: 100px;
+}
+
+/* Estas ya tienen bastante padding propio: con poquito offset alcanza */
+#como-funciona,
+#reputacion,
+#arquitectura {
+  scroll-margin-top: 20px;
+}
+
+/* ============================================================
+   ESCALERA DE NIVELES DE CONFIANZA
+   ============================================================ */
+
+.tl-level-ladder {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  margin-top: 28px;
+  padding-top: 24px;
+
+  border-top: 1px solid var(--tl-line);
+}
+
+.tl-level-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 10px 14px;
+
+  border-radius: 12px;
+
+  transition: background 0.25s ease;
+}
+
+.tl-level-dot {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+
+  border-radius: 50%;
+}
+
+.tl-level-dot--1 {
+  background: var(--tl-grey-dim);
+}
+
+.tl-level-dot--2 {
+  background: #38bdf8;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+}
+
+.tl-level-dot--3 {
+  background: #34d399;
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
+}
+
+.tl-level-dot--4 {
+  background: #f59e0b;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+}
+
+.tl-level-text {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+
+  font-size: 0.85rem;
+}
+
+.tl-level-text strong {
+  color: #f8fafc;
+  font-weight: 700;
+}
+
+.tl-level-text span {
+  color: var(--tl-grey);
+}
+
+.tl-level-item--active {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+/* ============================================================
+   COMPACTAR TARJETA DE SCORE (para que no quede más alta que el chat)
+   ============================================================ */
+
+.tl-trust-badge {
+  margin-top: 20px;   /* antes 32px */
+}
+
+.tl-level-ladder {
+  margin-top: 16px;   /* antes 28px */
+  padding-top: 16px;  /* antes 24px */
+  gap: 8px;            /* antes 18px */
+}
+
+.tl-level-item {
+  padding: 6px 10px;  /* antes 10px 14px */
+}
+
+/* ============================================================
+   SOLUCIÓN DEFINITIVA: CSS GRID STACKING PARA PESTAÑAS
+   ============================================================ */
+
+/* 1. Convertimos la tarjeta en un Grid de 2 filas */
+.tl-premium-calc {
+  display: grid !important;
+  /* Fila 1 para la navegación, Fila 2 para el contenido */
+  grid-template-rows: auto auto !important; 
+  grid-template-columns: 100% !important;
+  align-items: start !important;
+  width: 100% !important;
+  max-width: 660px !important;
+  margin: 0 !important;
+  background: #1a2238; /* Tu color de fondo */
+  border-radius: 16px;
+}
+
+/* 2. Ubicamos los botones en la primera fila */
+.tl-calc-nav {
+  grid-row: 1 !important;
+  grid-column: 1 !important;
+  z-index: 10;
+}
+
+/* 3. EL TRUCO: Ambas pestañas van en la MISMA celda (Fila 2) */
+.tl-tab-pane {
+  grid-row: 2 !important;
+  grid-column: 1 !important;
+  
+  /* En lugar de display: none, las ocultamos visualmente */
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important; /* Para que los inputs ocultos no sean clickeables */
+  
+  /* Transición suave al cambiar (opcional pero recomendado) */
+  transition: opacity 0.3s ease !important;
+}
+
+/* 4. Mostramos solo la pestaña activa */
+.tl-tab-pane.active {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* 5. Aseguramos que el contenido de la pestaña corta se distribuya bien en su nueva caja grande */
+#tab-usura {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centra el contenido de "Impacto Financiero" verticalmente */
+  height: 100%;
+}
+
+.contenedor-impacto {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+}
+
+.impacto-financiero,
+.score-sbt {
+    height: 100%;
+    box-sizing: border-box;
+}
+
+/* ============================================================
+   FIX FINAL — MISMO TAMAÑO PARA AMBAS PESTAÑAS DEL SIMULADOR
+   ============================================================ */
+
+/* La calculadora siempre conserva exactamente el mismo tamaño */
+#simulador .tl-premium-calc {
+  height: 460px !important;
+  min-height: 4600px !important;
+  box-sizing: border-box !important;
+
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: 58px 1fr !important;
+
+  overflow: hidden !important;
+}
+
+/* Barra de pestañas: mismo tamaño siempre */
+#simulador .tl-calc-nav {
+  grid-row: 1 !important;
+  grid-column: 1 !important;
+
+  height: 58px !important;
+  min-height: 58px !important;
+
+  display: flex !important;
+  align-items: center !important;
+
+  margin: 0 !important;
+  padding-bottom: 10px !important;
+
+  box-sizing: border-box !important;
+}
+
+/* Los dos contenidos ocupan exactamente la misma zona */
+#simulador .tl-tab-pane {
+  grid-row: 2 !important;
+  grid-column: 1 !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+
+  box-sizing: border-box !important;
+}
+
+/* El contenido de Impacto Financiero se centra dentro
+   del mismo espacio que ocupa SBT */
+#simulador #tab-usura {
+  height: 100% !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+/* El contenido SBT utiliza exactamente la misma altura */
+#simulador #tab-sbt {
+  height: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Títulos de ambas pestañas: mismo tamaño */
+#simulador .tl-calc-header h3 {
+  font-size: 1.15rem !important;
+  line-height: 1.25 !important;
+  margin: 0 !important;
+}
+
+/* Evitamos que los textos de los botones hagan crecer la navegación */
+#simulador .tl-tab-btn {
+  height: 48px !important;
+  min-height: 48px !important;
+
+  font-size: 0.92rem !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* El contenido SBT queda compacto y controlado */
+#simulador .tl-sbt-grid {
+  height: calc(100% - 10px) !important;
+  min-height: 0 !important;
+
+  margin-top: 0 !important;
+
+  grid-template-columns: 1.15fr 1fr !important;
+  gap: 20px !important;
+
+  align-items: center !important;
+}
+
+/* Inputs SBT un poco más compactos */
+#simulador .tl-sbt-inputs {
+  gap: 10px !important;
+}
+
+#simulador .tl-calc-input-box label {
+  font-size: 0.82rem !important;
+  line-height: 1.25 !important;
+  margin-bottom: 7px !important;
+}
+
+/* Resultado SBT */
+#simulador .tl-sbt-result-box {
+  padding: 1rem !important;
+  box-sizing: border-box !important;
+}
+
+/* Número del score */
+#simulador .tl-score-value {
+  font-size: 2.5rem !important;
+}
+
+/* Texto explicativo */
+#simulador .tl-value-prop {
+  font-size: 0.78rem !important;
+  line-height: 1.35 !important;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 850px) {
+  #simulador .tl-premium-calc {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  #simulador .tl-tab-pane {
+    height: auto !important;
+  }
+
+  #simulador .tl-sbt-grid {
+    height: auto !important;
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   FIX: LA TARJETA DEL SIMULADOR YA NO CAMBIA DE TAMAÑO
+   NI SE ENCIMA CON EL TÍTULO AL CAMBIAR DE PESTAÑA
+   ============================================================ */
+
+/* 1. Las dos pestañas ocupan siempre el mismo espacio mínimo */
+#tab-usura,
+#tab-sbt {
+  min-height: 260px;
+}
+
+/* 2. La tarjeta completa nunca cambia de alto entre pestañas */
+#simulador .tl-premium-calc {
+  min-height: 460px !important;
+}
+
+
+.tl-simulador-header {
+  top: 30px;   /* posición del título (más chico = más arriba) */
+}
+
+#tab-usura,
+#tab-sbt {
+  min-height: 220px;   /* antes 260px */
+}
+
+#simulador .tl-premium-calc {
+  min-height: 400px !important;   /* antes 460px */
+  padding: 2rem 2.2rem !important;   /* antes 2.5rem 2.8rem — un poco más compacto */
+}
+
+/* ============================================================
+   FIX REAL: TÍTULO Y TARJETA EN EL MISMO FLUJO (nunca se solapan)
+   ============================================================ */
+
+.tl-simulador-content {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+
+.tl-simulador-header {
+  position: static !important;   /* ya no flota suelto */
+  text-align: left !important;
+  margin-bottom: 24px;
+}
+
+.tl-simulador-content {
+  padding-left: 0;
+}
+
+
+.tl-simulador-header {
+  align-self: stretch !important;
+  width: 100%;
+  text-align: center !important;
+}
+
+/* ============================================================
+   SIMULADOR — LAYOUT FINAL (título centrado, tarjeta corrida)
+   ============================================================ */
+
+.tl-simulador-content {
+  padding-left: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;   /* centra al título por defecto */
+}
+
+.tl-simulador-header {
+  width: 100%;
+  text-align: center;
+}
+
+.tl-premium-calc {
+  align-self: flex-start;   /* la tarjeta no se centra, se queda a la izquierda... */
+  margin-left: 150px;         /* ...y se corre desde ahí, sin tocar al título */
+  width: calc(100% - 150px);
+}
+
+#simulador .tl-premium-calc {
+  margin-left: 220px !important;
+  width: calc(100% - 220px) !important;
+   max-width: 800px !important;
+}
+
+.tl-simulador-bg-video {
+  transform: scale(0.85) !important;
+  transform-origin: bottom left !important;
+}
+
+#simulador {
+  min-height: 10px !important;
+}
