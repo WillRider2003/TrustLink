@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Usuarios — TrustLink</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<style>
+  .filter-bar { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; margin-bottom:16px; }
+  .filter-group { display:flex; flex-direction:column; gap:5px; }
+  .filter-group label { font-size:0.74rem; font-weight:700; color:var(--tl-grey-600); }
+  .filter-group input, .filter-group select { padding:8px 12px; border-radius:var(--tl-radius-sm); border:1px solid var(--tl-grey-300); font-size:0.84rem; min-width:160px; }
+  .users-table { width:100%; border-collapse:collapse; font-size:0.86rem; }
+  .users-table th { text-align:left; padding:10px 12px; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.03em; color:var(--tl-grey-600); border-bottom:2px solid var(--tl-grey-200); }
+  .users-table td { padding:10px 12px; border-bottom:1px solid var(--tl-grey-200); vertical-align:middle; }
+  .user-avatar-mini { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.72rem; flex-shrink:0; }
+  .role-badge { padding:3px 10px; border-radius:999px; font-size:0.7rem; font-weight:700; display:inline-block; }
+  .role-comprador { background:var(--tl-accent-soft); color:var(--tl-accent-dark); }
+  .role-vendedor { background:rgba(30,158,90,0.14); color:var(--tl-green); }
+  .role-superadmin { background:#111114; color:#fff; }
+  .status-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:5px; }
+  .status-dot.activo { background:var(--tl-green); }
+  .status-dot.suspendido { background:#dc2626; }
+</style>
+</head>
+<body data-page="usuarios-admin" data-active-link="usuarios-admin.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Usuarios y roles</div>
+          <div class="topbar-subtitle">Gestiona compradores, vendedores y suspensiones de todo el sistema</div>
+        </div>
+      </div>
+      <div id="topbarNotifMount" style="position:relative;"></div>
+    </header>
+
+    <div class="content-body">
+      <div class="filter-bar">
+        <div class="filter-group" style="flex:1; min-width:200px;">
+          <label>Buscar</label>
+          <input type="text" id="filterSearch" placeholder="Nombre..." oninput="tlAplicarFiltros()">
+        </div>
+        <div class="filter-group">
+          <label>Rol</label>
+          <select id="filterRol" onchange="tlAplicarFiltros()">
+            <option value="">Todos</option>
+            <option value="comprador">Comprador</option>
+            <option value="vendedor">Vendedor</option>
+            <option value="superadmin">Superadmin</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Estado</label>
+          <select id="filterEstado" onchange="tlAplicarFiltros()">
+            <option value="">Todos</option>
+            <option value="activo">Activo</option>
+            <option value="suspendido">Suspendido</option>
+          </select>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="tlLimpiarFiltros()">Limpiar</button>
+      </div>
+
+      <div class="panel" style="padding:0; overflow:hidden;">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; padding:14px 18px; border-bottom:1px solid var(--tl-grey-200);">
+          <span style="font-weight:800; font-size:0.9rem;">Usuarios del sistema</span>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span id="filterCount" style="font-size:0.8rem; color:var(--tl-grey-600);"></span>
+            <button class="btn btn-outline btn-sm" id="btnDescargarUsuarios">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+              Descargar
+            </button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="users-table">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Score</th>
+                <th>Crédito</th>
+                <th>Desde</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="usuariosTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="banearOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Suspender usuario</div>
+      <button class="modal-close" onclick="tlCerrarModalBanear()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6L6 18M6 6l18 18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="banearForm">
+        <input type="hidden" id="banearUsuarioId">
+        <div class="field">
+          <label>Motivo de la suspensión</label>
+          <textarea id="banearMotivo" rows="3" required placeholder="Ej: reportes reiterados de incidencias no resueltas"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="background:var(--tl-amber);">Suspender cuenta</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app-real.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script>
+const ROL_LABELS = { comprador: 'Comprador', vendedor: 'Vendedor', superadmin: 'Superadmin' };
+const ROL_COLORS = {
+  comprador: { bg: '#dbeafe', fg: '#1d4ed8' },
+  vendedor:  { bg: '#dcfce7', fg: '#15803d' },
+  superadmin:{ bg: '#111114', fg: '#ffffff' },
+};
+
+let tlUsuariosCache = [];
+
+function tlIniciales(nombre) {
+  return (nombre || 'U').trim().split(/\s+/).map(p => p[0]).slice(0, 2).join('').toUpperCase();
+}
+
+function tlUsuarioFilaHTML(u) {
+  const color = ROL_COLORS[u.rol] || ROL_COLORS.comprador;
+  return `
+    <tr>
+      <td>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="user-avatar-mini" style="background:${color.bg}; color:${color.fg};">${tlIniciales(u.nombre)}</div>
+          <div>
+            <div style="font-weight:700;">${u.nombre}</div>
+            <div style="font-size:0.74rem; color:var(--tl-grey-600);">${u.telefono || 'sin teléfono'}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="role-badge role-${u.rol}">${ROL_LABELS[u.rol] || u.rol}</span></td>
+      <td><span class="status-dot ${u.baneado ? 'suspendido' : 'activo'}"></span>${u.baneado ? 'Suspendido' : 'Activo'}</td>
+      <td>${u.score_reputacion}</td>
+      <td>S/ ${Number(u.credito_disponible).toFixed(2)}</td>
+      <td style="white-space:nowrap; color:var(--tl-grey-600); font-size:0.8rem;">${new Date(u.creado_en).toLocaleDateString('es-PE')}</td>
+      <td>
+        ${u.baneado
+          ? `<button class="btn btn-outline btn-sm" onclick="tlDesbanearUI('${u.id}')">Reactivar</button>`
+          : `<button class="btn btn-outline btn-sm" style="border-color:var(--tl-amber); color:var(--tl-amber);" onclick="tlAbrirModalBanear('${u.id}', '${u.nombre.replace(/'/g, "\\'")}')">Suspender</button>`}
+      </td>
+    </tr>
+  `;
+}
+
+function tlAplicarFiltros() {
+  const busqueda = document.getElementById('filterSearch').value.trim().toLowerCase();
+  const rol = document.getElementById('filterRol').value;
+  const estado = document.getElementById('filterEstado').value;
+
+  const filtrados = tlUsuariosCache.filter(u => {
+    if (busqueda && !u.nombre.toLowerCase().includes(busqueda)) return false;
+    if (rol && u.rol !== rol) return false;
+    if (estado === 'activo' && u.baneado) return false;
+    if (estado === 'suspendido' && !u.baneado) return false;
+    return true;
+  });
+
+  document.getElementById('usuariosTbody').innerHTML = filtrados.length
+    ? filtrados.map(tlUsuarioFilaHTML).join('')
+    : `<tr><td colspan="7" style="text-align:center; padding:40px 20px; color:var(--tl-grey-600);">Sin resultados para este filtro</td></tr>`;
+  document.getElementById('filterCount').textContent = `${filtrados.length} de ${tlUsuariosCache.length}`;
+}
+
+function tlLimpiarFiltros() {
+  document.getElementById('filterSearch').value = '';
+  document.getElementById('filterRol').value = '';
+  document.getElementById('filterEstado').value = '';
+  tlAplicarFiltros();
+}
+
+async function tlCargarUsuarios() {
+  tlUsuariosCache = await tlListarUsuariosAdmin();
+  tlAplicarFiltros();
+}
+
+function tlAbrirModalBanear(id, nombre) {
+  document.getElementById('banearUsuarioId').value = id;
+  document.getElementById('banearMotivo').value = '';
+  document.querySelector('#banearOverlay .modal-title').textContent = `Suspender a ${nombre}`;
+  document.getElementById('banearOverlay').classList.add('show');
+}
+function tlCerrarModalBanear() { document.getElementById('banearOverlay').classList.remove('show'); }
+
+document.getElementById('banearForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  try {
+    await tlBanearUsuario(document.getElementById('banearUsuarioId').value, document.getElementById('banearMotivo').value.trim());
+    tlShowToastReal('Usuario suspendido', 'success');
+    tlCerrarModalBanear();
+    await tlCargarUsuarios();
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo suspender');
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+async function tlDesbanearUI(id) {
+  try {
+    await tlDesbanearUsuario(id);
+    tlShowToastReal('Usuario reactivado', 'success');
+    await tlCargarUsuarios();
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo reactivar');
+  }
+}
+
+document.getElementById('btnDescargarUsuarios').addEventListener('click', async () => {
+  if (!tlUsuariosCache.length) { tlShowToastReal('No hay usuarios para exportar'); return; }
+  const formato = await tlElegirFormatoDescarga('Descargar usuarios');
+  if (!formato) return;
+
+  const headers = ['Nombre', 'Rol', 'Estado', 'Score', 'Credito', 'Desde'];
+  const filas = tlUsuariosCache.map(u => [
+    u.nombre, ROL_LABELS[u.rol] || u.rol, u.baneado ? 'Suspendido' : 'Activo',
+    u.score_reputacion, Number(u.credito_disponible).toFixed(2),
+    new Date(u.creado_en).toLocaleDateString('es-PE'),
+  ]);
+  tlDescargarTabla(`trustlink_usuarios_${new Date().toISOString().slice(0,10)}`, headers, filas, formato);
+});
+
+(async () => {
+  const ctx = await tlInitLayout('usuarios-admin.html', 'superadmin');
+  if (!ctx) return;
+  await tlCargarUsuarios();
+})();
+</script>
+</body>
+</html>

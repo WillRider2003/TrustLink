@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi tienda — TrustLink</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="dashboard-vendedor" data-active-link="dashboard-vendedor.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Mi tienda</div>
+          <div class="topbar-subtitle">Gestiona tus productos publicados</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div id="topbarNotifMount" style="position:relative;"></div>
+        <button class="btn btn-primary btn-sm" onclick="tlAbrirModalNuevoProducto()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>
+          Nuevo producto
+        </button>
+      </div>
+    </header>
+
+    <div class="content-body">
+      <div id="misProductosEmpty" style="display:none;" class="empty-state">
+        <div class="empty-state-title">Todavía no publicaste ningún producto</div>
+        <div class="empty-state-desc">Usa "Nuevo producto" para empezar a vender.</div>
+      </div>
+      <div class="product-grid" id="misProductosGrid"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="nuevoProductoOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Publicar producto</div>
+      <button class="modal-close" onclick="tlCerrarModalNuevoProducto()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6L6 18M6 6l18 18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="nuevoProductoForm">
+        <div class="field"><label>Nombre del producto</label><input type="text" id="prodNombre" required></div>
+        <div class="field"><label>Descripción</label><textarea id="prodDescripcion" rows="3"></textarea></div>
+        <div class="field"><label>Precio (S/)</label><input type="number" id="prodPrecio" min="0.01" step="0.01" required></div>
+        <div class="field"><label>Stock</label><input type="number" id="prodStock" min="1" value="1" required></div>
+        <div class="field">
+          <label>Categoría</label>
+          <select id="prodCategoria">
+            <option>Herramientas y ferretería</option>
+            <option>Ropa y accesorios</option>
+            <option>Electrónica</option>
+            <option>Seguridad industrial</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Imagen del producto (opcional)</label>
+          <div class="dropzone" id="prodImgDropzone" onclick="document.getElementById('prodImgInput').click()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+            <div class="dropzone-text">Haz clic para subir una foto</div>
+            <div class="dropzone-sub">JPG, PNG o WEBP · máx. 5MB</div>
+          </div>
+          <input type="file" id="prodImgInput" accept="image/jpeg,image/png,image/webp" style="display:none;">
+          <div id="prodImgPreviewWrap" style="display:none; margin-top:10px;">
+            <div style="position:relative; width:84px; height:84px;">
+              <img id="prodImgPreview" style="width:100%; height:100%; object-fit:cover; border-radius:var(--tl-radius-sm);" alt="Vista previa">
+              <button type="button" onclick="tlQuitarImagenNuevoProducto()" style="position:absolute; top:-6px; right:-6px; width:20px; height:20px; border-radius:50%; background:#dc2626; color:white; font-size:0.7rem; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer;">✕</button>
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Publicar</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="editarProductoOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Editar producto</div>
+      <button class="modal-close" onclick="tlCerrarModalEditarProducto()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6L6 18M6 6l18 18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="editarProductoForm">
+        <input type="hidden" id="editProdId">
+        <div class="field"><label>Nombre del producto</label><input type="text" id="editProdNombre" required></div>
+        <div class="field"><label>Precio (S/)</label><input type="number" id="editProdPrecio" min="0.01" step="0.01" required></div>
+        <div class="field"><label>Stock</label><input type="number" id="editProdStock" min="0" required></div>
+        <div class="field">
+          <label>Imagen del producto</label>
+          <div class="dropzone" id="editProdImgDropzone" onclick="document.getElementById('editProdImgInput').click()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+            <div class="dropzone-text">Haz clic para cambiar la foto</div>
+            <div class="dropzone-sub">JPG, PNG o WEBP · máx. 5MB</div>
+          </div>
+          <input type="file" id="editProdImgInput" accept="image/jpeg,image/png,image/webp" style="display:none;">
+          <input type="hidden" id="editProdImagenActual">
+          <div id="editProdImgPreviewWrap" style="display:none; margin-top:10px;">
+            <div style="position:relative; width:84px; height:84px;">
+              <img id="editProdImgPreview" style="width:100%; height:100%; object-fit:cover; border-radius:var(--tl-radius-sm);" alt="Vista previa">
+              <button type="button" onclick="tlQuitarImagenEditarProducto()" style="position:absolute; top:-6px; right:-6px; width:20px; height:20px; border-radius:50%; background:#dc2626; color:white; font-size:0.7rem; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer;">✕</button>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:0.76rem; color:var(--tl-grey-600); margin:-4px 0 14px;">
+          Los cambios de precio no afectan pedidos ya realizados: el comprador paga lo que costaba al momento de su compra.
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Guardar cambios</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app-real.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script>
+let tlMisProductosCache = [];
+
+// ---------- Imagen: modal "Nuevo producto" ----------
+let tlNuevoProdArchivo = null;
+
+document.getElementById('prodImgInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  e.target.value = ''; // permite volver a elegir el mismo archivo
+  if (!file) return;
+
+  const TIPOS_PERMITIDOS = ['image/jpeg', 'image/png', 'image/webp'];
+  const MAX_BYTES = 5 * 1024 * 1024;
+  if (!TIPOS_PERMITIDOS.includes(file.type)) {
+    tlShowToastReal('Formato no permitido. Usa JPG, PNG o WEBP.');
+    return;
+  }
+  if (file.size > MAX_BYTES) {
+    tlShowToastReal('La imagen supera el máximo de 5MB.');
+    return;
+  }
+
+  tlNuevoProdArchivo = file;
+  document.getElementById('prodImgPreview').src = URL.createObjectURL(file);
+  document.getElementById('prodImgPreviewWrap').style.display = 'block';
+});
+
+function tlQuitarImagenNuevoProducto() {
+  tlNuevoProdArchivo = null;
+  document.getElementById('prodImgPreviewWrap').style.display = 'none';
+  document.getElementById('prodImgPreview').src = '';
+}
+
+// ---------- Imagen: modal "Editar producto" ----------
+let tlEditProdArchivo = null;
+let tlEditProdImagenQuitada = false;
+
+document.getElementById('editProdImgInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+
+  const TIPOS_PERMITIDOS = ['image/jpeg', 'image/png', 'image/webp'];
+  const MAX_BYTES = 5 * 1024 * 1024;
+  if (!TIPOS_PERMITIDOS.includes(file.type)) {
+    tlShowToastReal('Formato no permitido. Usa JPG, PNG o WEBP.');
+    return;
+  }
+  if (file.size > MAX_BYTES) {
+    tlShowToastReal('La imagen supera el máximo de 5MB.');
+    return;
+  }
+
+  tlEditProdArchivo = file;
+  tlEditProdImagenQuitada = false;
+  document.getElementById('editProdImgPreview').src = URL.createObjectURL(file);
+  document.getElementById('editProdImgPreviewWrap').style.display = 'block';
+});
+
+function tlQuitarImagenEditarProducto() {
+  tlEditProdArchivo = null;
+  tlEditProdImagenQuitada = true;
+  document.getElementById('editProdImgPreviewWrap').style.display = 'none';
+  document.getElementById('editProdImgPreview').src = '';
+}
+
+function tlMiProductoCardHTML(p) {
+  return `
+    <div class="product-card">
+      <img src="${p.imagen_url || 'https://placehold.co/400x400/2563eb/FFFFFF?text=' + encodeURIComponent(p.nombre)}" class="product-card-img" alt="${p.nombre}">
+      <div class="product-card-body">
+        <div class="product-card-name">${p.nombre}</div>
+        <div class="product-card-seller">Stock: ${p.stock} · ${p.activo ? 'Activo' : 'Pausado'}</div>
+        <div class="product-card-price">S/ ${Number(p.precio).toFixed(2)}</div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-outline btn-sm" style="flex:1;" onclick="tlAbrirModalEditarProducto(${p.id})">
+            Editar
+          </button>
+          <button class="btn btn-outline btn-sm" style="flex:1;" onclick="tlToggleActivo(${p.id}, ${!p.activo})">
+            ${p.activo ? 'Pausar' : 'Reactivar'}
+          </button>
+        </div>
+        <button class="btn btn-outline btn-sm btn-block" style="margin-top:8px; border-color:#fca5a5; color:#dc2626;" onclick="tlEliminarProductoUI(${p.id})">
+          Eliminar
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+async function tlCargarMisProductos() {
+  const { data: userData } = await sb.auth.getUser();
+  tlMisProductosCache = await tlListarProductos({ soloDeVendedor: userData.user.id });
+  const grid = document.getElementById('misProductosGrid');
+  const empty = document.getElementById('misProductosEmpty');
+
+  if (!tlMisProductosCache.length) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  grid.innerHTML = tlMisProductosCache.map(tlMiProductoCardHTML).join('');
+}
+
+async function tlToggleActivo(id, nuevoActivo) {
+  await tlActualizarProducto(id, { activo: nuevoActivo });
+  await tlCargarMisProductos();
+}
+
+async function tlEliminarProductoUI(id) {
+  if (!await tlConfirm('¿Eliminar este producto? Si ya tiene pedidos asociados, se pausará en vez de eliminarse para no romper el historial.', { titulo: 'Eliminar producto', textoAceptar: 'Sí, eliminar' })) return;
+  try {
+    await tlEliminarProducto(id);
+    tlShowToastReal('Producto eliminado', 'success');
+    await tlCargarMisProductos();
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo eliminar el producto');
+  }
+}
+
+function tlAbrirModalNuevoProducto() { document.getElementById('nuevoProductoOverlay').classList.add('show'); }
+function tlCerrarModalNuevoProducto() {
+  document.getElementById('nuevoProductoOverlay').classList.remove('show');
+  document.getElementById('nuevoProductoForm').reset();
+  tlQuitarImagenNuevoProducto();
+}
+
+function tlAbrirModalEditarProducto(id) {
+  const p = tlMisProductosCache.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('editProdId').value = p.id;
+  document.getElementById('editProdNombre').value = p.nombre;
+  document.getElementById('editProdPrecio').value = p.precio;
+  document.getElementById('editProdStock').value = p.stock;
+  document.getElementById('editProdImagenActual').value = p.imagen_url || '';
+
+  tlEditProdArchivo = null;
+  tlEditProdImagenQuitada = false;
+  if (p.imagen_url) {
+    document.getElementById('editProdImgPreview').src = p.imagen_url;
+    document.getElementById('editProdImgPreviewWrap').style.display = 'block';
+  } else {
+    document.getElementById('editProdImgPreviewWrap').style.display = 'none';
+    document.getElementById('editProdImgPreview').src = '';
+  }
+
+  document.getElementById('editarProductoOverlay').classList.add('show');
+}
+function tlCerrarModalEditarProducto() { document.getElementById('editarProductoOverlay').classList.remove('show'); }
+
+document.getElementById('editarProductoForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.textContent = 'Guardando...';
+  try {
+    const id = parseInt(document.getElementById('editProdId').value, 10);
+
+    let imagen_url = document.getElementById('editProdImagenActual').value || null;
+    if (tlEditProdImagenQuitada) imagen_url = null;
+    if (tlEditProdArchivo) imagen_url = await tlSubirImagenProducto(tlEditProdArchivo);
+
+    await tlActualizarProducto(id, {
+      nombre: document.getElementById('editProdNombre').value.trim(),
+      precio: parseFloat(document.getElementById('editProdPrecio').value),
+      stock: parseInt(document.getElementById('editProdStock').value, 10),
+      imagen_url,
+    });
+    tlShowToastReal('Producto actualizado', 'success');
+    tlCerrarModalEditarProducto();
+    await tlCargarMisProductos();
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo actualizar el producto');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Guardar cambios';
+  }
+});
+
+document.getElementById('nuevoProductoForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.textContent = 'Publicando...';
+  try {
+    let imagen_url = null;
+    if (tlNuevoProdArchivo) imagen_url = await tlSubirImagenProducto(tlNuevoProdArchivo);
+
+    await tlCrearProducto({
+      nombre: document.getElementById('prodNombre').value.trim(),
+      descripcion: document.getElementById('prodDescripcion').value.trim(),
+      precio: parseFloat(document.getElementById('prodPrecio').value),
+      stock: parseInt(document.getElementById('prodStock').value, 10),
+      categoria: document.getElementById('prodCategoria').value,
+      imagen_url,
+    });
+    tlShowToastReal('Producto publicado', 'success');
+    tlCerrarModalNuevoProducto();
+    await tlCargarMisProductos();
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo publicar el producto');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Publicar';
+  }
+});
+
+(async () => {
+  const ctx = await tlInitLayout('dashboard-vendedor.html', 'vendedor');
+  if (!ctx) return;
+  await tlCargarMisProductos();
+})();
+</script>
+</body>
+</html>

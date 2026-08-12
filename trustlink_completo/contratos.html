@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contratos on-chain — TrustLink</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<style>
+  .w3-estado {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 4px 10px; border-radius: 20px;
+  }
+  .w3-estado.ok { background: rgba(30,158,90,0.12); color: var(--tl-green); }
+  .w3-estado.pendiente { background: rgba(200,137,26,0.14); color: var(--tl-amber); }
+  .w3-estado::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .w3-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; }
+  .w3-dato { display: flex; justify-content: space-between; gap: 10px; font-size: 0.8rem; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .w3-dato:last-child { border-bottom: none; }
+  .w3-dato-label { color: rgba(255,255,255,0.55); }
+  .w3-dato-valor { font-family: 'SF Mono', Menlo, monospace; font-size: 0.72rem; word-break: break-all; text-align: right; color: #93c5fd; }
+  .w3-resultado { margin-top: 14px; font-size: 0.84rem; }
+</style>
+</head>
+<body data-page="contratos" data-active-link="contratos.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Contratos on-chain</div>
+          <div class="topbar-subtitle">Escrow y reputación SBT verificables en Arbitrum Sepolia</div>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <span class="chip-live" id="chipRed">Arbitrum Sepolia</span>
+      </div>
+    </header>
+
+    <div class="content-body">
+      <div id="w3AvisoConfig" class="panel" style="display:none; border-left:4px solid var(--tl-amber);">
+        <div class="panel-title" style="margin-bottom:6px;">Contratos pendientes de vincular</div>
+        <div style="font-size:0.84rem; color:var(--tl-grey-600); line-height:1.55;">
+          El código Solidity ya está en la carpeta <code>contracts/</code> del proyecto. Cuando los despliegues en
+          Arbitrum Sepolia, pega las dos direcciones en <code>js/web3-contratos.js</code> (constante <code>TL_WEB3</code>)
+          y esta página empezará a leer datos reales de la blockchain automáticamente: estado de órdenes del escrow,
+          ventas exitosas, SBTs y score de cualquier vendedor.
+        </div>
+      </div>
+
+      <div class="w3-grid">
+        <!-- ESCROW -->
+        <div class="contract-card">
+          <div class="contract-card-name">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            TrustLinkEscrow.sol
+            <span class="w3-estado pendiente" id="estadoEscrow" style="margin-left:auto;">Pendiente</span>
+          </div>
+          <div class="contract-card-address" id="addrEscrow">Dirección no configurada — ver contracts/TrustLinkEscrow.sol</div>
+          <div style="margin-top:12px;">
+            <div class="w3-dato"><span class="w3-dato-label">Red</span><span class="w3-dato-valor">Arbitrum Sepolia (421614)</span></div>
+            <div class="w3-dato"><span class="w3-dato-label">Plazo de confirmación</span><span class="w3-dato-valor" id="escrowPlazo">72 h (por contrato)</span></div>
+            <div class="w3-dato"><span class="w3-dato-label">Reputación vinculada</span><span class="w3-dato-valor" id="escrowRep">—</span></div>
+          </div>
+          <div class="contract-fn-list">
+            <div class="contract-fn">crearOrden(vendedor, codigoHash) payable</div>
+            <div class="contract-fn">confirmarEntrega(ordenId, codigo)</div>
+            <div class="contract-fn">liberarPorTimeout(ordenId)</div>
+            <div class="contract-fn">reportarDisputa(ordenId)</div>
+            <div class="contract-fn">resolverDisputa(ordenId, liberarAlVendedor) onlyOwner</div>
+          </div>
+          <a class="btn btn-outline btn-sm" id="linkEscrow" target="_blank" rel="noopener" style="margin-top:14px; border-color:rgba(255,255,255,0.3); color:#fff; display:none;">Ver en Arbiscan</a>
+        </div>
+
+        <!-- REPUTATION -->
+        <div class="contract-card">
+          <div class="contract-card-name">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>
+            TrustLinkReputation.sol
+            <span class="w3-estado pendiente" id="estadoRep" style="margin-left:auto;">Pendiente</span>
+          </div>
+          <div class="contract-card-address" id="addrRep">Dirección no configurada — ver contracts/TrustLinkReputation.sol</div>
+          <div style="margin-top:12px;">
+            <div class="w3-dato"><span class="w3-dato-label">Token</span><span class="w3-dato-valor" id="repToken">TrustLink Reputation (TLREP)</span></div>
+            <div class="w3-dato"><span class="w3-dato-label">Tipo</span><span class="w3-dato-valor">SBT — ERC-721 no transferible</span></div>
+            <div class="w3-dato"><span class="w3-dato-label">Escrow autorizado</span><span class="w3-dato-valor" id="repEscrow">—</span></div>
+          </div>
+          <div class="contract-fn-list">
+            <div class="contract-fn">registrarVentaExitosa(vendedor, comprador) soloEscrow</div>
+            <div class="contract-fn">reputacionDe(vendedor) → (ventas, score, compradores)</div>
+            <div class="contract-fn">actualizarScore(vendedor, 0-100) onlyOwner</div>
+            <div class="contract-fn">_update() bloquea transferencias (soulbound)</div>
+          </div>
+          <a class="btn btn-outline btn-sm" id="linkRep" target="_blank" rel="noopener" style="margin-top:14px; border-color:rgba(255,255,255,0.3); color:#fff; display:none;">Ver en Arbiscan</a>
+        </div>
+      </div>
+
+      <!-- VERIFICADOR ON-CHAIN -->
+      <div class="w3-grid" style="margin-top:16px;">
+        <div class="panel" style="margin-bottom:0;">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Verificar reputación de un vendedor</div>
+              <div class="panel-subtitle">Lee ventasExitosas, score y SBTs directamente del contrato</div>
+            </div>
+          </div>
+          <form id="formRep">
+            <div class="field"><label>Wallet del vendedor</label><input type="text" id="inputWallet" placeholder="0x..." required></div>
+            <button type="submit" class="btn btn-primary btn-block" id="btnRep">Consultar on-chain</button>
+          </form>
+          <div class="w3-resultado" id="resultadoRep"></div>
+        </div>
+
+        <div class="panel" style="margin-bottom:0;">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Verificar una orden del escrow</div>
+              <div class="panel-subtitle">Consulta el estado real de una orden por su ID</div>
+            </div>
+          </div>
+          <form id="formOrden">
+            <div class="field"><label>ID de la orden</label><input type="number" id="inputOrdenId" min="1" placeholder="Ej. 1" required></div>
+            <button type="submit" class="btn btn-primary btn-block" id="btnOrden">Consultar on-chain</button>
+          </form>
+          <div class="w3-resultado" id="resultadoOrden"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app-real.js"></script>
+<script src="js/web3-contratos.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script>
+function tlAcortarAddr(a) { return a ? a.slice(0, 8) + '…' + a.slice(-6) : '—'; }
+
+async function tlPintarEstadoContratos() {
+  const estado = await tlEstadoContratos();
+
+  if (!estado.configurado) {
+    document.getElementById('w3AvisoConfig').style.display = 'block';
+    return;
+  }
+
+  const pintar = (idEstado, idAddr, idLink, info) => {
+    const chip = document.getElementById(idEstado);
+    document.getElementById(idAddr).textContent = info.address;
+    const link = document.getElementById(idLink);
+    link.href = `${TL_WEB3.explorer}/address/${info.address}`;
+    link.style.display = 'inline-flex';
+    if (info.desplegado) { chip.textContent = 'Desplegado'; chip.className = 'w3-estado ok'; }
+    else { chip.textContent = 'Sin bytecode'; chip.className = 'w3-estado pendiente'; }
+  };
+  pintar('estadoEscrow', 'addrEscrow', 'linkEscrow', estado.escrow);
+  pintar('estadoRep', 'addrRep', 'linkRep', estado.reputation);
+
+  if (estado.escrow.plazoHoras) document.getElementById('escrowPlazo').textContent = estado.escrow.plazoHoras + ' horas';
+  if (estado.escrow.reputacionVinculada) document.getElementById('escrowRep').textContent = tlAcortarAddr(estado.escrow.reputacionVinculada);
+  if (estado.reputation.nombre) document.getElementById('repToken').textContent = `${estado.reputation.nombre} (${estado.reputation.simbolo})`;
+  if (estado.reputation.escrowVinculado) document.getElementById('repEscrow').textContent = tlAcortarAddr(estado.reputation.escrowVinculado);
+}
+
+document.getElementById('formRep').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const out = document.getElementById('resultadoRep');
+  if (!tlWeb3Configurado()) { out.innerHTML = '<span style="color:var(--tl-amber); font-weight:700;">Configura primero las direcciones en js/web3-contratos.js</span>'; return; }
+  const wallet = document.getElementById('inputWallet').value.trim();
+  if (!ethers.isAddress(wallet)) { out.innerHTML = '<span style="color:#dc2626; font-weight:700;">Dirección inválida</span>'; return; }
+  const btn = document.getElementById('btnRep');
+  btn.disabled = true; btn.textContent = 'Consultando…';
+  try {
+    const r = await tlLeerReputacionOnChain(wallet);
+    out.innerHTML = `
+      <div class="kv-row"><span class="kv-row-label">Ventas exitosas</span><span class="kv-row-value">${r.ventas}</span></div>
+      <div class="kv-row"><span class="kv-row-label">SBTs de reputación</span><span class="kv-row-value">${r.sbts}</span></div>
+      <div class="kv-row"><span class="kv-row-label">Compradores distintos</span><span class="kv-row-value">${r.compradoresDistintos}</span></div>
+      <div class="kv-row"><span class="kv-row-label">Score publicado</span><span class="kv-row-value">${r.score} / 100</span></div>
+    `;
+  } catch (err) {
+    console.error(err);
+    out.innerHTML = '<span style="color:#dc2626; font-weight:700;">No se pudo leer del contrato. ¿Está desplegado y la dirección es correcta?</span>';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Consultar on-chain';
+  }
+});
+
+document.getElementById('formOrden').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const out = document.getElementById('resultadoOrden');
+  if (!tlWeb3Configurado()) { out.innerHTML = '<span style="color:var(--tl-amber); font-weight:700;">Configura primero las direcciones en js/web3-contratos.js</span>'; return; }
+  const id = Number(document.getElementById('inputOrdenId').value);
+  const btn = document.getElementById('btnOrden');
+  btn.disabled = true; btn.textContent = 'Consultando…';
+  try {
+    const o = await tlLeerOrdenOnChain(id);
+    if (!o) {
+      out.innerHTML = '<span style="color:var(--tl-grey-600); font-weight:600;">La orden #' + id + ' no existe en el contrato.</span>';
+    } else {
+      out.innerHTML = `
+        <div class="kv-row"><span class="kv-row-label">Estado</span><span class="kv-row-value">${o.estado}</span></div>
+        <div class="kv-row"><span class="kv-row-label">Monto</span><span class="kv-row-value">${o.montoEth} ETH</span></div>
+        <div class="kv-row"><span class="kv-row-label">Comprador</span><span class="kv-row-value" style="font-family:monospace; font-size:0.74rem;">${tlAcortarAddr(o.comprador)}</span></div>
+        <div class="kv-row"><span class="kv-row-label">Vendedor</span><span class="kv-row-value" style="font-family:monospace; font-size:0.74rem;">${tlAcortarAddr(o.vendedor)}</span></div>
+        <div class="kv-row"><span class="kv-row-label">Creada</span><span class="kv-row-value">${o.creadaEn.toLocaleString('es-PE')}</span></div>
+        <div class="kv-row"><span class="kv-row-label">Plazo para confirmar</span><span class="kv-row-value">${o.plazoConfirmacion.toLocaleString('es-PE')}</span></div>
+      `;
+    }
+  } catch (err) {
+    console.error(err);
+    out.innerHTML = '<span style="color:#dc2626; font-weight:700;">No se pudo leer del contrato. ¿Está desplegado y la dirección es correcta?</span>';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Consultar on-chain';
+  }
+});
+
+(async () => {
+  const ctx = await tlInitLayout('contratos.html');
+  if (!ctx) return;
+  await tlPintarEstadoContratos();
+})();
+</script>
+</body>
+</html>

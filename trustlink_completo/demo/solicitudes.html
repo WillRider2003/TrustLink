@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solicitudes de vendedor — TrustLink</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="solicitudes" data-active-link="solicitudes.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Solicitudes para ser vendedor</div>
+          <div class="topbar-subtitle">Revisa y aprueba las solicitudes de los compradores</div>
+        </div>
+      </div>
+      <div id="topbarNotifMount" style="position:relative;"></div>
+    </header>
+
+    <div class="content-body">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-card-top"><div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div></div>
+          <div class="stat-card-value" id="statPendientes">0</div>
+          <div class="stat-card-label">Pendientes de revisión</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top"><div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+          <div class="stat-card-value" id="statAceptadas">0</div>
+          <div class="stat-card-label">Aceptadas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top"><div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/></svg></div></div>
+          <div class="stat-card-value" id="statRechazadas">0</div>
+          <div class="stat-card-label">Rechazadas</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Pendientes</div>
+            <div class="panel-subtitle">Requieren tu decisión</div>
+          </div>
+        </div>
+        <div id="listaPendientes"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Historial de solicitudes</div>
+            <div class="panel-subtitle">Ya revisadas — aceptadas o rechazadas</div>
+          </div>
+        </div>
+        <div id="listaResueltas"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="js/data.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script src="js/app.js"></script>
+<script>
+function tlSolicitudCardHTML(s, editable) {
+  const badgeCfg = {
+    pendiente: { cls: 'badge-amber', label: 'Pendiente' },
+    aceptada: { cls: 'badge-green', label: 'Aceptada' },
+    rechazada: { cls: 'badge-dark', label: 'Rechazada' },
+  }[s.estado];
+
+  return `
+    <div style="border:1.5px solid var(--tl-grey-200); border-radius:var(--tl-radius-md); padding:16px; margin-bottom:12px;">
+      <div style="display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:10px;">
+        <div>
+          <div style="font-weight:800; font-size:0.9rem;">${s.nombre}</div>
+          <div style="font-size:0.8rem; color:var(--tl-grey-600); margin-top:2px;">DNI ${s.dni} · ${s.telefono} · ${s.rubro}</div>
+          <div style="font-size:0.78rem; color:var(--tl-grey-600); margin-top:6px;">${s.descripcion || 'Sin descripción adicional.'}</div>
+          <div style="font-size:0.72rem; color:var(--tl-grey-600); margin-top:6px;">Enviada el ${s.fecha}</div>
+        </div>
+        <span class="badge ${badgeCfg.cls}">${badgeCfg.label}</span>
+      </div>
+      ${editable ? `
+      <div style="display:flex; gap:10px; margin-top:14px;">
+        <button class="btn btn-primary btn-sm" onclick="tlDecidirSolicitud('${s.id}', 'aceptada')">Aceptar</button>
+        <button class="btn btn-outline btn-sm" onclick="tlDecidirSolicitud('${s.id}', 'rechazada')">Rechazar</button>
+      </div>` : ''}
+    </div>
+  `;
+}
+
+function tlRenderSolicitudes() {
+  const lista = tlGetSolicitudes();
+  const pendientes = lista.filter(s => s.estado === 'pendiente');
+  const resueltas = lista.filter(s => s.estado !== 'pendiente');
+
+  document.getElementById('statPendientes').textContent = pendientes.length;
+  document.getElementById('statAceptadas').textContent = lista.filter(s => s.estado === 'aceptada').length;
+  document.getElementById('statRechazadas').textContent = lista.filter(s => s.estado === 'rechazada').length;
+
+  const pendWrap = document.getElementById('listaPendientes');
+  pendWrap.innerHTML = pendientes.length
+    ? pendientes.map(s => tlSolicitudCardHTML(s, true)).join('')
+    : `<div class="empty-state">${ICONS.check}<div class="empty-state-title">No hay solicitudes pendientes</div><div class="empty-state-desc">Cuando un comprador solicite ser vendedor, aparecerá aquí.</div></div>`;
+
+  const resWrap = document.getElementById('listaResueltas');
+  resWrap.innerHTML = resueltas.length
+    ? resueltas.map(s => tlSolicitudCardHTML(s, false)).join('')
+    : `<div class="empty-state">${ICONS.inbox}<div class="empty-state-title">Todavía no hay historial</div><div class="empty-state-desc">Las solicitudes que aceptes o rechaces aparecerán aquí.</div></div>`;
+}
+
+function tlDecidirSolicitud(id, estado) {
+  const lista = tlActualizarSolicitud(id, estado);
+  const solicitud = lista.find(s => s.id === id);
+  if (solicitud) {
+    tlAgregarNotificacion('comprador',
+      estado === 'aceptada' ? '¡Ya eres vendedor!' : 'Solicitud no aprobada',
+      estado === 'aceptada' ? 'Tu solicitud para vender en TrustLink fue aceptada. Ya puedes publicar productos.' : 'Tu solicitud para ser vendedor no fue aprobada esta vez.');
+  }
+  tlShowToast(estado === 'aceptada' ? 'Solicitud aceptada — el usuario ya puede vender' : 'Solicitud rechazada', estado === 'aceptada' ? 'success' : 'default');
+  tlRenderSolicitudes();
+  // Refresca el badge de pendientes en el sidebar sin recargar la página.
+  tlRenderSidebar('superadmin', 'solicitudes.html');
+}
+
+document.addEventListener('DOMContentLoaded', tlRenderSolicitudes);
+</script>
+</body>
+</html>

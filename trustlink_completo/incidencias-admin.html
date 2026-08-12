@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incidencias — TrustLink</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="incidencias-admin" data-active-link="incidencias-admin.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Incidencias reportadas</div>
+          <div class="topbar-subtitle">Revisa reportes de compradores y vendedores</div>
+        </div>
+      </div>
+      <div id="topbarNotifMount" style="position:relative;"></div>
+    </header>
+
+    <div class="content-body">
+      <div id="incidenciasLista"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="incidenciaDetalleOverlay">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-header">
+      <div class="modal-title">Detalle de incidencia</div>
+      <button class="modal-close" onclick="document.getElementById('incidenciaDetalleOverlay').classList.remove('show')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6L6 18M6 6l18 18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="incidenciaDetalleBody"></div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app-real.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script>
+const INC_BADGE = { abierta: 'badge-amber', en_revision: 'badge-amber', resuelta_comprador: 'badge-green', resuelta_vendedor: 'badge-green', descartada: 'badge-dark' };
+const INC_LABEL = { abierta: 'Abierta', en_revision: 'En revisión', resuelta_comprador: 'Resuelta (a favor comprador)', resuelta_vendedor: 'Resuelta (a favor vendedor)', descartada: 'Descartada' };
+const CAT_LABEL = { producto_dañado: 'Producto dañado', no_llego: 'No llegó', no_es_lo_pedido: 'No es lo pedido', comprador_no_confirma: 'Comprador no confirma', pago_no_liberado: 'Pago no liberado', otro: 'Otro' };
+
+let tlIncidenciasCache = [];
+
+function tlIncidenciaCardHTML(inc) {
+  return `
+    <div class="panel" style="cursor:pointer;" onclick="tlAbrirIncidencia(${inc.id})">
+      <div style="display:flex; justify-content:space-between; align-items:start; gap:10px;">
+        <div>
+          <div style="font-weight:800;">${CAT_LABEL[inc.categoria] || inc.categoria}</div>
+          <div style="font-size:0.8rem; color:var(--tl-grey-600);">
+            Reportado por ${inc.perfiles ? inc.perfiles.nombre : '—'} (${inc.rol_reportante})
+            ${inc.pedidos ? ' · Pedido #' + inc.pedidos.id + ' (S/ ' + Number(inc.pedidos.monto_total).toFixed(2) + ')' : ''}
+          </div>
+          <div style="font-size:0.78rem; color:var(--tl-grey-600); margin-top:6px;">${inc.descripcion}</div>
+        </div>
+        <span class="badge ${INC_BADGE[inc.estado]}">${INC_LABEL[inc.estado]}</span>
+      </div>
+    </div>
+  `;
+}
+
+async function tlCargarIncidencias() {
+  tlIncidenciasCache = await tlListarIncidencias();
+  document.getElementById('incidenciasLista').innerHTML = tlIncidenciasCache.length
+    ? tlIncidenciasCache.map(tlIncidenciaCardHTML).join('')
+    : `<div class="empty-state"><div class="empty-state-title">No hay incidencias reportadas</div></div>`;
+}
+
+async function tlAbrirIncidencia(id) {
+  const inc = tlIncidenciasCache.find(x => x.id === id);
+  if (!inc) return;
+
+  const imagenes = await tlGetImagenesIncidencia(id);
+  const body = document.getElementById('incidenciaDetalleBody');
+
+  const puedeResolver = inc.estado === 'abierta' || inc.estado === 'en_revision';
+
+  body.innerHTML = `
+    <div style="font-size:0.86rem; margin-bottom:14px;"><b>${CAT_LABEL[inc.categoria]}</b><br>${inc.descripcion}</div>
+    ${imagenes.length ? `
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
+        ${imagenes.map(img => img.url ? `<a href="${img.url}" target="_blank"><img src="${img.url}" style="width:80px; height:80px; object-fit:cover; border-radius:8px;"></a>` : '').join('')}
+      </div>
+    ` : ''}
+    ${puedeResolver ? `
+      <div class="field"><label>Resolución</label><textarea id="resolucionTexto" rows="3" placeholder="Explica tu decisión..."></textarea></div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-primary btn-sm" style="flex:1;" onclick="tlResolverUI(${id}, true)">Resolver a favor del comprador</button>
+        <button class="btn btn-outline btn-sm" style="flex:1;" onclick="tlResolverUI(${id}, false)">Resolver a favor del vendedor</button>
+      </div>
+    ` : `<div class="modal-body-note">Resolución: ${inc.resolucion || '—'}</div>`}
+  `;
+  document.getElementById('incidenciaDetalleOverlay').classList.add('show');
+}
+
+async function tlResolverUI(id, favorComprador) {
+  const resolucion = document.getElementById('resolucionTexto').value.trim();
+  if (!resolucion) { tlShowToastReal('Escribe una resolución'); return; }
+  try {
+    await tlResolverIncidencia(id, resolucion, favorComprador);
+    tlShowToastReal('Incidencia resuelta', 'success');
+    document.getElementById('incidenciaDetalleOverlay').classList.remove('show');
+    await tlCargarIncidencias();
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo resolver');
+  }
+}
+
+(async () => {
+  const ctx = await tlInitLayout('incidencias-admin.html', 'superadmin');
+  if (!ctx) return;
+  await tlCargarIncidencias();
+})();
+</script>
+</body>
+</html>

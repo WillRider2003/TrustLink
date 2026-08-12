@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Créditos pendientes — TrustLink</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="creditos-admin" data-active-link="creditos-admin.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Créditos pendientes</div>
+          <div class="topbar-subtitle">Aprueba o rechaza solicitudes de préstamo de vendedores</div>
+        </div>
+      </div>
+      <div id="topbarNotifMount" style="position:relative;"></div>
+    </header>
+
+    <div class="content-body">
+      <div class="section-heading">Solicitudes pendientes de aprobación</div>
+      <div id="creditosAdminLista"></div>
+
+      <div class="section-heading" style="margin-top:26px;">Créditos vencidos sin pagar</div>
+      <div id="creditosVencidosLista"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app-real.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script>
+async function tlCargarCreditosAdmin() {
+  const lista = await tlListarCreditosPendientes();
+  document.getElementById('creditosAdminLista').innerHTML = lista.length
+    ? lista.map(c => `
+      <div class="panel" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <div style="font-weight:800;">${c.perfiles.nombre}</div>
+          <div style="font-size:0.84rem; color:var(--tl-grey-600);">Solicita S/ ${Number(c.monto_solicitado).toFixed(2)} · devolvería S/ ${Number(c.monto_a_pagar).toFixed(2)} (12% interés mensual) · ${new Date(c.creado_en).toLocaleDateString('es-PE')}</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-primary btn-sm" onclick="tlDecidirCreditoUI(${c.id}, true)">Aprobar</button>
+          <button class="btn btn-outline btn-sm" onclick="tlDecidirCreditoUI(${c.id}, false)">Rechazar</button>
+        </div>
+      </div>
+    `).join('')
+    : `<div class="empty-state"><div class="empty-state-title">No hay créditos pendientes</div></div>`;
+
+  const vencidos = await tlListarCreditosVencidosNoPagados();
+  document.getElementById('creditosVencidosLista').innerHTML = vencidos.length
+    ? vencidos.map(c => `
+      <div class="panel" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-left:3px solid var(--tl-amber);">
+        <div>
+          <div style="font-weight:800;">${c.perfiles.nombre}</div>
+          <div style="font-size:0.84rem; color:var(--tl-grey-600);">Debe S/ ${Number(c.monto_a_pagar).toFixed(2)} · venció el ${new Date(c.fecha_vencimiento).toLocaleDateString('es-PE')}${c.aplazado ? ' · ya usó su aplazamiento' : ''}</div>
+        </div>
+        <button class="btn btn-outline btn-sm" style="border-color:var(--tl-amber); color:var(--tl-amber);" onclick="tlReportarSbsUI(${c.id})">Reportar a SBS</button>
+      </div>
+    `).join('')
+    : `<div class="empty-state"><div class="empty-state-title">No hay créditos vencidos sin pagar</div></div>`;
+}
+
+async function tlReportarSbsUI(id) {
+  if (!await tlConfirm('¿Reportar este préstamo vencido a la SBS? Esta acción penaliza el score del vendedor.', { titulo: 'Reportar a la SBS', textoAceptar: 'Sí, reportar' })) return;
+  try {
+    await tlReportarCreditoSbs(id);
+    tlShowToastReal('Préstamo reportado a la SBS', 'success');
+    await tlCargarCreditosAdmin();
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo reportar');
+  }
+}
+
+async function tlDecidirCreditoUI(id, aprobar) {
+  try {
+    await tlDecidirCredito(id, aprobar);
+    tlShowToastReal(aprobar ? 'Crédito aprobado' : 'Crédito rechazado', aprobar ? 'success' : 'default');
+    await tlCargarCreditosAdmin();
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo procesar');
+  }
+}
+
+(async () => {
+  const ctx = await tlInitLayout('creditos-admin.html', 'superadmin');
+  if (!ctx) return;
+  await tlCargarCreditosAdmin();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis pedidos — TrustLink</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="mis-pedidos" data-active-link="mis-pedidos.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title" id="pageTitle">Mis pedidos</div>
+          <div class="topbar-subtitle" id="pageSubtitle">El dinero queda seguro hasta que confirmes la entrega</div>
+        </div>
+      </div>
+      <div id="topbarNotifMount" style="position:relative;"></div>
+    </header>
+
+    <div class="content-body">
+      <div id="pedidosEmpty" style="display:none;" class="empty-state">
+        <div class="empty-state-title">Todavía no tienes pedidos</div>
+      </div>
+      <div id="pedidosLista"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal detalle de pedido -->
+<div class="overlay" id="pedidoOverlay">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <div class="modal-title" id="pedidoModalTitle">Pedido</div>
+      <button class="modal-close" onclick="tlCerrarPedidoModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6L6 18M6 6l18 18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="pedidoModalBody"></div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app-real.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script>
+let tlRolActual = null;
+let tlPedidosCache = [];
+let tlCountdownInterval = null;
+
+const ESTADO_LABEL = {
+  creado: 'Pago retenido en garantía',
+  enviado: 'Enviado',
+  en_camino: 'En camino',
+  llegado: 'Llegó — esperando confirmación',
+  confirmado: 'Confirmado y pagado',
+  en_disputa: 'En disputa',
+  reembolsado: 'Reembolsado al comprador',
+  liberado_admin: 'Liberado al vendedor (por superadmin)',
+  cancelado: 'Cancelado',
+};
+
+const ESTADO_BADGE = {
+  creado: 'badge-dark', enviado: 'badge-amber', en_camino: 'badge-amber',
+  llegado: 'badge-amber', confirmado: 'badge-green', en_disputa: 'badge-red',
+  reembolsado: 'badge-dark', liberado_admin: 'badge-green', cancelado: 'badge-dark',
+};
+
+function tlPedidoCardHTML(p) {
+  return `
+    <div class="panel" style="display:flex; align-items:center; gap:16px; cursor:pointer;" onclick="tlAbrirPedido(${p.id})">
+      <img src="${p.productos.imagen_url || 'https://placehold.co/80x80/2563eb/FFFFFF'}" style="width:56px; height:56px; border-radius:10px; object-fit:cover;">
+      <div style="flex:1;">
+        <div style="font-weight:800;">${p.productos.nombre}</div>
+        <div style="font-size:0.8rem; color:var(--tl-grey-600);">Pedido #${p.id} · S/ ${Number(p.monto_total).toFixed(2)} · ${new Date(p.creado_en).toLocaleDateString('es-PE')}</div>
+      </div>
+      <span class="badge ${ESTADO_BADGE[p.estado]}">${ESTADO_LABEL[p.estado]}</span>
+    </div>
+  `;
+}
+
+async function tlCargarPedidos() {
+  tlPedidosCache = await tlListarMisPedidos(tlRolActual);
+  const lista = document.getElementById('pedidosLista');
+  const empty = document.getElementById('pedidosEmpty');
+
+  if (!tlPedidosCache.length) {
+    lista.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  lista.innerHTML = tlPedidosCache.map(tlPedidoCardHTML).join('');
+}
+
+function tlEscrowTimelineHTML(pedido) {
+  const pasos = ['creado', 'enviado', 'en_camino', 'llegado', 'confirmado'];
+  if (['en_disputa', 'reembolsado', 'liberado_admin', 'cancelado'].includes(pedido.estado)) {
+    return `<div class="modal-body-note">Este pedido está en un estado especial: <b>${ESTADO_LABEL[pedido.estado]}</b>.</div>`;
+  }
+  const idxActual = pasos.indexOf(pedido.estado);
+
+  const labels = {
+    creado: ['Pago en garantía', 'Tu dinero está retenido y seguro.'],
+    enviado: ['Enviado', 'El vendedor despachó tu pedido.'],
+    en_camino: ['En camino', 'Tu pedido va en camino.'],
+    llegado: ['Llegó', 'Ingresa tu código para confirmar.'],
+    confirmado: ['Confirmado', 'Pago liberado al vendedor.'],
+  };
+
+  return `
+    <div class="escrow-timeline">
+      ${pasos.map((paso, i) => {
+        const done = i < idxActual || (i === idxActual && paso === 'confirmado');
+        const active = i === idxActual && paso !== 'confirmado';
+        return `
+          <div class="escrow-step ${done ? 'done' : ''} ${active ? 'active' : ''}">
+            <div class="escrow-step-dot">${done ? ICONS_REAL.check : (i + 1)}</div>
+            <div class="escrow-step-body">
+              <div class="escrow-step-title">${labels[paso][0]}</div>
+              <div class="escrow-step-desc">${labels[paso][1]}</div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+/**
+ * Bloque "Verificable en blockchain": muestra el hash único de cada
+ * transacción real del pedido en el contrato TrustLinkEscrow
+ * (Arbitrum Sepolia), con link a Arbiscan. Si el pedido aún no está
+ * anclado on-chain, no muestra nada.
+ */
+function tlOnChainHTML(pedido) {
+  const filas = [
+    ['Depósito en escrow', pedido.tx_crear_hash],
+    ['Entrega confirmada', pedido.tx_confirmar_hash],
+    ['Disputa reportada', pedido.tx_disputa_hash],
+    ['Disputa resuelta', pedido.tx_resolucion_hash],
+  ].filter(f => f[1]);
+  if (!filas.length) return '';
+
+  return `
+    <div style="margin-top:18px; border:1.5px solid var(--tl-accent-soft); background:var(--tl-accent-soft-2); border-radius:var(--tl-radius-md); padding:14px 16px;">
+      <div style="display:flex; align-items:center; gap:8px; font-weight:800; font-size:0.86rem; color:var(--tl-accent-dark); margin-bottom:8px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Verificable en blockchain${pedido.onchain_orden_id ? ` · orden #${pedido.onchain_orden_id}` : ''}
+      </div>
+      ${filas.map(([label, hash]) => `
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:5px 0; font-size:0.78rem;">
+          <span style="color:var(--tl-grey-600); font-weight:600;">${label}</span>
+          <a href="${tlArbiscanTxUrl(hash)}" target="_blank" rel="noopener" style="font-family:'SF Mono', Menlo, monospace; font-size:0.72rem; color:var(--tl-accent); font-weight:700;" title="${hash}">
+            ${hash.slice(0, 10)}…${hash.slice(-8)} ↗
+          </a>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+async function tlAbrirPedido(pedidoId) {
+  const pedido = await tlGetPedido(pedidoId);
+  if (!pedido) return;
+
+  document.getElementById('pedidoModalTitle').textContent = `Pedido #${pedido.id} — ${pedido.productos.nombre}`;
+  const body = document.getElementById('pedidoModalBody');
+
+  let accionesHTML = '';
+
+  if (tlRolActual === 'vendedor' && pedido.vendedor_id) {
+    if (pedido.estado === 'creado') {
+      accionesHTML = `<button class="btn btn-primary btn-block" onclick="tlAvanzarPedidoUI(${pedido.id}, 'enviado')">Marcar como enviado</button>`;
+    } else if (pedido.estado === 'enviado') {
+      accionesHTML = `<button class="btn btn-primary btn-block" onclick="tlAvanzarPedidoUI(${pedido.id}, 'en_camino')">Marcar en camino</button>`;
+    } else if (pedido.estado === 'en_camino') {
+      accionesHTML = `<button class="btn btn-primary btn-block" onclick="tlAvanzarPedidoUI(${pedido.id}, 'llegado')">Marcar como llegado (activa el código)</button>`;
+    }
+  }
+
+  if (tlRolActual === 'comprador' && pedido.estado === 'llegado') {
+    const venceEn = new Date(pedido.codigo_vence_en).getTime();
+    accionesHTML = `
+      <div class="codigo-confirm-box">
+        <div class="codigo-confirm-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Ingresa tu código de confirmación
+        </div>
+        <div class="codigo-confirm-desc">Tiempo restante: <b id="countdownDisplay" class="codigo-confirm-timer">--:--</b>. Si se acaba el tiempo, tu cuenta se bloqueará 12 horas.</div>
+        <div style="display:flex; gap:8px; margin-top:10px;">
+          <input type="text" id="codigoInput" maxlength="6" placeholder="6 dígitos" class="codigo-confirm-input">
+          <button class="btn btn-primary" onclick="tlConfirmarEntregaUI(${pedido.id})">Confirmar</button>
+        </div>
+      </div>
+    `;
+    if (tlCountdownInterval) clearInterval(tlCountdownInterval);
+    tlCountdownInterval = setInterval(() => {
+      const restante = venceEn - Date.now();
+      const el = document.getElementById('countdownDisplay');
+      if (!el) { clearInterval(tlCountdownInterval); return; }
+      if (restante <= 0) { el.textContent = '00:00'; el.style.color = '#dc2626'; clearInterval(tlCountdownInterval); return; }
+      const m = Math.floor(restante / 60000);
+      const s = Math.floor((restante % 60000) / 1000);
+      el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    }, 1000);
+  }
+
+  if (pedido.estado !== 'en_disputa' && !['reembolsado','liberado_admin','cancelado','confirmado'].includes(pedido.estado)) {
+    accionesHTML += `
+      <button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="window.location.href='reportar-incidencia.html?pedido=${pedido.id}'">
+        Reportar un problema con este pedido
+      </button>
+    `;
+  }
+
+  body.innerHTML = `
+    ${tlEscrowTimelineHTML(pedido)}
+    ${tlOnChainHTML(pedido)}
+    <div style="margin-top:18px;">${accionesHTML}</div>
+  `;
+
+  document.getElementById('pedidoOverlay').classList.add('show');
+}
+
+async function tlAvanzarPedidoUI(pedidoId, nuevoEstado) {
+  try {
+    await tlAvanzarPedido(pedidoId, nuevoEstado);
+    tlShowToastReal('Pedido actualizado', 'success');
+    tlCerrarPedidoModal();
+    await tlCargarPedidos();
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo actualizar el pedido');
+  }
+}
+
+async function tlConfirmarEntregaUI(pedidoId) {
+  const codigo = document.getElementById('codigoInput').value.trim();
+  if (codigo.length !== 6) { tlShowToastReal('El código debe tener 6 dígitos'); return; }
+
+  try {
+    await tlConfirmarEntrega(pedidoId, codigo);
+    tlShowToastReal('¡Entrega confirmada! Pago liberado al vendedor.', 'success');
+    tlCerrarPedidoModal();
+    await tlCargarPedidos();
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo confirmar la entrega');
+    if (err.message && err.message.includes('bloqueada')) {
+      setTimeout(() => window.location.reload(), 2500);
+    }
+  }
+}
+
+function tlCerrarPedidoModal() {
+  document.getElementById('pedidoOverlay').classList.remove('show');
+  if (tlCountdownInterval) clearInterval(tlCountdownInterval);
+}
+
+(async () => {
+  const ctx = await tlInitLayout('mis-pedidos.html');
+  if (!ctx) return;
+  tlRolActual = ctx.perfil.rol;
+  document.getElementById('pageTitle').textContent = tlRolActual === 'vendedor' ? 'Ventas' : 'Mis compras';
+  await tlCargarPedidos();
+})();
+</script>
+</body>
+</html>

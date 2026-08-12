@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketplace — TrustLink</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="marketplace" data-active-link="marketplace.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Marketplace</div>
+          <div class="topbar-subtitle">Productos verificados de vendedores con reputación en TrustLink</div>
+        </div>
+      </div>
+      <div class="topbar-actions" style="display:flex; align-items:center; gap:12px;">
+        <div id="topbarNotifMount" style="position:relative;"></div>
+        <a href="carrito.html" class="btn btn-outline btn-sm" id="carritoLink">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+          Carrito
+        </a>
+      </div>
+    </header>
+
+    <div class="content-body">
+      <div id="marketplaceError" style="display:none; margin-bottom:16px; padding:14px 18px; border-radius:10px; background:#fef2f2; border:1px solid #fecaca; color:#991b1b; font-size:0.86rem;"></div>
+      <div id="marketplaceEmpty" style="display:none;" class="empty-state">
+        <div class="empty-state-title">Todavía no hay productos publicados</div>
+        <div class="empty-state-desc">Cuando un vendedor publique su primer producto, aparecerá aquí.</div>
+      </div>
+      <div class="product-grid" id="marketplaceGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de compra -->
+<div class="overlay" id="comprarOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Confirmar compra</div>
+      <button class="modal-close" onclick="tlCerrarModalCompra()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6L6 18M6 6l18 18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="comprarModalBody"></div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app-real.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script>
+/**
+ * FIX BUG "marketplace en blanco": este script declaraba
+ * `let tlPerfilActual` otra vez, pero app-real.js ya lo declara a
+ * nivel global. Redeclarar un `let` global lanza un SyntaxError que
+ * mata TODO el script de la página antes de ejecutarse — por eso no
+ * se pintaba ni la sidebar ni los productos ni el mensaje de error.
+ * Se reutiliza la variable global de app-real.js.
+ */
+let tlProductosCache = [];
+
+function tlMostrarErrorMarketplace(mensaje) {
+  const el = document.getElementById('marketplaceError');
+  el.textContent = mensaje;
+  el.style.display = 'block';
+}
+
+function tlProductoCardHTML(p) {
+  const esPropio = tlPerfilActual && p.vendedor_id === tlPerfilActual.id;
+  return `
+    <div class="product-card">
+      <img src="${p.imagen_url || 'https://placehold.co/400x400/2563eb/FFFFFF?text=' + encodeURIComponent(p.nombre)}" class="product-card-img" alt="${p.nombre}">
+      <div class="product-card-body">
+        <div class="product-card-name">${p.nombre}</div>
+        <div class="product-card-seller">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+          ${p.perfiles ? p.perfiles.nombre : 'Vendedor'} · stock: ${p.stock}
+        </div>
+        <div class="product-card-price">S/ ${Number(p.precio).toFixed(2)}</div>
+        ${esPropio
+          ? `<button class="btn btn-outline btn-sm btn-block" disabled>Es tu producto</button>`
+          : p.stock > 0
+            ? `<div style="display:flex; gap:6px;">
+                 <button class="btn btn-primary btn-sm" style="flex:1;" onclick="tlAbrirModalCompra(${p.id})">Comprar</button>
+                 <button class="btn btn-outline btn-sm" onclick="tlAgregarCarritoDesdeGrid(${p.id})" title="Añadir al carrito">
+                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+                 </button>
+               </div>`
+            : `<button class="btn btn-outline btn-sm btn-block" disabled>Sin stock</button>`
+        }
+      </div>
+    </div>
+  `;
+}
+
+async function tlAgregarCarritoDesdeGrid(productoId) {
+  try {
+    await tlAgregarAlCarrito(productoId, 1);
+    tlShowToastReal('Producto añadido al carrito', 'success');
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo añadir al carrito');
+  }
+}
+
+async function tlCargarMarketplace() {
+  const grid = document.getElementById('marketplaceGrid');
+  const empty = document.getElementById('marketplaceEmpty');
+
+  try {
+    tlProductosCache = await tlListarProductos();
+  } catch (err) {
+    console.error('tlCargarMarketplace: tlListarProductos lanzó excepción', err);
+    tlMostrarErrorMarketplace('No se pudieron cargar los productos (' + (err.message || 'error desconocido') + '). Revisa la consola del navegador (F12) para más detalle.');
+    grid.innerHTML = '';
+    empty.style.display = 'none';
+    return;
+  }
+
+  if (!tlProductosCache || !tlProductosCache.length) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  grid.innerHTML = tlProductosCache.map(tlProductoCardHTML).join('');
+}
+
+function tlAbrirModalCompra(productoId) {
+  const p = tlProductosCache.find(x => x.id === productoId);
+  if (!p) return;
+
+  const bloqueado = tlPerfilActual && tlPerfilActual._bloqueo;
+  const body = document.getElementById('comprarModalBody');
+
+  if (bloqueado) {
+    body.innerHTML = `
+      <div style="text-align:center; padding:10px 0;">
+        <div style="font-weight:800; color:#dc2626; margin-bottom:8px;">Cuenta bloqueada temporalmente</div>
+        <div style="font-size:0.86rem; color:var(--tl-grey-600);">${bloqueado.motivo}. Podrás comprar de nuevo después de ${new Date(bloqueado.fecha_fin).toLocaleString('es-PE')}.</div>
+      </div>
+    `;
+    document.getElementById('comprarOverlay').classList.add('show');
+    return;
+  }
+
+  if (Number(tlPerfilActual.credito_disponible) < Number(p.precio)) {
+    body.innerHTML = `
+      <div style="text-align:center; padding:10px 0;">
+        <div style="font-weight:800; color:#dc2626; margin-bottom:8px;">Crédito insuficiente</div>
+        <div style="font-size:0.86rem; color:var(--tl-grey-600);">Este producto cuesta S/ ${Number(p.precio).toFixed(2)} y tu crédito disponible es S/ ${Number(tlPerfilActual.credito_disponible).toFixed(2)}.</div>
+      </div>
+    `;
+    document.getElementById('comprarOverlay').classList.add('show');
+    return;
+  }
+
+  body.innerHTML = `
+    <div style="display:flex; gap:14px; align-items:center; margin-bottom:18px;">
+      <img src="${p.imagen_url || 'https://placehold.co/100x100/2563eb/FFFFFF'}" style="width:64px; height:64px; border-radius:10px; object-fit:cover;">
+      <div>
+        <div style="font-weight:800;">${p.nombre}</div>
+        <div style="font-size:0.86rem; color:var(--tl-grey-600);">S/ ${Number(p.precio).toFixed(2)}</div>
+      </div>
+    </div>
+    <div class="modal-body-note">
+      Tu pago quedará retenido en garantía. Se libera al vendedor solo cuando confirmes la entrega con el código de 6 dígitos que te llegará por notificación.
+    </div>
+    <button class="btn btn-primary btn-block" id="btnConfirmarCompraReal" onclick="tlEjecutarCompra(${p.id})">
+      Confirmar y depositar en escrow
+    </button>
+  `;
+  document.getElementById('comprarOverlay').classList.add('show');
+}
+
+async function tlEjecutarCompra(productoId) {
+  const btn = document.getElementById('btnConfirmarCompraReal');
+  btn.disabled = true;
+  btn.textContent = 'Procesando...';
+
+  try {
+    const pedidoId = await tlCrearPedido(productoId, 1);
+    tlCerrarModalCompra();
+    tlShowToastReal('Pedido #' + pedidoId + ' creado. Revisa tus notificaciones: ahí está tu código de confirmación.', 'success');
+    await tlCargarMarketplace();
+    await tlRefrescarPerfilSidebar();
+    await tlRenderNotifBell();
+  } catch (err) {
+    tlShowToastReal(err.message || 'No se pudo completar la compra');
+    btn.disabled = false;
+    btn.textContent = 'Confirmar y depositar en escrow';
+  }
+}
+
+function tlCerrarModalCompra() {
+  document.getElementById('comprarOverlay').classList.remove('show');
+}
+
+async function tlRefrescarPerfilSidebar() {
+  tlPerfilActual = await tlGetMiPerfil();
+  tlRenderSidebarReal(tlPerfilActual, 'marketplace.html');
+}
+
+/**
+ * Init defensivo: cada paso está en su propio try/catch con mensaje
+ * visible en pantalla (no solo consola), para que un fallo en
+ * cualquier punto sea diagnosticable de inmediato en vez de dejar
+ * la página en blanco sin pista de qué pasó.
+ */
+(async () => {
+  let ctx;
+  try {
+    ctx = await tlInitLayout('marketplace.html');
+  } catch (err) {
+    console.error('marketplace.html: tlInitLayout lanzó excepción no capturada', err);
+    tlMostrarErrorMarketplace('Error inicializando la página (' + (err.message || err) + '). Revisa la consola del navegador (F12).');
+    return;
+  }
+  if (!ctx) return; // tlInitLayout ya redirigió a login o mostró su propio aviso
+
+  tlPerfilActual = ctx.perfil;
+
+  // El bloqueo de compra es informativo, nunca debe poder tumbar la
+  // carga del marketplace si la RPC falla por cualquier motivo.
+  try {
+    tlPerfilActual._bloqueo = await tlGetBloqueoVigente(ctx.perfil.id);
+    if (tlPerfilActual._bloqueo) {
+      tlShowToastReal('Tu cuenta está bloqueada para comprar hasta ' + new Date(tlPerfilActual._bloqueo.fecha_fin).toLocaleString('es-PE'));
+    }
+  } catch (err) {
+    console.error('tlGetBloqueoVigente falló, se ignora para no bloquear el marketplace:', err);
+    tlPerfilActual._bloqueo = null;
+  }
+
+  await tlCargarMarketplace();
+})();
+</script>
+</body>
+</html>

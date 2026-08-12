@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditoría — TrustLink</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="auditoria" data-active-link="auditoria.html">
+<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
+
+
+<div class="app-shell">
+  <div id="sidebarMount"></div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Auditoría del sistema</div>
+          <div class="topbar-subtitle">Registro de todas las acciones sensibles de la plataforma</div>
+        </div>
+      </div>
+      <div id="topbarNotifMount" style="position:relative;"></div>
+    </header>
+
+    <div class="content-body">
+      <div class="panel">
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+          <div class="field" style="margin-bottom:0;">
+            <label>Desde</label>
+            <input type="date" id="filtroDesde">
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Hasta</label>
+            <input type="date" id="filtroHasta">
+          </div>
+          <div class="field" style="margin-bottom:0; flex:1; min-width:180px;">
+            <label>Acción</label>
+            <select id="filtroAccion">
+              <option value="">Todas</option>
+              <option value="PEDIDO_CREADO">Pedido creado</option>
+              <option value="PEDIDO_LLEGADO">Pedido llegado</option>
+              <option value="PEDIDO_CONFIRMADO">Pedido confirmado</option>
+              <option value="BLOQUEO_12H_AUTOMATICO">Bloqueo 12h automático</option>
+              <option value="INCIDENCIA_REPORTADA">Incidencia reportada</option>
+              <option value="INCIDENCIA_RESUELTA">Incidencia resuelta</option>
+              <option value="SOLICITUD_VENDEDOR_ACEPTADA">Solicitud vendedor aceptada</option>
+              <option value="SOLICITUD_VENDEDOR_RECHAZADA">Solicitud vendedor rechazada</option>
+              <option value="CREDITO_SOLICITADO">Crédito solicitado</option>
+              <option value="CREDITO_APROBADO">Crédito aprobado</option>
+              <option value="CREDITO_PAGADO">Crédito pagado</option>
+            </select>
+          </div>
+          <button class="btn btn-outline" id="btnFiltrar">Filtrar</button>
+          <button class="btn btn-primary" id="btnDescargar">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            Descargar
+          </button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+            <thead>
+              <tr style="text-align:left; border-bottom:2px solid var(--tl-grey-200);">
+                <th style="padding:8px;">Fecha</th>
+                <th style="padding:8px;">Acción</th>
+                <th style="padding:8px;">Actor</th>
+                <th style="padding:8px;">Entidad</th>
+                <th style="padding:8px;">Detalle</th>
+              </tr>
+            </thead>
+            <tbody id="auditoriaTbody"></tbody>
+          </table>
+        </div>
+        <div id="auditoriaPaginacion"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="chatbotMount"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app-real.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/chatbot-widget.js"></script>
+<script>
+let tlAuditoriaCache = [];
+
+async function tlCargarAuditoria() {
+  const desde = document.getElementById('filtroDesde').value;
+  const hasta = document.getElementById('filtroHasta').value;
+  const accion = document.getElementById('filtroAccion').value;
+
+  tlAuditoriaCache = await tlListarAuditoria({
+    desde: desde ? new Date(desde).toISOString() : undefined,
+    hasta: hasta ? new Date(hasta + 'T23:59:59').toISOString() : undefined,
+    accion: accion || undefined,
+  });
+
+  // Paginación de 15 filas por página: evita el scroll interminable
+  // y mantiene la tabla manejable aunque haya cientos de eventos.
+  tlPaginar({
+    items: tlAuditoriaCache,
+    porPagina: 15,
+    paginacionMountId: 'auditoriaPaginacion',
+    renderPagina: (pagina) => {
+      document.getElementById('auditoriaTbody').innerHTML = pagina.map(a => `
+        <tr style="border-bottom:1px solid var(--tl-grey-200);">
+          <td style="padding:8px; white-space:nowrap;">${new Date(a.creado_en).toLocaleString('es-PE')}</td>
+          <td style="padding:8px; font-family:monospace; font-size:0.76rem;">${a.accion}</td>
+          <td style="padding:8px;">${a.perfiles ? a.perfiles.nombre : '—'}</td>
+          <td style="padding:8px;">${a.entidad || '—'} ${a.entidad_id ? '#' + a.entidad_id : ''}</td>
+          <td style="padding:8px; font-family:monospace; font-size:0.72rem; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${a.detalle ? JSON.stringify(a.detalle) : ''}">${a.detalle ? JSON.stringify(a.detalle) : '—'}</td>
+        </tr>
+      `).join('') || `<tr><td colspan="5" style="padding:20px; text-align:center; color:var(--tl-grey-600);">Sin resultados para este filtro</td></tr>`;
+    },
+  });
+}
+
+async function tlDescargarAuditoria() {
+  if (!tlAuditoriaCache.length) { tlShowToastReal('No hay datos para exportar'); return; }
+  const formato = await tlElegirFormatoDescarga('Descargar auditoría');
+  if (!formato) return;
+
+  const headers = ['Fecha', 'Accion', 'Actor', 'Entidad', 'EntidadId', 'Detalle'];
+  const filas = tlAuditoriaCache.map(a => [
+    new Date(a.creado_en).toLocaleString('es-PE'),
+    a.accion,
+    a.perfiles ? a.perfiles.nombre : '',
+    a.entidad || '',
+    a.entidad_id || '',
+    a.detalle ? JSON.stringify(a.detalle) : '',
+  ]);
+  tlDescargarTabla(`trustlink_auditoria_${new Date().toISOString().slice(0,10)}`, headers, filas, formato);
+}
+
+document.getElementById('btnFiltrar').addEventListener('click', tlCargarAuditoria);
+document.getElementById('btnDescargar').addEventListener('click', tlDescargarAuditoria);
+
+(async () => {
+  const ctx = await tlInitLayout('auditoria.html', 'superadmin');
+  if (!ctx) return;
+  await tlCargarAuditoria();
+})();
+</script>
+</body>
+</html>
