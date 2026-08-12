@@ -3762,7 +3762,11 @@ body.tl-landing {
 
 /* Contenedor total de scroll */
 .tl-hero-mascot-sticky-wrap {
-  height: 300vh;
+  /* Este 160vh es solo un respaldo mientras el video carga sus metadatos.
+     En cuanto carga, landing.js recalcula el alto real según la duración
+     exacta del video (ver PX_DE_SCROLL_POR_SEGUNDO_DE_VIDEO en el JS),
+     así ya no adivinamos un número en vh — se ajusta solo. */
+  height: 160vh;
   position: relative;
   width: 100%;
 }
@@ -7446,4 +7450,95 @@ body.tl-landing {
 
 #simulador {
   min-height: 10px !important;
+}
+
+/* ===== FIX 1 (v2): VIDEO DEL HERO — legible sin tocar el scroll-scrub =====
+   La versión anterior de este fix convertía el video en un banner estático
+   (position:relative), lo cual ROMPÍA el efecto de scroll-scrub (el video
+   necesita quedarse position:absolute dentro de .tl-hero-mascot-sticky para
+   que el JS pueda ir cambiando de fotograma). Esta versión no toca la
+   posición ni el tamaño del video: solo agrega una "sombra" oscura detrás
+   del bloque de texto (con un pseudo-elemento) para que se lea bien sin
+   importar qué fotograma esté mostrando el video en ese momento. */
+@media (max-width: 860px) {
+  .tl-hero-content-overlay {
+    justify-content: center !important;
+    padding: 0 1.25rem !important;
+  }
+
+  .tl-hero-minimal {
+    max-width: 100% !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+    transform: none !important;
+    position: relative;
+    z-index: 3;
+    padding: 28px 20px !important;
+  }
+
+  /* Sombra/scrim detrás del texto, no del video completo */
+  .tl-hero-minimal::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 100% 90% at 50% 50%,
+      rgba(6, 9, 19, 0.86) 0%,
+      rgba(6, 9, 19, 0.68) 55%,
+      rgba(6, 9, 19, 0.15) 90%
+    );
+    border-radius: 28px;
+    z-index: -1;
+  }
+
+  .tl-hero-tag { margin-left: auto; margin-right: auto; }
+
+  .tl-hero-actions {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    row-gap: 12px;
+  }
+  .tl-hero-actions .tl-btn-primary,
+  .tl-hero-actions .tl-btn-secondary {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 420px) {
+  .tl-hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .tl-hero-actions .tl-btn-primary,
+  .tl-hero-actions .tl-btn-secondary {
+    width: 100%;
+  }
+}
+
+/* ===== FIX 2: TARJETA DEL SIMULADOR — se salía de pantalla ===== */
+@media (max-width: 1024px) {
+  .tl-premium-calc,
+  #simulador .tl-premium-calc,
+  .tl-simulador-content .tl-premium-calc {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 640px !important;
+  }
+  .tl-simulador-content {
+    padding-right: 0 !important;
+    justify-content: center !important;
+  }
+}
+/* ===== FIX 3: LA SECCIÓN DEL HERO ROMPÍA EL "STICKY" DEL VIDEO =====
+   Más arriba en el archivo hay una definición vieja de .tl-hero-section
+   (con overflow:hidden + display:flex centrado) que quedó de antes de
+   meter el video con scroll-scrub. El overflow:hidden interfiere con
+   position:sticky del video, y por eso, aunque el alto del scroll ya
+   esté bien calculado, se sentía como un espacio/salto raro antes de
+   llegar a "Detrás de cada bodega...". La neutralizamos aquí: */
+.tl-hero-section {
+  display: block !important;
+  overflow: visible !important;
+  isolation: auto !important;
 }

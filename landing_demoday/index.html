@@ -32,27 +32,36 @@
 <div class="content-wrap" data-enhanced="true" data-center="true" data-layers="true" data-stagger="range">
   <main class="tl-page">
     <section class="tl-hero-section" id="top">
+      <!-- ENVOLTORIO STICKY (Indispensable para que el JS calcule el scroll) -->
+      <div class="tl-hero-mascot-sticky-wrap">
+        <!-- PANTALLA FIJADA (esto es lo que faltaba: sin este div, el video
+             no se queda "pegado" en pantalla mientras se hace scroll, y en
+             vez de eso se estira a 300vh y arrastra todo el resto de la página) -->
+        <div class="tl-hero-mascot-sticky">
 
-      <!-- VIDEO DE FONDO AUTOPLAY -->
-      <video id="llamaVideo" class="tl-hero-video-bg" autoplay muted playsinline preload="auto">
-        <source src="img/llama_video_sin fondo.mp4" type="video/mp4">
-      </video>
+          <!-- VIDEO DE FONDO -->
+          <video id="llamaVideo" class="tl-hero-video-bg" muted playsinline preload="auto">
+            <source src="img/video_llama_gop1.mp4" type="video/mp4">
+          </video>
 
-      <!-- CONTENIDO SOBRE EL VIDEO -->
-      <div class="tl-hero-content-overlay">
-        <div class="tl-hero-minimal">
-          <div class="tl-hero-tag">
-            <span class="dot"></span> Arbitrum Sepolia · Testnet en vivo
+          <!-- CONTENIDO SOBRE EL VIDEO -->
+          <div class="tl-hero-content-overlay">
+            <div class="tl-hero-minimal">
+              <div class="tl-hero-tag">
+                <span class="dot"></span> Arbitrum Sepolia · Testnet en vivo
+              </div>
+              <h1 class="tl-hero-title">Compra con <em>seguridad</em> y convierte cada venta en acceso a crédito.</h1>
+              <p class="tl-hero-sub">
+                Convierte cada venta segura en <strong>reputación verificable</strong>,
+                historial y nuevas oportunidades de crédito.
+              </p>
+              <div class="tl-hero-actions">
+                <a href="login.html" class="tl-btn-primary">Empezar ahora <span>→</span></a>
+                <a href="#como-funciona" class="tl-btn-secondary">Cómo funciona <span>↓</span></a>
+              </div>
+            </div>
           </div>
-          <h1 class="tl-hero-title">Compra con <em>segruridad</em> y convierte cada venta en acceso a crédito.</h1>
-          <p class="tl-hero-sub">
-            Convierte cada venta segura en <strong>reputación verificable</strong>,
-            historial y nuevas oportunidades de crédito.
-          </p>
-          <div class="tl-hero-actions">
-            <a href="login.html" class="tl-btn-primary">Empezar ahora <span>→</span></a>
-            <a href="#como-funciona" class="tl-btn-secondary">Cómo funciona <span>↓</span></a>
-          </div>
+
         </div>
       </div>
     </section>

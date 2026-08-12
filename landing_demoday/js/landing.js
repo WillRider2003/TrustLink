@@ -226,56 +226,156 @@ document.addEventListener('DOMContentLoaded', () => {
   chartObserver.observe(showcase);
 });
 
-// --- ANIMACIÓN PREMIUM DE LA MASCOTA CON VIDEO Y SCROLL ---
 document.addEventListener('DOMContentLoaded', () => {
+  // ============================================================
+  // 1. ANIMACIÓN DE LA MASCOTA CON SCROLL (GOP = 1)
+  // ============================================================
   const video = document.getElementById('llamaVideo');
   const stickyWrap = document.querySelector('.tl-hero-mascot-sticky-wrap');
+  const stickyInner = document.querySelector('.tl-hero-mascot-sticky');
+  const nav = document.querySelector('.tl-nav');
 
-  if (!video || !stickyWrap) return;
-
-  // Pausar video de entrada
-  video.pause();
-
-  let targetTime = 0;
-  let currentTime = 0;
-
-  // Asegura que los metadatos del video (duración) estén disponibles
-  video.addEventListener('loadedmetadata', () => {
-    updateScrollProgress();
-  });
-
-  function updateScrollProgress() {
-    const rect = stickyWrap.getBoundingClientRect();
-    const maxScroll = stickyWrap.offsetHeight - window.innerHeight;
-
-    if (maxScroll > 0) {
-      // Calcular qué porcentaje del contenedor sticky se ha recorrido (de 0 a 1)
-      const scrollPosition = -rect.top;
-      const progress = Math.max(0, Math.min(1, scrollPosition / maxScroll));
-
-      if (video.duration) {
-        targetTime = progress * video.duration;
-      }
+  // ------------------------------------------------------------
+  // QUITAR EL "SALTO" INICIAL: el video quería pegarse justo en
+  // top:0 (el borde de la pantalla), pero el nav (que también es
+  // sticky) ya ocupa ese espacio. Eso obligaba a scrollear "la
+  // altura del nav" de golpe antes de que el video se trabara.
+  // Medimos la altura real del nav y hacemos que el video se
+  // pegue justo debajo — así queda enganchado desde el pixel 0
+  // de scroll, sin saltos.
+  // ------------------------------------------------------------
+  function syncStickyTopWithNav() {
+    if (stickyInner && nav) {
+      stickyInner.style.top = nav.offsetHeight + 'px';
     }
   }
+  syncStickyTopWithNav();
+  window.addEventListener('resize', syncStickyTopWithNav);
 
-  // Loop de renderizado suave (LERP) para evitar tirones al avanzar/retroceder el video
-  function render() {
-    currentTime += (targetTime - currentTime) * 0.1;
+  if (video && stickyWrap) {
+    // Pausar video inicialmente
+    video.pause();
 
-    if (Math.abs(targetTime - currentTime) > 0.001) {
-      video.currentTime = currentTime;
+    // ------------------------------------------------------------
+    // ALTO DEL "CARRIL" DE SCROLL — calculado con la duración real
+    // del video en vez de adivinar un valor en vh. Así el scroll
+    // dura exactamente lo que dura el video, ni un pixel de más
+    // (ese sobrante era el "espacio vacío" que veías).
+    //
+    // Ajusta SOLO este número para hacerlo sentir más lento o más
+    // rápido: más alto = hay que scrollear más para ver el video
+    // completo (se siente más "cinemático"). Más bajo = se ve más
+    // rápido/directo.
+    // ------------------------------------------------------------
+    const PX_DE_SCROLL_POR_SEGUNDO_DE_VIDEO = 180;
+
+    function setScrollTrackHeight() {
+      if (video.duration && isFinite(video.duration)) {
+        const scrollDistance = video.duration * PX_DE_SCROLL_POR_SEGUNDO_DE_VIDEO;
+        stickyWrap.style.height = `calc(100vh + ${scrollDistance}px)`;
+      }
     }
 
+    let targetTime = 0;
+    let currentTime = 0;
+
+    // Actualiza la posición objetivo según el scroll del contenedor
+    function updateScrollProgress() {
+      const rect = stickyWrap.getBoundingClientRect();
+      const maxScroll = stickyWrap.offsetHeight - window.innerHeight;
+
+      if (maxScroll > 0) {
+        const scrollPosition = -rect.top;
+        const progress = Math.max(0, Math.min(1, scrollPosition / maxScroll));
+
+        if (video.duration) {
+          targetTime = progress * video.duration;
+        }
+      }
+    }
+
+    // Loop de renderizado suave (LERP)
+    function render() {
+      currentTime += (targetTime - currentTime) * 0.1;
+
+      if (Math.abs(targetTime - currentTime) > 0.001) {
+        video.currentTime = currentTime;
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    video.addEventListener('loadedmetadata', () => {
+      setScrollTrackHeight();
+      updateScrollProgress();
+    });
+
+    window.addEventListener('scroll', updateScrollProgress, { passive: true });
+    window.addEventListener('resize', () => {
+      setScrollTrackHeight();
+      updateScrollProgress();
+    });
+
+    // Iniciar el loop continuo
     requestAnimationFrame(render);
   }
 
-  // Escuchar eventos de desplazamiento y cambio de tamaño
-  window.addEventListener('scroll', updateScrollProgress, { passive: true });
-  window.addEventListener('resize', updateScrollProgress);
+  // ============================================================
+  // 2. OBSERVADOR DE MÉTRICAS Y CONTEO NUMÉRICO
+  // ============================================================
+  const targetSection = document.querySelector('.tl-premium-insights');
 
-  // Iniciar loop de animación
-  requestAnimationFrame(render);
+  if (targetSection) {
+    const observerOptions = {
+      root: null,
+      threshold: 0.25 // Se activa al ver el 25% de la sección
+    };
+
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Activa las animaciones CSS (barras y rosquilla)
+          targetSection.classList.add('is-visible');
+
+          // Dispara el conteo progresivo de los números
+          animateNumbers();
+
+          // Desconecta el observador para que no se reinicie la animación
+          obs.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    observer.observe(targetSection);
+  }
+
+  // Función interna para animar contadores (.counter-num)
+  function animateNumbers() {
+    const counters = document.querySelectorAll('.counter-num');
+
+    counters.forEach(counter => {
+      const target = parseFloat(counter.getAttribute('data-target'));
+      if (isNaN(target)) return;
+
+      const suffix = counter.getAttribute('data-suffix') || '';
+      const decimals = parseInt(counter.getAttribute('data-decimals') || '0', 10);
+      const duration = 1600; // ms
+      const stepTime = 20;
+      const steps = duration / stepTime;
+      const increment = target / steps;
+      let current = 0;
+
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          counter.innerText = target.toFixed(decimals) + suffix;
+          clearInterval(timer);
+        } else {
+          counter.innerText = current.toFixed(decimals) + suffix;
+        }
+      }, stepTime);
+    });
+  }
 });
 
 document.addEventListener('DOMContentLoaded', () => {
