@@ -5,17 +5,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TrustLink — Confianza y crédito on-chain para la economía informal</title>
-<link rel="icon" type="image/png" href="img/logo.png">
   <meta name="description"
     content="Marketplace descentralizado con escrow, reputación on-chain y crédito progresivo para vendedores informales, sobre Arbitrum.">
+  <link rel="icon" type="image/png" href="img/logo.png">
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/landing.css">
   <link rel="stylesheet" href="css/components.css">
 </head>
 
 <body class="tl-landing" data-page="landing">
-<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
-
+  <!-- Esta landing es un diseño siempre-oscuro (fondo navy + texto blanco
+     definidos en css/landing.css), no una vista clara/oscura como el
+     resto de la plataforma. A propósito NO se agrega la clase "dark"
+     aquí aunque el usuario haya dejado el modo oscuro activado en otra
+     página: esa clase pisaba variables compartidas (--tl-white, etc.)
+     y volvía el texto invisible sobre estos fondos oscuros. -->
 
   <!-- NAV -->
   <nav class="tl-nav">
@@ -25,212 +29,1259 @@
     </a>
     <div class="tl-nav-links">
       <a href="#problema">El problema</a>
+      <a href="#simulador">Simulador</a>
       <a href="#como-funciona">Cómo funciona</a>
       <a href="#reputacion">Reputación</a>
       <a href="#arquitectura">Arquitectura</a>
+      <a href="#roadmap">Roadmap</a>
     </div>
     <a href="login.html" class="tl-btn tl-btn-primary">Iniciar sesión</a>
   </nav>
 
-  <!-- HERO -->
-  <header class="tl-hero" id="top">
-    <div class="tl-wrap tl-hero-inner">
-      <div class="tl-hero-tag"><span class="dot"></span>Arbitrum Sepolia · Testnet en vivo</div>
+  <!-- CONTENEDOR MAESTRO DEL HERO INTERACTIVO (GRID DE 5x3 SUBGRID) -->
+  <div class="content-wrap" data-enhanced="true" data-center="true" data-layers="true" data-stagger="range">
+    <main class="tl-page">
+      <section class="tl-hero-section" id="top">
+        <!-- VIDEO DE FONDO — reproducción normal en loop (sin scroll-scrub) -->
+        <video id="llamaVideo" class="tl-hero-video-bg" autoplay muted loop playsinline preload="auto">
+          <source src="img/video_llama_gop1.mp4" type="video/mp4">
+        </video>
 
-      <!-- CAMBIO: mensaje de beneficio inmediato -->
-      <h1 class="tl-hero-title">
-        Compra con <em>seguridad</em> y convierte cada venta en acceso a crédito.
-      </h1>
+        <!-- CONTENIDO SOBRE EL VIDEO -->
+        <div class="tl-hero-content-overlay">
+          <div class="tl-hero-minimal">
+            <div class="tl-hero-tag">
+              <span class="dot"></span> Arbitrum Sepolia · Testnet en vivo
+            </div>
+            <h1 class="tl-hero-title">Compra con <em>seguridad</em> y convierte cada venta en acceso a crédito.</h1>
+            <p class="tl-hero-sub">
+              Convierte cada venta segura en <strong>reputación verificable</strong>,
+              historial y nuevas oportunidades de crédito.
+            </p>
+            <div class="tl-hero-actions">
+              <a href="login.html" class="tl-btn-primary">Empezar ahora <span>→</span></a>
+              <a href="#como-funciona" class="tl-btn-secondary">Cómo funciona <span>↓</span></a>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <!-- CAMBIO: menos técnico, más visión -->
-      <p class="tl-hero-sub">
-        TrustLink protege pagos entre compradores y vendedores y construye un historial
-        verificable que puede abrir oportunidades de financiamiento para quienes hoy venden
-        fuera del sistema financiero formal.
-      </p>
+      <!-- Frase de transición entre el Hero y la galería -->
+      <section class="tl-hero-bridge">
+        <div class="tl-wrap tl-reveal">
+          <p class="tl-hero-bridge-text">
+            Detrás de cada bodega, cada carretilla y cada feria,
+            hay alguien construyendo su futuro <em>sin que el sistema lo note</em>.
+          </p>
+        </div>
+      </section>
 
-      <div class="tl-hero-actions">
-        <a href="login.html" class="tl-btn tl-btn-primary tl-btn-lg">Iniciar sesión</a>
-        <a href="#como-funciona" class="tl-btn tl-btn-outline tl-btn-lg">Ver cómo funciona</a>
-      </div>
+      <!-- ============================================================
+        AQUÍ RECIÉN COMIENZA EL SCROLL ANIMATION
+        ============================================================ -->
 
-      <div class="tl-hero-meta">
-        <div class="tl-hero-meta-item"><b>Pago protegido</b>El dinero se libera solo tras la entrega</div>
-        <div class="tl-hero-meta-item"><b>Reputación verificable</b>Cada venta suma historial público</div>
-        <div class="tl-hero-meta-item"><b>Crédito progresivo</b>Mejor reputación, mejores oportunidades</div>
-        <div class="tl-hero-meta-item"><b>Experiencia simple</b>Sin jerga cripto para el usuario final</div>
-      </div>
-    </div>
-  </header>
-  <!-- TICKER -->
-  <div class="tl-ticker-wrap">
-    <div class="tl-ticker">
-      <span>Arbitrum Sepolia</span><span>Escrow Contract</span><span>SBT Reputación</span><span>Score 60% Volumen / 40%
-        Diversidad</span><span>Java · Spring Boot</span><span>Google Gemini API</span><span>Arbitrum
-        Sepolia</span><span>Escrow Contract</span><span>SBT Reputación</span><span>Score 60% Volumen / 40%
-        Diversidad</span><span>Java · Spring Boot</span><span>Google Gemini API</span>
-    </div>
+      <section class="tl-hero-scroll-container" id="trustlink-scroll-gallery">
+
+
+        <div class="content">
+
+          <div class="grid">
+
+
+            <!-- =================================================
+                    CAPA 1 — EXTERIOR
+                    ================================================= -->
+
+            <div class="layer">
+
+              <div>
+                <img src="img/foto1.png" alt="Mercado local">
+              </div>
+
+              <div>
+                <img src="img/foto2.png" alt="Comerciante textil">
+              </div>
+
+              <div>
+                <img src="img/foto3.png" alt="Transacción">
+              </div>
+
+              <div>
+                <img src="img/foto4.png" alt="Bodega">
+              </div>
+
+              <div>
+                <img src="img/vendedora3.png" alt="Ventas">
+              </div>
+
+              <div>
+                <img src="img/vendedora2.jpg" alt="Capital">
+              </div>
+
+            </div>
+
+
+            <!-- =================================================
+                    CAPA 2 — INTERMEDIA
+                    ================================================= -->
+
+            <div class="layer">
+
+              <div>
+                <img src="img/foto5.png" alt="Pago QR">
+              </div>
+
+              <div>
+                <img src="img/foto6.png" alt="Seguridad digital">
+              </div>
+
+              <div>
+                <img src="img/foto7.png" alt="Blockchain">
+              </div>
+
+              <div>
+                <img src="img/foto8.png" alt="Firma digital">
+              </div>
+
+              <div>
+                <img src="img/foto9.png" alt="Entrega">
+              </div>
+
+              <div>
+                <img src="img/foto10.png" alt="Identidad digital">
+              </div>
+
+            </div>
+
+
+            <!-- =================================================
+                    CAPA 3 — CENTRO
+                    ================================================= -->
+
+            <div class="layer">
+
+              <div>
+                <img src="img/foto12.png" alt="Infraestructura">
+              </div>
+
+              <div>
+                <img src="img/foto13.png" alt="Reputación">
+              </div>
+
+            </div>
+
+
+            <!-- =================================================
+                    FOTO CENTRAL
+                    ================================================= -->
+
+            <div class="scaler">
+
+              <div class="gallery-main-image">
+
+                <img src="img/foto14.png" alt="Comerciante TrustLink">
+
+              </div>
+
+            </div>
+
+
+          </div>
+
+        </div>
+
+      </section>
+    </main>
   </div>
 
-  <!-- MÉTRICAS DEMO -->
-  <section class="tl-section-tight">
-    <div class="tl-wrap tl-reveal">
-      <div class="tl-stat-grid">
-        <div class="tl-stat-cell">
-          <div class="tl-stat-value">1,250</div>
-          <div class="tl-stat-label">Transacciones verificadas</div>
+
+  <!-- TICKER no -->
+
+  <!-- Graficas interactivas -->
+  <section class="tl-premium-insights" id="problema">
+    <div class="tl-wrap">
+
+      <!-- ENCABEZADO MINIMALISTA -->
+      <div class="tl-ins-header">
+        <span class="tl-ins-tag">Radiografía del Mercado</span>
+        <h2 class="tl-ins-h2">La economía invisible en datos reales</h2>
+      </div>
+
+      <!-- CONTENEDOR DE GRÁFICOS DE ALTA CALIDAD -->
+      <div class="tl-ins-showcase">
+
+        <!-- CARD 1 (Izquierda): GRÁFICO DE ÁREAS - LA PARADOJA -->
+        <div class="tl-chart-card">
+          <div class="tl-chart-visual area-chart">
+            <svg class="tl-area-svg" viewBox="0 0 200 120">
+              <!-- Línea del Techo de Cristal -->
+              <line x1="0" y1="25" x2="200" y2="25" stroke="#6B7280" stroke-width="1" stroke-dasharray="4" />
+              <text x="100" y="15" text-anchor="middle" class="glass-ceiling-text" fill="#9CA3AF" font-size="8">El Techo
+                de Cristal: 50% aún excluidos</text>
+
+              <!-- Área de crecimiento del índice (2021-2025) -->
+              <!-- Puntos aproximados simulando: 34.3, 41.5, 46.5, 47.9, 49.9 -->
+              <path class="area-fill" d="M0,120 L0,95 L50,80 L100,65 L150,60 L200,55 L200,120 Z"
+                fill="rgba(37, 99, 235, 0.15)" />
+              <path class="area-line" d="M0,95 L50,80 L100,65 L150,60 L200,55" fill="none" stroke="#2563EB"
+                stroke-width="2.5" />
+
+              <!-- Puntos de datos -->
+              <circle cx="200" cy="55" r="4" fill="#2563EB" />
+            </svg>
+          </div>
+          <div class="tl-chart-info">
+            <h3>La Paradoja de la Inclusión</h3>
+            <p>La digitalización avanza, pero el sistema tradicional tocó un tope. <strong>La mitad del país</strong>
+              sigue sin acceso a crédito real.</p>
+            <span class="tl-ins-source">Fuente: Índice de Inclusión Financiera (2021-2025)</span>
+          </div>
         </div>
-        <div class="tl-stat-cell">
-          <div class="tl-stat-value">S/ 48,000</div>
-          <div class="tl-stat-label">Pagos protegidos</div>
+
+        <!-- CARD 2 (Centro): GRÁFICO DE BARRAS - EL COSTO DE LA INVISIBILITY -->
+        <div class="tl-chart-card featured-danger-card">
+          <div class="tl-chart-visual comparison-bars">
+
+            <div class="bar-row">
+              <div class="bar-label-group">
+                <span class="bar-label">Banca Tradicional</span>
+                <span class="bar-value-text text-blue">~40% TEA</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill normal-bar" style="width: 15%;"></div>
+              </div>
+            </div>
+
+            <div class="bar-row mt-4">
+              <div class="bar-label-group">
+                <span class="bar-label text-danger">Usura (Gota a Gota)</span>
+                <span class="bar-value-text text-danger font-bold">10,448% TEA</span>
+              </div>
+              <div class="bar-track broken-track">
+                <!-- La barra llena el 100% y tiene un efecto degradado simulando que continúa -->
+                <div class="bar-fill danger-bar" style="width: 100%;"></div>
+              </div>
+            </div>
+
+          </div>
+          <div class="tl-chart-info">
+            <h3>¿Elegirías un préstamo con 10,000% de interés?</h3>
+            <p>Este es el costo de la exclusión. <strong>12 millones de peruanos</strong> no tienen otra opción ante
+              emergencias.</p>
+          </div>
         </div>
-        <div class="tl-stat-cell">
-          <div class="tl-stat-value">87</div>
-          <div class="tl-stat-label">Vendedores con score &gt; 80</div>
+
+        <!-- CARD 3 (Derecha): GRÁFICO CIRCULAR - EL MOTOR INVISIBLE -->
+        <div class="tl-chart-card">
+          <div class="tl-chart-visual">
+            <svg class="tl-donut-chart" viewBox="0 0 160 160">
+              <!-- Círculo base fondo -->
+              <circle class="donut-bg" cx="80" cy="80" r="65" fill="none" stroke="#1E293B" stroke-width="15" />
+
+              <!-- Sector Formal (29.8%) - Inicia en 0 -->
+              <circle class="donut-segment formal-seg" cx="80" cy="80" r="65" fill="none" stroke="#475569"
+                stroke-width="15" stroke-dasharray="0 408.4" stroke-dashoffset="0" />
+
+              <!-- Sector Informal (70.2%) - Inicia en 0 y empieza donde termina el formal (-121.7) -->
+              <circle class="donut-segment informal-seg" cx="80" cy="80" r="65" fill="none" stroke="#2563EB"
+                stroke-width="15" stroke-dasharray="0 408.4" stroke-dashoffset="-121.7" />
+            </svg>
+            <div class="tl-donut-center">
+              <strong style="font-size: 1.2rem;">7 de cada 10</strong>
+              <span style="font-size: 0.8rem;">Invisibles</span>
+            </div>
+          </div>
+          <div class="tl-chart-info">
+            <h3>El Motor Invisible</h3>
+            <p><strong>70.2%</strong> de la población ocupada (12.3M) opera y produce fuera del radar bancario
+              tradicional.</p>
+            <span class="tl-ins-source">Fuente: INEI</span>
+          </div>
         </div>
-        <div class="tl-stat-cell">
-          <div class="tl-stat-value">0</div>
-          <div class="tl-stat-label">Fraudes exitosos en pruebas</div>
-        </div>
+
       </div>
     </div>
   </section>
 
-  <!-- EL PROBLEMA -->
-  <section class="tl-section" id="problema">
-    <div class="tl-wrap">
-      <div class="tl-reveal">
-        <div class="tl-eyebrow">(01) — El problema</div>
-        <h2 class="tl-h2">Dos brechas que se <em>alimentan entre sí.</em></h2>
-        <p class="tl-lede">
-          Sin confianza no hay transacción, y sin transacciones no hay crédito. Millones de
-          vendedores informales en Perú quedan atrapados en ese círculo.
-        </p>
+  <!-- SIMULADOR INTERACTIVO TRUSTLINK CON VIDEO DE FONDO -->
+  <section class="tl-section" id="simulador">
+
+    <!-- 1. VIDEO DE FONDO -->
+    <video class="tl-simulador-bg-video" autoplay loop muted playsinline>
+      <source src="img/llama_calculadora.mp4" type="video/mp4">
+    </video>
+
+    <!-- 2. CAPA SUPERIOR (TÍTULO + CALCULADORA, apilados en el mismo flujo) -->
+    <div class="tl-wrap tl-simulador-content">
+
+      <!-- Encabezado: ahora vive DENTRO del mismo contenedor que la tarjeta -->
+      <div class="tl-reveal tl-header-centered tl-simulador-header">
+        <div class="tl-eyebrow tl-eyebrow-clean">SIMULADOR</div>
+        <h2 class="tl-h2">Haz tu <em>propia cuenta</em></h2>
       </div>
 
-      <div class="tl-problem-grid tl-reveal">
-        <div class="tl-problem-card">
-          <div class="tl-problem-num">01 — Confianza</div>
-          <div class="tl-problem-title">Comprar entre desconocidos es un riesgo</div>
-          <div class="tl-problem-desc">
-            El comprador no sabe si recibirá el producto; el vendedor no sabe si le pagarán.
-            Sin un mecanismo neutral, cada venta puede convertirse en una pérdida.
+      <div class="tl-premium-calc tl-reveal">
+
+        <!-- PESTAÑAS SELECTORAS -->
+        <div class="tl-calc-nav">
+          <button class="tl-tab-btn active" onclick="switchTab('sbt')">
+            <svg class="tl-tab-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            Score de Confianza (SBT)
+          </button>
+          <button class="tl-tab-btn" onclick="switchTab('usura')">
+            <svg class="tl-tab-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+            Impacto Financiero
+          </button>
+        </div>
+
+        <!-- ================= PESTAÑA 1: USURA vs TRUSTLINK ================= -->
+        <div id="tab-usura" class="tl-tab-pane">
+          <div class="tl-calc-header">
+            <span class="tl-alert-dot"></span>
+            <h3>Simulador de Impacto Financiero</h3>
+          </div>
+          <div class="tl-calc-body">
+            <div class="tl-calc-input-box">
+              <label for="borrowAmount">¿Qué capital necesitas simular?</label>
+              <div class="tl-input-wrapper">
+                <span>S/</span>
+                <input type="number" id="borrowAmount" value="1000" min="100" max="10000" step="100"
+                  oninput="runUsuryEngine()">
+              </div>
+            </div>
+            <div class="tl-calc-display-box">
+              <div class="calc-metric usury">
+                <span class="metric-lbl">Costo en el "Gota a Gota" (10,448% TEA)</span>
+                <strong id="usuryTotal">S/ 1,300.00</strong>
+              </div>
+              <div class="calc-metric trustlink">
+                <span class="metric-lbl">Costo construyendo reputación en TrustLink</span>
+                <strong>S/ 0.00 <small class="green-tag">On-Chain</small></strong>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="tl-problem-card">
-          <div class="tl-problem-num">02 — Crédito</div>
-          <div class="tl-problem-title">Vender bien no abre puertas en el banco</div>
-          <div class="tl-problem-desc">
-            La banca tradicional exige historial formal. Un vendedor informal puede ser
-            confiable durante años y nunca tener cómo demostrarlo.
+        <!-- ================= PESTAÑA 2: ESTIMADOR SCORE SBT ================= -->
+        <div id="tab-sbt" class="tl-tab-pane active">
+          <div class="tl-calc-header">
+            <span class="tl-alert-dot blue"></span>
+            <h3>Estimador de "Score de Confianza" (SBT Predictor)</h3>
+
+          </div>
+
+          <div class="tl-sbt-grid">
+            <!-- Entradas -->
+            <div class="tl-sbt-inputs">
+              <div class="tl-calc-input-box">
+                <label for="salesVol">Ventas mensuales aprox. (S/)</label>
+                <div class="tl-input-wrapper">
+                  <span>S/</span>
+                  <input type="number" id="salesVol" value="2500" min="100" max="50000" step="100"
+                    oninput="runSBTEngine()">
+                </div>
+              </div>
+
+              <div class="tl-calc-input-box">
+                <label for="cleanClients">Clientes atendidos sin reclamos</label>
+                <div class="tl-input-wrapper">
+                  <span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                  </span>
+                  <input type="number" id="cleanClients" value="30" min="1" max="1000" oninput="runSBTEngine()">
+                </div>
+              </div>
+
+              <!-- Slider interactivo -->
+              <div class="tl-calc-input-box">
+                <div class="tl-slider-label">
+                  <label>Proyección de crecimiento seguro:</label>
+                  <span id="sliderVal" class="tl-slider-num">+20%</span>
+                </div>
+                <input type="range" id="growthSlider" min="0" max="100" value="20" class="tl-range-slider"
+                  oninput="runSBTEngine()">
+              </div>
+            </div>
+
+            <!-- Resultado & Propuesta de Valor -->
+            <div class="tl-sbt-result-box">
+              <div class="tl-score-circle">
+                <span class="tl-score-title">Puntaje SBT Estimado</span>
+                <div class="tl-score-value"><span id="sbtScore">78</span><small>/100</small></div>
+                <span class="tl-score-badge" id="sbtBadge">Nivel Confianza Alta</span>
+              </div>
+
+              <p class="tl-value-prop" id="sbtPropText">
+                Con este puntaje de <strong>78/100</strong>, dejas de ser parte del 83% de informales sin historial y te
+                conviertes en un candidato elegible para el crédito resiliente de TrustLink.
+              </p>
+            </div>
           </div>
         </div>
+
       </div>
+
     </div>
   </section>
 
   <!-- CÓMO FUNCIONA -->
-  <section class="tl-section" id="como-funciona"
-    style="background:var(--tl-bg-2); border-top:1px solid var(--tl-line); border-bottom:1px solid var(--tl-line);">
+  <section id="como-funciona" class="tl-section tl-how-it-works">
     <div class="tl-wrap">
-      <div class="tl-reveal">
-        <div class="tl-eyebrow">(02) — Cómo funciona</div>
-        <h2 class="tl-h2">Tres pasos para una venta <em>segura y verificable.</em></h2>
-        <p class="tl-lede">
-          El comprador paga, el vendedor entrega y TrustLink convierte esa venta en reputación verificable.
-        </p>
+      <!-- Encabezado centrado -->
+      <div class="tl-header-centered">
+        <div class="tl-eyebrow no-line">CÓMO FUNCIONA</div>
+        <h2 class="tl-h2">Tres pasos para una venta <span style="color: #3B82F6;">segura y verificable</span>, sin
+          intermediarios.</h2>
+        <p class="tl-lede">El dinero queda retenido en garantía hasta que la entrega se confirma. Así de simple.</p>
       </div>
+      <!-- Nueva estructura de Senthora adaptada a TrustLink -->
+      <div class="tl-interactive-container">
 
-      <!-- CAMBIO: flujo visual simple -->
-      <div class="tl-steps tl-reveal">
+        <!-- LADO IZQUIERDO: Pasos con línea de progreso conector -->
+        <div class="tl-timeline-steps">
+          <div class="tl-progress-line-bg">
+            <div class="tl-progress-line-fill" id="progressLine"></div>
+          </div>
 
-        <div class="tl-step">
-          <span class="tl-step-num">01</span>
-          <div class="tl-step-title">Comprador deposita</div>
-          <div class="tl-step-desc">
-            El pago queda retenido en el escrow hasta que la entrega sea confirmada.
+          <div class="tl-interactive-step active" data-step="1" onclick="switchStep(1)">
+            <div class="tl-step-indicator">01</div>
+            <div class="tl-step-info">
+              <h3 class="tl-interactive-title">Depósito en garantía</h3>
+              <p class="tl-interactive-desc">El comprador paga y el dinero queda bloqueado on-chain. Nadie puede tocarlo
+                todavía.</p>
+              <span class="tl-step-fn">crearOrden()</span>
+            </div>
+          </div>
+
+          <div class="tl-interactive-step" data-step="2" onclick="switchStep(2)">
+            <div class="tl-step-indicator">02</div>
+            <div class="tl-step-info">
+              <h3 class="tl-interactive-title">Confirmación con código</h3>
+              <p class="tl-interactive-desc">El comprador recibe el producto e ingresa un código. Eso libera el pago al
+                vendedor al instante.</p>
+              <span class="tl-step-fn">confirmarEntrega()</span>
+            </div>
+          </div>
+
+          <div class="tl-interactive-step" data-step="3" onclick="switchStep(3)">
+            <div class="tl-step-indicator">03</div>
+            <div class="tl-step-info">
+              <h3 class="tl-interactive-title">Timeout protector</h3>
+              <p class="tl-interactive-desc">Si el comprador no confirma a tiempo, el contrato reembolsa solo
+                automáticamente.</p>
+              <span class="tl-step-fn">liberarPorTimeout()</span>
+            </div>
           </div>
         </div>
 
-        <div class="tl-step">
-          <span class="tl-step-num">02</span>
-          <div class="tl-step-title">Vendedor entrega</div>
-          <div class="tl-step-desc">
-            El comprador confirma la recepción ingresando un código simple.
+        <!-- LADO DERECHO: El Mockup cambiante con la Mascota AI Asistente -->
+        <div class="tl-mockup-wrapper">
+          <div class="tl-phone-mockup">
+            <div class="tl-phone-screen">
+              <div class="tl-phone-header">
+                <span class="tl-phone-time">9:41</span>
+                <div class="tl-phone-notch"></div>
+                <div class="tl-phone-icons">
+                  <!-- SVG Rayo (Zap) -->
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                    class="tl-phone-icon-svg">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                  </svg>
+                  <!-- SVG Wifi -->
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                    class="tl-phone-icon-svg">
+                    <path d="M12 20h.01" />
+                    <path d="M8.5 16.5c3.5-3.5 3.5-3.5 7 0" />
+                    <path d="M5 13c7-7 7-7 14 0" />
+                    <path d="M1.5 9.5c10.5-10.5 10.5-10.5 21 0" />
+                  </svg>
+                  <!-- SVG Batería Cargando -->
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                    class="tl-phone-icon-svg">
+                    <path d="M5 7H3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+                    <path d="M11 7h7a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-7" />
+                    <line x1="23" x2="23" y1="11" y2="13" />
+                    <polygon points="11 7 8 12 12 12 9 17" />
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Contenido dinámico del teléfono -->
+              <div class="tl-phone-content">
+                <!-- Vista Paso 1 -->
+                <div class="tl-step-view active" id="view-step-1">
+                  <div class="tl-avatar-box">
+                    <img src="img/icono_funciona.png" alt="Mascota TrustLink" class="tl-mascot-avatar">
+                  </div>
+                  <div class="tl-bubble-chat">
+                    <p><strong>Trusti Chatbot:</strong> "Estoy custodiando los fondos de la venta de manera segura en la
+                      Testnet de Arbitrum Sepolia. ¡Nadie puede tocarlos hasta que el cliente reciba su pedido!"</p>
+                  </div>
+                  <div class="tl-mini-card">
+                    <span>Monto Bloqueado</span>
+                    <strong>S/ 150.00 PEN</strong>
+                    <span class="badge-lock">
+                      <!-- SVG Candado (Lock) -->
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
+                      Escrow Activo
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Vista Paso 2 -->
+                <div class="tl-step-view" id="view-step-2">
+                  <div class="tl-avatar-box">
+                    <img src="img/icono_funciona.png" alt="Mascota TrustLink" class="tl-mascot-avatar">
+                  </div>
+                  <div class="tl-bubble-chat">
+                    <p><strong>Trusti Chatbot:</strong> "El comprador ya tiene el producto en sus manos. Ingresa el
+                      código de liberación aquí abajo para autorizar el cobro instantáneo."</p>
+                  </div>
+                  <div class="tl-code-input-demo">
+                    <div class="code-box">7</div>
+                    <div class="code-box">4</div>
+                    <div class="code-box">2</div>
+                    <div class="code-box">9</div>
+                  </div>
+                </div>
+
+                <!-- Vista Paso 3 -->
+                <div class="tl-step-view" id="view-step-3">
+                  <div class="tl-avatar-box">
+                    <img src="img/icono_funciona.png" alt="Mascota TrustLink" class="tl-mascot-avatar">
+                  </div>
+                  <div class="tl-bubble-chat">
+                    <p><strong>Trusti Chatbot:</strong> "¡Transacción completada! Tu reputación pública ha subido
+                      gracias al algoritmo descentralizado. ¡Felicidades por otra venta legítima!"</p>
+                  </div>
+                  <div class="tl-mini-card success-card">
+                    <span>
+                      <!-- SVG Medalla / Premio (Award) -->
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="8" r="7" />
+                        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+                      </svg>
+                      SBT Reputación Emitido
+                    </span>
+                    <strong>Score Actualizado: 85/100</strong>
+                    <div class="progress-bar-mini">
+                      <div class="fill" style="width: 85%"></div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="tl-step">
-          <span class="tl-step-num">03</span>
-          <div class="tl-step-title">Pago + reputación</div>
-          <div class="tl-step-desc">
-            Los fondos se liberan automáticamente y el score del vendedor se actualiza.
-          </div>
-        </div>
 
       </div>
     </div>
   </section>
+
+  <!-- Web3 Invisible uwu -->
+  <section class="tl-section tl-web3-section" id="arquitectura">
+    <div class="tl-wrap">
+
+      <!-- Encabezado -->
+      <div class="tl-reveal tl-header-centered">
+        <div class="tl-eyebrow tl-eyebrow-clean">ARQUITECTURA</div>
+        <h2 class="tl-h2">La tecnología trabaja <em>invisible</em>. Tú solo vendes.</h2>
+        <p class="tl-lede">
+          Detrás de cada venta corre un contrato inteligente sobre Arbitrum.
+          Tú no necesitas saber qué es una "wallet" ni qué es el "gas" - para ti,
+          se siente tan simple como mandar un Yape.
+        </p>
+      </div>
+
+      <!-- Sello de Testnet en vivo -->
+      <div class="tl-reveal tl-web3-testnet-badge">
+        <span class="tl-web3-testnet-dot"></span>
+        Testnet en vivo — Arbitrum Sepolia
+      </div>
+
+      <!-- Diagrama de flujo: venta por WhatsApp -> Sello on-chain -->
+      <div class="tl-reveal tl-web3-flow">
+
+        <div class="tl-web3-connector"></div>
+
+        <!-- PASO 1 -->
+        <div class="tl-web3-step">
+          <div class="tl-web3-step-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <span class="tl-web3-step-num">01</span>
+          <h3>Vendes por WhatsApp</h3>
+        </div>
+
+        <!-- PASO 2 -->
+        <div class="tl-web3-step">
+          <div class="tl-web3-step-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <span class="tl-web3-step-num">02</span>
+          <h3>El pago queda en Escrow</h3>
+        </div>
+
+        <!-- PASO 3 -->
+        <div class="tl-web3-step">
+          <div class="tl-web3-step-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="16 10 11 15 8 12"></polyline>
+            </svg>
+          </div>
+          <span class="tl-web3-step-num">03</span>
+          <h3>Confirman la entrega</h3>
+        </div>
+
+        <!-- PASO 4 -->
+        <div class="tl-web3-step">
+          <div class="tl-web3-step-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <path d="m9 12 2 2 4-4"></path>
+            </svg>
+          </div>
+          <span class="tl-web3-step-num">04</span>
+          <h3>Se emite tu Sello on-chain</h3>
+        </div>
+
+      </div>
+
+      <!-- Chips de tranquilidad -->
+      <div class="tl-reveal tl-web3-chips">
+        <span class="tl-web3-chip">Sin wallets que instalar</span>
+        <span class="tl-web3-chip">Sin "gas" que pagar</span>
+        <span class="tl-web3-chip">Funciona con poca señal</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Efecto: los círculos del diagrama Web3 se iluminan progresivamente según el scroll -->
+  <script>
+    (function () {
+      var flow = document.querySelector('.tl-web3-flow');
+      if (!flow) return;
+
+      var steps = Array.prototype.slice.call(flow.querySelectorAll('.tl-web3-step'));
+      if (!steps.length) return;
+
+      var ticking = false;
+
+      function updateLights() {
+        var rect = flow.getBoundingClientRect();
+        var vh = window.innerHeight;
+
+        // El efecto arranca cuando el diagrama empieza a entrar por abajo
+        // de la pantalla, y termina cuando ya casi se fue por arriba.
+        var startY = vh * 0.85;
+        var endY = vh * 0.35;
+
+        var progress = (startY - rect.top) / (startY - endY);
+        progress = Math.max(0, Math.min(1, progress));
+
+        var numLit = Math.ceil(progress * steps.length);
+
+        steps.forEach(function (step, i) {
+          step.classList.toggle('is-lit', i < numLit);
+        });
+
+        ticking = false;
+      }
+
+      function onScroll() {
+        if (!ticking) {
+          requestAnimationFrame(updateLights);
+          ticking = true;
+        }
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      updateLights();
+    })();
+  </script>
+
 
   <!-- REPUTACIÓN / SCORE -->
   <section class="tl-section" id="reputacion">
     <div class="tl-wrap">
-      <div class="tl-reveal">
-        <div class="tl-eyebrow">(03) — Reputación</div>
-        <h2 class="tl-h2">Cada venta exitosa construye <em>historial verificable.</em></h2>
+
+      <!-- Encabezado -->
+      <div class="tl-reveal tl-header-centered">
+        <div class="tl-eyebrow tl-eyebrow-clean">REPUTACIÓN</div>
+        <h2 class="tl-h2">Tu Reputación es tu <em>nuevo Capital.</em></h2>
         <p class="tl-lede">
-          Al confirmarse la entrega, el sistema actualiza la reputación del vendedor y
-          genera un registro público verificable.
+          Cada venta que cierras con éxito en TrustLink construye <b>tu Historial Verificable.</b> Tu puntaje se
+          actualiza al instante, creando un perfil que el banco ya no podrá ignorar.
         </p>
       </div>
 
-      <div class="tl-formula-card tl-reveal">
-        <div class="tl-formula-bars">
-          <div class="tl-formula-row">
-            <div class="tl-formula-label">Volumen de ventas</div>
-            <div class="tl-formula-track">
-              <div class="tl-formula-fill" style="width:60%"></div>
+      <!-- Contenedor Dividido: Métricas + IA -->
+      <div class="tl-reputation-grid tl-reveal">
+
+        <!-- LADO IZQUIERDO: Visualización del Score -->
+        <div class="tl-score-card">
+          <h3 class="tl-card-title">¿Cómo subes de nivel?</h3>
+
+          <div class="tl-formula-bars">
+            <!-- Métrica 1 -->
+            <div class="tl-metric-group">
+              <div class="tl-formula-row">
+                <div class="tl-formula-label">Ventas Constantes</div>
+                <div class="tl-formula-track">
+                  <div class="tl-formula-fill" style="width:60%"></div>
+                </div>
+                <div class="tl-formula-pct">60%</div>
+              </div>
+              <p class="tl-micro-copy">Premiamos tu constancia para demostrar que tu negocio está vivo, no solo el
+                monto.</p>
             </div>
-            <div class="tl-formula-pct">60%</div>
+
+            <!-- Métrica 2 -->
+            <div class="tl-metric-group">
+              <div class="tl-formula-row">
+                <div class="tl-formula-label">Clientes Reales</div>
+                <div class="tl-formula-track">
+                  <div class="tl-formula-fill tl-fill-alt" style="width:40%"></div>
+                </div>
+                <div class="tl-formula-pct">40%</div>
+              </div>
+              <p class="tl-micro-copy">Evitamos el "auto-yapeo" exigiendo clientes variados para que tu crédito sea
+                creíble.</p>
+            </div>
           </div>
 
-          <div class="tl-formula-row">
-            <div class="tl-formula-label">Diversidad de compradores</div>
-            <div class="tl-formula-track">
-              <div class="tl-formula-fill" style="width:40%"></div>
+          <!-- El "SBT" transformado en un Sello Visual con Ícono SVG de Escudo -->
+          <div class="tl-trust-badge">
+            <div class="tl-badge-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <polyline points="9 12 11 14 15 10"></polyline>
+              </svg>
             </div>
-            <div class="tl-formula-pct">40%</div>
+            <div class="tl-badge-text">
+              <strong>DNI de Confianza Digital</strong>
+              <span>Tu Sello de Honestidad Inmutable. Protección blindada 100% tuya.</span>
+            </div>
+          </div>
+
+          <!-- Escalera de niveles de confianza -->
+          <div class="tl-level-ladder">
+
+            <div class="tl-level-item">
+              <span class="tl-level-dot tl-level-dot--1"></span>
+              <div class="tl-level-text">
+                <strong>0–25</strong>
+                <span>Nivel Inicial</span>
+              </div>
+            </div>
+
+            <div class="tl-level-item">
+              <span class="tl-level-dot tl-level-dot--2"></span>
+              <div class="tl-level-text">
+                <strong>26–50</strong>
+                <span>Nivel Básico</span>
+              </div>
+            </div>
+
+            <div class="tl-level-item">
+              <span class="tl-level-dot tl-level-dot--3"></span>
+              <div class="tl-level-text">
+                <strong>51–75</strong>
+                <span>Confianza Media</span>
+              </div>
+            </div>
+
+            <div class="tl-level-item tl-level-item--active">
+              <span class="tl-level-dot tl-level-dot--4"></span>
+              <div class="tl-level-text">
+                <strong>76–100</strong>
+                <span>Confianza Alta - mejores tasas de crédito</span>
+              </div>
+            </div>
+
           </div>
         </div>
 
-        <div class="tl-formula-note">
-          La reputación crece cuando un vendedor vende a compradores distintos y mantiene un
-          historial consistente de entregas exitosas.
+        <!-- LADO DERECHO: Asistente de IA (Copiloto Financiero) -->
+        <div class="tl-ai-assistant-card">
+
+          <!-- HEADER DEL COPILOTO -->
+          <div class="tl-ai-header">
+
+            <!-- Ícono de Asistente IA -->
+            <div class="tl-ai-avatar">
+              <img src="img/icono_funciona.png" alt="Trusti Chatbot" class="tl-ai-avatar-img">
+            </div>
+
+            <div class="tl-ai-title-wrap">
+              <div class="tl-ai-title">
+                Trusti Chatbot
+              </div>
+
+              <div class="tl-ai-status">
+                <span class="tl-ai-status-dot"></span>
+                En línea y listo para ayudar
+              </div>
+            </div>
+
+          </div>
+
+
+          <!-- CUERPO DEL CHAT -->
+          <div class="tl-ai-chat-body" id="tl-ai-chat-body">
+
+            <!-- MENSAJE INICIAL -->
+            <div class="tl-ai-message tl-ai-welcome-message">
+
+              ¡Hola! Soy Trusti, tu Copiloto en TrustLink.
+              <br><br>
+
+              Puedo ayudarte a entender cómo proteger tu negocio,
+              mejorar tu reputación y acceder a mejores oportunidades
+              financieras.
+
+              <br><br>
+
+              <strong>¿Sobre qué quieres saber?</strong>
+
+            </div>
+
+            <!-- CATEGORÍAS -->
+            <div class="tl-ai-categories" id="tl-ai-categories">
+
+              <!-- ============================= -->
+              <!-- CATEGORÍA 1 -->
+              <!-- ============================= -->
+
+              <button class="tl-ai-category-btn" type="button" data-category="seguridad">
+
+                <span class="tl-ai-category-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+
+                  </svg>
+                </span>
+
+                <span class="tl-ai-category-content">
+                  <strong>Seguridad en mis ventas</strong>
+                  <small>Protege tu dinero de estafas</small>
+                </span>
+
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+
+                  <polyline points="9 18 15 12 9 6"></polyline>
+
+                </svg>
+
+              </button>
+
+
+              <!-- ============================= -->
+              <!-- CATEGORÍA 2 -->
+              <!-- ============================= -->
+
+              <button class="tl-ai-category-btn" type="button" data-category="prestamos">
+
+                <span class="tl-ai-category-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+
+                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                    <polyline points="17 6 23 6 23 12"></polyline>
+
+                  </svg>
+                </span>
+
+                <span class="tl-ai-category-content">
+                  <strong>Préstamos y crecimiento</strong>
+                  <small>Crece sin caer en la usura</small>
+                </span>
+
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+
+                  <polyline points="9 18 15 12 9 6"></polyline>
+
+                </svg>
+
+              </button>
+
+
+              <!-- ============================= -->
+              <!-- CATEGORÍA 3 -->
+              <!-- ============================= -->
+
+              <button class="tl-ai-category-btn" type="button" data-category="reputacion">
+
+                <span class="tl-ai-category-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+
+                    <polygon
+                      points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                    </polygon>
+
+                  </svg>
+                </span>
+
+                <span class="tl-ai-category-content">
+                  <strong>Mi reputación</strong>
+                  <small>Conoce tu DNI de Confianza</small>
+                </span>
+
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+
+                  <polyline points="9 18 15 12 9 6"></polyline>
+
+                </svg>
+
+              </button>
+
+
+              <!-- ============================= -->
+              <!-- CATEGORÍA 4 -->
+              <!-- ============================= -->
+
+              <button class="tl-ai-category-btn" type="button" data-category="app">
+
+                <span class="tl-ai-category-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                    <line x1="12" y1="18" x2="12.01" y2="18"></line>
+
+                  </svg>
+                </span>
+
+                <span class="tl-ai-category-content">
+                  <strong>Uso de la app</strong>
+                  <small>Web3 sin complicaciones</small>
+                </span>
+
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+
+                  <polyline points="9 18 15 12 9 6"></polyline>
+
+                </svg>
+
+              </button>
+
+            </div>
+
+            <!-- ===================================== -->
+            <!-- A partir de aquí, todo el flujo de la  -->
+            <!-- conversación (preguntas del usuario y  -->
+            <!-- respuestas del copiloto) se genera de  -->
+            <!-- forma dinámica con JS, como mensajes   -->
+            <!-- dentro de este mismo contenedor.       -->
+            <!-- ===================================== -->
+
+          </div>
+
         </div>
+
+
+        <!-- ====================================================== -->
+        <!-- BASE DE PREGUNTAS Y RESPUESTAS DEL COPILOTO -->
+        <!-- ====================================================== -->
+
+        <script>
+
+          const trustLinkQuestions = {
+
+            /* ================================================== */
+            /* CATEGORÍA 1: SEGURIDAD EN MIS VENTAS */
+            /* ================================================== */
+
+            seguridad: {
+
+              title: "Seguridad en mis ventas",
+
+              questions: [
+
+                {
+                  question: "¿Cómo evita TrustLink que me estafen con vouchers falsos?",
+
+                  answer:
+                    "Usamos un Escrow (Casillero Digital). El dinero del comprador se guarda de forma segura y solo se libera a tu cuenta cuando confirma que recibió el producto. Ya no dependes de vouchers que pueden ser editados."
+                },
+
+                {
+                  question: "¿Qué hago si el comprador recibe el producto pero no quiere liberar el pago?",
+
+                  answer:
+                    "Contamos con un protocolo de resolución de disputas basado en pruebas digitales de envío. A diferencia de una conversación por WhatsApp, aquí tienes un intermediario neutral que ayuda a resolver el conflicto."
+                },
+
+                {
+                  question: "¿Qué es el fraude del voucher falso y cómo me protege TrustLink?",
+
+                  answer:
+                    "Muchos estafadores envían capturas de pantalla de transferencias editadas para exigir el envío del producto antes de que verifiques tu saldo. Con TrustLink, el dinero debe estar efectivamente depositado en el Escrow antes de que recibas la orden de despacho. Si no existe un depósito real, no hay venta."
+                },
+
+                {
+                  question: "¿Qué pasa si vendo un producto y el comprador nunca confirma la recepción?",
+
+                  answer:
+                    "El protocolo cuenta con un sistema de resolución de disputas. Si tienes pruebas digitales de envío, como guías de remisión o fotos del despacho, el sistema puede liberar el pago después de un periodo de validación, evitando que el comprador se quede con el producto y el dinero."
+                },
+
+                {
+                  question: "¿Puedo usar TrustLink para ventas por Instagram o TikTok?",
+
+                  answer:
+                    "¡Sí! TrustLink está pensado para el social commerce. Puedes generar un enlace de pago seguro y compartirlo por Instagram, TikTok, WhatsApp u otras plataformas, protegiendo tus transacciones."
+                }
+
+              ]
+
+            },
+
+
+            /* ================================================== */
+            /* CATEGORÍA 2: PRÉSTAMOS Y CRECIMIENTO */
+            /* ================================================== */
+
+            prestamos: {
+
+              title: "Préstamos y crecimiento",
+
+              questions: [
+
+                {
+                  question: "¿Por qué TrustLink es mejor que el 'Gota a Gota'?",
+
+                  answer:
+                    "El 'Gota a Gota' puede involucrar tasas abusivas y mecanismos de cobro violentos. TrustLink propone Crédito Resiliente con condiciones transparentes y tasas que se ajustan a tu realidad financiera."
+                },
+
+                {
+                  question: "Si el banco no me da crédito por ser informal, ¿ustedes sí?",
+
+                  answer:
+                    "Sí. En TrustLink, tu actividad comercial puede convertirse en evidencia de tu capacidad de pago. Tus ventas realizadas mediante canales verificables ayudan a construir una reputación financiera que antes no era visible para el sistema tradicional."
+                },
+
+                {
+                  question: "Tengo una calificación negativa en Infocorp, ¿puedo pedir un préstamo en TrustLink?",
+
+                  answer:
+                    "El sistema busca valorar tu comportamiento financiero actual. Tu historial de ventas seguras puede ayudarte a construir una nueva reputación financiera, aunque hayas tenido dificultades en el pasado."
+                },
+
+                {
+                  question: "¿Qué significa que el crédito es 'resiliente'?",
+
+                  answer:
+                    "Significa que el crédito puede considerar situaciones extraordinarias que afectan tu capacidad de pago. Por ejemplo, ante una emergencia climática en tu zona, el sistema puede contemplar mecanismos de alivio previamente definidos para evitar que una crisis temporal destruya tu negocio."
+                },
+
+                {
+                  question: "¿Qué es el 'reseteo de deuda' del Gota a Gota y por qué es peligroso?",
+
+                  answer:
+                    "En algunos préstamos informales, perder un pago puede generar condiciones abusivas y hacer que la deuda crezca rápidamente. En TrustLink, las condiciones son transparentes y quedan establecidas mediante contratos inteligentes, reduciendo la posibilidad de cambios arbitrarios."
+                }
+
+              ]
+
+            },
+
+
+            /* ================================================== */
+            /* CATEGORÍA 3: MI REPUTACIÓN */
+            /* ================================================== */
+
+            reputacion: {
+
+              title: "Mi reputación",
+
+              questions: [
+
+                {
+                  question: "¿Qué es el 'DNI de Confianza' y para qué me sirve?",
+
+                  answer:
+                    "Es un certificado digital basado en un Soulbound Token (SBT) que registra tu buen comportamiento. No se puede vender ni transferir. Representa tu reputación y puede ayudarte a demostrar que eres una vendedora confiable."
+                },
+
+                {
+                  question: "¿Cómo subo mi puntaje (Score)?",
+
+                  answer:
+                    "El score se basa en una fórmula transparente: 60% corresponde a la constancia en ventas y 40% a la diversidad de clientes. La idea es demostrar que tu negocio tiene actividad real y una red de clientes confiable."
+                },
+
+                {
+                  question: "¿Puedo prestarle mi 'DNI de Confianza' a un familiar para que saque un préstamo?",
+
+                  answer:
+                    "No. Tu Soulbound Token (SBT) es intransferible y está ligado a tu identidad digital. Representa tu propia reputación, por lo que no se puede prestar, comprar ni vender."
+                },
+
+                {
+                  question: "¿Por qué mi score bajó si mis ventas aumentaron?",
+
+                  answer:
+                    "El score no solo considera cuánto vendes, sino también la diversidad de tus clientes. Si realizas muchas ventas con las mismas personas, el sistema podría detectar un comportamiento artificial. Una red variada de clientes ayuda a demostrar que tu negocio es real y sostenible."
+                },
+
+                {
+                  question: "¿Este puntaje me servirá para pedir préstamos en otros bancos más adelante?",
+
+                  answer:
+                    "Ese es uno de los objetivos de TrustLink: construir un historial financiero verificable que puedas utilizar para demostrar tu actividad comercial y comportamiento responsable ante futuras entidades financieras."
+                }
+
+              ]
+
+            },
+
+
+            /* ================================================== */
+            /* CATEGORÍA 4: USO DE LA APP */
+            /* ================================================== */
+
+            app: {
+
+              title: "Uso de la app",
+
+              questions: [
+
+                {
+                  question: "¿Necesito saber de criptomonedas para usar TrustLink?",
+
+                  answer:
+                    "No. La tecnología blockchain y Arbitrum funcionan detrás de escena para aportar seguridad. Para ti, la experiencia está diseñada para ser tan sencilla como usar WhatsApp o realizar un Yape."
+                },
+
+                {
+                  question: "¿Puedo hablar con una persona real si tengo un problema?",
+
+                  answer:
+                    "Sí. Aunque nuestro Copiloto Financiero puede orientarte las 24 horas, también tendrás la posibilidad de contactar con nuestro equipo cuando necesites asistencia humana."
+                },
+
+                {
+                  question: "¿Para qué sirve exactamente el Asistente de IA en la app?",
+
+                  answer:
+                    "Funciona como un copiloto financiero. Puede explicarte en palabras sencillas por qué cambió tu score, ayudarte a identificar señales de una posible estafa y orientarte sobre cómo administrar mejor tus finanzas."
+                },
+
+                {
+                  question: "¿La aplicación consume muchos datos de internet?",
+
+                  answer:
+                    "No. TrustLink está diseñada para ser ligera y funcionar incluso con conexiones limitadas, pensando en personas que trabajan en mercados, tiendas o zonas donde la señal puede ser inestable."
+                },
+
+                {
+                  question: "¿Qué hago si sospecho que alguien está suplantando mi identidad?",
+
+                  answer:
+                    "Repórtalo inmediatamente mediante el botón de emergencia de TrustLink. También te recomendamos cambiar tus credenciales y, si sospechas que tus datos personales fueron comprometidos fuera de la plataforma, comunicarte con las autoridades correspondientes."
+                }
+
+              ]
+
+            }
+
+          };
+
+        </script>
+
       </div>
     </div>
   </section>
 
-  <!-- ARQUITECTURA -->
-  <section class="tl-section" id="arquitectura"
-    style="background:var(--tl-bg-2); border-top:1px solid var(--tl-line); border-bottom:1px solid var(--tl-line);">
+  <section class="tl-section tl-roadmap-section" id="roadmap">
     <div class="tl-wrap">
-      <div class="tl-reveal">
-        <div class="tl-eyebrow">(04) — Arquitectura</div>
-        <h2 class="tl-h2">Transparencia donde importa, eficiencia donde conviene.</h2>
+
+      <!-- Encabezado -->
+      <div class="tl-reveal tl-header-centered">
+        <div class="tl-eyebrow tl-eyebrow-clean">HOJA DE RUTA</div>
+        <h2 class="tl-h2">Un plan con <em>visión de país</em>.</h2>
         <p class="tl-lede">
-          La custodia de fondos y la reputación quedan registradas en la blockchain,
-          mientras que el análisis y la experiencia de usuario se gestionan fuera de ella.
+          TrustLink no es una idea de negocio: es una solución técnica que ya opera
+          en Testnet, con un camino claro hacia el escalamiento nacional.
         </p>
       </div>
 
-      <!-- Se mantiene tu estructura técnica original -->
+      <!-- Timeline de fases -->
+      <div class="tl-reveal tl-roadmap-grid">
+
+        <div class="tl-roadmap-card">
+          <span class="tl-roadmap-phase">Fase 1</span>
+          <span class="tl-roadmap-time">60 días</span>
+          <h3>Validación del MVP</h3>
+          <p>Lanzamiento en Lima Metropolitana y Piura con las primeras 500 microempresarias.</p>
+        </div>
+
+        <div class="tl-roadmap-card">
+          <span class="tl-roadmap-phase">Fase 2</span>
+          <span class="tl-roadmap-time">6 meses</span>
+          <h3>Expansión regional</h3>
+          <p>Crecimiento a nuevas regiones e integración del Crédito Resiliente ante emergencias climáticas.</p>
+        </div>
+
+        <div class="tl-roadmap-card">
+          <span class="tl-roadmap-phase">Fase 3</span>
+          <span class="tl-roadmap-time">1 año</span>
+          <h3>Escalamiento nacional</h3>
+          <p>Conectar a los 12.3 millones de informales del Perú con la banca formal.</p>
+        </div>
+
+      </div>
+
     </div>
   </section>
-
   <!-- CTA FINAL -->
   <section class="tl-cta">
+    <img src="img/llama_superior.png" alt="" class="tl-cta-llama" aria-hidden="true">
     <div class="tl-wrap tl-reveal">
       <h2 class="tl-cta-title">Confianza que se puede <em>verificar</em>, no solo prometer.</h2>
       <p class="tl-cta-sub">Explora la plataforma como comprador, vendedor o administrador.</p>
@@ -249,38 +1300,38 @@
           </div>
           <div class="tl-footer-desc">Marketplace descentralizado con escrow, reputación on-chain y crédito progresivo
             para vendedores informales, sobre Arbitrum Sepolia.</div>
-        </div>
-        <div>
-          <div class="tl-footer-col-title">Protocolo</div>
-          <div class="tl-footer-link">Escrow <span class="fn">crearOrden()</span></div>
-          <div class="tl-footer-link">Confirmación <span class="fn">confirmarEntrega()</span></div>
-          <div class="tl-footer-link">Timeout <span class="fn">liberarPorTimeout()</span></div>
-          <div class="tl-footer-link">Reputación <span class="fn">SBT</span></div>
+
+          <div class="tl-footer-badge">
+            <span class="tl-footer-badge-dot"></span>
+            Testnet en vivo — Arbitrum Sepolia
+          </div>
         </div>
 
         <div>
-          <div class="tl-footer-col-title">Venta</div>
-          <div class="tl-footer-link">01 <span class="fn">Comprador deposita</span></div>
-          <div class="tl-footer-link">02 <span class="fn">Vendedor entrega</span></div>
-          <div class="tl-footer-link">03 <span class="fn">Pago + reputación</span></div>
-          <div class="tl-footer-link">Compra segura <span class="fn">Acceso a crédito</span></div>
+          <div class="tl-footer-col-title">Stack</div>
+          <div class="tl-footer-link">Red <span class="fn">Arbitrum Sepolia</span></div>
+          <div class="tl-footer-link">Backend <span class="fn">Supabase</span></div>
+          <div class="tl-footer-link">Base de datos <span class="fn">PostgreSQL</span></div>
+          <div class="tl-footer-link">IA <span class="fn">Gemini API</span></div>
         </div>
-
-
-
-
-
-
-
-
       </div>
+
+      <div>
+        <div class="tl-footer-col-title">Protocolo</div>
+        <div class="tl-footer-link">Escrow <span class="fn">crearOrden()</span></div>
+        <div class="tl-footer-link">Confirmación <span class="fn">confirmarEntrega()</span></div>
+        <div class="tl-footer-link">Timeout <span class="fn">liberarPorTimeout()</span></div>
+        <div class="tl-footer-link">Reputación <span class="fn">SBT</span></div>
+      </div>
+
+
+
       <div class="tl-footer-bottom">
-        <div class="tl-footer-bottom-text">© 2026 TrustLink — BUIDL Hackathon, Arbitrum Track</div>
+        <div class="tl-footer-bottom-text">© 2026 TrustLink — REFACTOR GROUP, Arbitrum Track</div>
         <div class="tl-footer-bottom-text">Arbitrum Sepolia · Testnet</div>
       </div>
     </div>
   </footer>
-
   <div id="chatbotMount"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -289,6 +1340,7 @@
   <script src="js/chatbot.js"></script>
   <script src="js/chatbot-widget.js"></script>
   <script>document.addEventListener('DOMContentLoaded', tlRenderChatbotWidget);</script>
+
 
 </body>
 

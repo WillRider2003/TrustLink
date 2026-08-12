@@ -1,350 +1,453 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TrustLink — Iniciar sesión</title>
-<link rel="icon" type="image/png" href="img/logo.png">
-<link rel="stylesheet" href="css/variables.css">
-<link rel="stylesheet" href="css/layout.css">
-<link rel="stylesheet" href="css/components.css">
-<style>
-  /* ===== Refinamientos visuales del login ===== */
-  .login-split-right-inner { max-width: 430px; }
-  .login-form-title { font-size: 1.72rem; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrustLink — Iniciar sesión</title>
+  <link rel="icon" type="image/png" href="img/logo.png">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    /* ===== Refinamientos visuales del login ===== */
+    .login-split-right-inner {
+      max-width: 430px;
+    }
 
-  /* Botón principal con degradado y sombra suave */
-  #btnLogin, #btnRegister {
-    background: linear-gradient(120deg, var(--tl-accent) 0%, #1d4ed8 100%);
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.28);
-    letter-spacing: 0.01em;
-  }
-  #btnLogin:hover, #btnRegister:hover {
-    box-shadow: 0 10px 26px rgba(37, 99, 235, 0.38);
-  }
+    .login-form-title {
+      font-size: 1.72rem;
+    }
 
-  .field-input-wrap input { border-radius: 11px; padding-top: 11px; padding-bottom: 11px; }
-  .login-tabs { border-radius: 14px; }
-  .login-tab { padding: 11px; border-radius: 10px; }
+    /* Botón principal con degradado y sombra suave */
+    #btnLogin,
+    #btnRegister {
+      background: linear-gradient(120deg, var(--tl-accent) 0%, #1d4ed8 100%);
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.28);
+      letter-spacing: 0.01em;
+    }
 
-  /* Tarjeta de cuenta de prueba (reemplaza el texto plano de vendedor) */
-  .demo-cred-card {
-    display: flex; align-items: center; gap: 12px;
-    background: var(--tl-accent-soft-2);
-    border: 1px dashed var(--tl-accent);
-    border-radius: 14px;
-    padding: 12px 14px;
-    margin-bottom: 20px;
-  }
-  .demo-cred-icon {
-    width: 38px; height: 38px; border-radius: 11px;
-    background: var(--tl-accent);
-    color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .demo-cred-icon svg { width: 18px; height: 18px; }
-  .demo-cred-body { flex: 1; min-width: 0; }
-  .demo-cred-title {
-    font-size: 0.72rem; font-weight: 800;
-    text-transform: uppercase; letter-spacing: 0.06em;
-    color: var(--tl-accent-dark);
-    margin-bottom: 3px;
-  }
-  .demo-cred-line {
-    font-size: 0.78rem; color: var(--tl-text-dark);
-    display: flex; flex-wrap: wrap; gap: 4px 10px;
-  }
-  .demo-cred-line code {
-    font-family: 'SF Mono', Menlo, monospace;
-    font-size: 0.74rem;
-    background: var(--tl-white);
-    border: 1px solid var(--tl-grey-200);
-    border-radius: 6px;
-    padding: 2px 7px;
-  }
-  .demo-cred-fill {
-    flex-shrink: 0;
-    font-size: 0.72rem; font-weight: 800;
-    color: var(--tl-accent);
-    border: 1.5px solid var(--tl-accent-soft);
-    background: var(--tl-white);
-    border-radius: 999px;
-    padding: 6px 12px;
-    transition: background .15s, color .15s, border-color .15s;
-  }
-  .demo-cred-fill:hover { background: var(--tl-accent); color: #fff; border-color: var(--tl-accent); }
-</style>
+    #btnLogin:hover,
+    #btnRegister:hover {
+      box-shadow: 0 10px 26px rgba(37, 99, 235, 0.38);
+    }
+
+    .field-input-wrap input {
+      border-radius: 11px;
+      padding-top: 11px;
+      padding-bottom: 11px;
+    }
+
+    .login-tabs {
+      border-radius: 14px;
+    }
+
+    .login-tab {
+      padding: 11px;
+      border-radius: 10px;
+    }
+
+    /* Tarjeta de cuenta de prueba (reemplaza el texto plano de vendedor) */
+    .demo-cred-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--tl-accent-soft-2);
+      border: 1px dashed var(--tl-accent);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+    }
+
+    .demo-cred-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      background: var(--tl-accent);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .demo-cred-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .demo-cred-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .demo-cred-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--tl-accent-dark);
+      margin-bottom: 3px;
+    }
+
+    .demo-cred-line {
+      font-size: 0.78rem;
+      color: var(--tl-text-dark);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+    }
+
+    .demo-cred-line code {
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: 0.74rem;
+      background: var(--tl-white);
+      border: 1px solid var(--tl-grey-200);
+      border-radius: 6px;
+      padding: 2px 7px;
+    }
+
+    .demo-cred-fill {
+      flex-shrink: 0;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--tl-accent);
+      border: 1.5px solid var(--tl-accent-soft);
+      background: var(--tl-white);
+      border-radius: 999px;
+      padding: 6px 12px;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+
+    .demo-cred-fill:hover {
+      background: var(--tl-accent);
+      color: #fff;
+      border-color: var(--tl-accent);
+    }
+  </style>
 </head>
+
 <body data-page="login">
-<script>if(localStorage.getItem("tl_dark_mode")==="1")document.body.classList.add("dark");</script>
-<!-- Toggle de modo oscuro (visible sin iniciar sesión) -->
-<button type="button" id="loginDarkToggle" title="Cambiar tema" style="position:fixed; top:20px; right:20px; z-index:30; width:42px; height:42px; border-radius:50%; border:1px solid var(--tl-grey-300); background:var(--tl-white); color:var(--tl-text-dark); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:var(--tl-shadow-sm);">
-  <span id="loginDarkIcon"></span>
-</button>
-<script>
-(function () {
-  var MOON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>';
-  var SUN  = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
-  var icon = document.getElementById('loginDarkIcon');
-  function sync() { icon.innerHTML = document.body.classList.contains('dark') ? SUN : MOON; }
-  document.getElementById('loginDarkToggle').addEventListener('click', function () {
-    var isDark = document.body.classList.toggle('dark');
-    try { localStorage.setItem('tl_dark_mode', isDark ? '1' : '0'); } catch (e) {}
-    sync();
-  });
-  sync();
-})();
-</script>
+  <script>if (localStorage.getItem("tl_dark_mode") === "1") document.body.classList.add("dark");</script>
+  <!-- Toggle de modo oscuro (visible sin iniciar sesión) -->
+  <button type="button" id="loginDarkToggle" title="Cambiar tema"
+    style="position:fixed; top:20px; right:20px; z-index:30; width:42px; height:42px; border-radius:50%; border:1px solid var(--tl-grey-300); background:var(--tl-white); color:var(--tl-text-dark); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:var(--tl-shadow-sm);">
+    <span id="loginDarkIcon"></span>
+  </button>
+  <script>
+    (function () {
+      var MOON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>';
+      var SUN = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+      var icon = document.getElementById('loginDarkIcon');
+      function sync() { icon.innerHTML = document.body.classList.contains('dark') ? SUN : MOON; }
+      document.getElementById('loginDarkToggle').addEventListener('click', function () {
+        var isDark = document.body.classList.toggle('dark');
+        try { localStorage.setItem('tl_dark_mode', isDark ? '1' : '0'); } catch (e) { }
+        sync();
+      });
+      sync();
+    })();
+  </script>
 
 
 
-<a href="index.html" class="login-back-link">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
-  Volver al inicio
-</a>
+  <a href="index.html" class="login-back-link">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16">
+      <path d="M19 12H5" />
+      <path d="M12 19l-7-7 7-7" />
+    </svg>
+    Volver al inicio
+  </a>
 
-<div class="login-split">
-  <div class="login-split-left">
-    <div class="login-split-glow"></div>
-    <div class="login-split-left-inner">
-      <div class="login-brand">
-        <img src="img/logo.png" alt="TrustLink" onerror="this.style.display='none'">
-        <div class="login-brand-text">Trust<span>Link</span></div>
-      </div>
-      <h1 class="login-split-title">El Protocolo de Confianza para la Economía Informal</h1>
-      <p class="login-split-desc">Escrow verificado, reputación y crédito progresivo para vendedores informales. Regístrate y compra con S/ 230 de crédito de bienvenida.</p>
-      <div class="login-split-badges">
-        <span class="login-split-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Escrow real</span>
-        <span class="login-split-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg> Reputación</span>
-        <span class="login-split-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg> Crédito progresivo</span>
-      </div>
-
-      <a href="demo/login.html" class="login-demo-link">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg>
-        <div>
-          <div class="login-demo-link-title">¿Solo quieres ver la demo del hackathon?</div>
-          <div class="login-demo-link-desc">Accede a la demo guiada, sin registro — pensada para el jurado</div>
+  <div class="login-split">
+    <div class="login-split-left">
+      <div class="login-split-glow"></div>
+      <div class="login-split-left-inner">
+        <div class="login-brand">
+          <img src="img/logo.png" alt="TrustLink" onerror="this.style.display='none'">
+          <div class="login-brand-text">Trust<span>Link</span></div>
         </div>
-        <svg class="login-demo-link-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6"/></svg>
-      </a>
+        <h1 class="login-split-title">El Protocolo de Confianza para la Economía Informal</h1>
+        <p class="login-split-desc">Escrow verificado, reputación y crédito progresivo para vendedores informales.
+          Regístrate y compra con S/ 230 de crédito de bienvenida.</p>
+        <div class="login-split-badges">
+          <span class="login-split-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="11" width="18" height="11" rx="2" />
+              <path d="M7 11V7a5 5 0 0110 0v4" />
+            </svg> Escrow real</span>
+          <span class="login-split-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" />
+            </svg> Reputación</span>
+          <span class="login-split-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" />
+            </svg> Crédito progresivo</span>
+        </div>
+
+        <a href="demo/login.html" class="login-demo-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M5 3l14 9-14 9V3z" />
+          </svg>
+          <div>
+            <div class="login-demo-link-title">¿Solo quieres ver la demo del hackathon?</div>
+            <div class="login-demo-link-desc">Accede a la demo guiada, sin registro previo.</div>
+          </div>
+          <svg class="login-demo-link-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="login-split-right">
+      <div class="login-split-right-inner">
+        <div class="login-tabs">
+          <button class="login-tab active" id="tabLogin" onclick="tlSwitchTab('login')">Iniciar sesión</button>
+          <button class="login-tab" id="tabRegister" onclick="tlSwitchTab('register')">Crear cuenta</button>
+        </div>
+
+        <!-- LOGIN -->
+        <div id="panelLogin">
+          <div class="login-form-icon">
+            <img src="img/logo.png" alt="TrustLink" style="width:30px; height:30px; object-fit:contain;"
+              onerror="this.outerHTML='<svg viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\'><path d=\'M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z\'/></svg>'">
+          </div>
+          <h2 class="login-form-title">Bienvenido de nuevo</h2>
+          <p class="login-form-sub">Inicia sesión para comprar, vender y construir tu historial de confianza.</p>
+
+          <div class="demo-cred-card">
+            <div class="demo-cred-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M3 9l1-5h16l1 5" />
+                <path d="M3 9h18v11H3z" />
+                <path d="M8 14h8" />
+              </svg>
+            </div>
+            <div class="demo-cred-body">
+              <div class="demo-cred-title">Cuenta de prueba · Vendedor</div>
+              <div class="demo-cred-line">
+                <span><code>vendedor1@trustlink.com</code></span>
+                <span><code>Trustlink2026</code></span>
+              </div>
+            </div>
+            <button type="button" class="demo-cred-fill" id="btnRellenarVendedor">Usar</button>
+          </div>
+
+          <form id="loginForm" novalidate>
+            <div class="field field-icon">
+              <label>Correo electrónico</label>
+              <div class="field-input-wrap">
+                <svg class="field-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M4 4h16v16H4z" opacity="0" />
+                  <path d="M22 6l-10 7L2 6" />
+                  <path d="M2 6h20v12H2z" />
+                </svg>
+                <input type="email" id="loginEmail" placeholder="tucorreo@ejemplo.com" autocomplete="email" required>
+              </div>
+            </div>
+            <div class="field field-icon">
+              <label>Contraseña</label>
+              <div class="field-input-wrap">
+                <svg class="field-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <rect x="3" y="11" width="18" height="11" rx="2" />
+                  <path d="M7 11V7a5 5 0 0110 0v4" />
+                </svg>
+                <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password"
+                  required>
+              </div>
+            </div>
+            <div id="loginError" class="form-error" style="display:none;"></div>
+            <button type="submit" class="btn btn-primary btn-block btn-lg-pad" id="btnLogin">Iniciar sesión</button>
+          </form>
+        </div>
+
+        <!-- REGISTRO -->
+        <div id="panelRegister" style="display:none;">
+          <div class="login-form-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+              <circle cx="8.5" cy="7" r="4" />
+              <path d="M20 8v6M23 11h-6" />
+            </svg>
+          </div>
+          <h2 class="login-form-title">Crea tu cuenta</h2>
+          <p class="login-form-sub">Empiezas como comprador con S/ 230.00 de crédito para probar la plataforma.</p>
+
+          <form id="registerForm" novalidate>
+            <div class="field field-icon">
+              <label>Nombre completo</label>
+              <div class="field-input-wrap">
+                <svg class="field-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 21v-1a7 7 0 0114 0v1" />
+                </svg>
+                <input type="text" id="regNombre" placeholder="Ej. María" required>
+              </div>
+              <div class="field-hint-msg" id="regNombreMsg"></div>
+            </div>
+            <div class="field field-icon">
+              <label>Apellido</label>
+              <div class="field-input-wrap">
+                <svg class="field-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 21v-1a7 7 0 0114 0v1" />
+                </svg>
+                <input type="text" id="regApellido" placeholder="Ej. Quispe">
+              </div>
+            </div>
+            <div class="field field-icon">
+              <label>DNI</label>
+              <div class="field-input-wrap">
+                <svg class="field-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <rect x="3" y="4" width="18" height="16" rx="2" />
+                  <path d="M7 9h6M7 13h10" />
+                </svg>
+                <input type="text" id="regDni" placeholder="8 dígitos" maxlength="8" inputmode="numeric">
+              </div>
+              <div class="field-hint-msg" id="regDniMsg"></div>
+            </div>
+            <div class="field field-icon">
+              <label>Teléfono</label>
+              <div class="field-input-wrap">
+                <svg class="field-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path
+                    d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z" />
+                </svg>
+                <input type="tel" id="regTelefono" placeholder="Ej. 987 654 321">
+              </div>
+              <div class="field-hint-msg" id="regTelefonoMsg"></div>
+            </div>
+            <div class="field field-icon">
+              <label>Correo electrónico</label>
+              <div class="field-input-wrap">
+                <svg class="field-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M22 6l-10 7L2 6" />
+                  <path d="M2 6h20v12H2z" />
+                </svg>
+                <input type="email" id="regEmail" placeholder="tucorreo@ejemplo.com" required>
+              </div>
+              <div class="field-hint-msg" id="regEmailMsg"></div>
+            </div>
+            <div class="field field-icon">
+              <label>Contraseña</label>
+              <div class="field-input-wrap">
+                <svg class="field-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <rect x="3" y="11" width="18" height="11" rx="2" />
+                  <path d="M7 11V7a5 5 0 0110 0v4" />
+                </svg>
+                <input type="password" id="regPassword" placeholder="Crea una contraseña" required>
+              </div>
+              <ul class="password-requirements" id="passwordRequirements">
+                <li id="reqLength" data-ok="false"><span class="req-dot"></span> Al menos 8 caracteres</li>
+                <li id="reqNumber" data-ok="false"><span class="req-dot"></span> Al menos 1 número</li>
+                <li id="reqUpper" data-ok="false"><span class="req-dot"></span> Al menos 1 letra mayúscula</li>
+              </ul>
+            </div>
+            <div id="registerError" class="form-error" style="display:none;"></div>
+            <button type="submit" class="btn btn-primary btn-block btn-lg-pad" id="btnRegister">Crear cuenta</button>
+          </form>
+        </div>
+
+        <div class="login-footer-note">
+          Al registrarte, tu cuenta empieza como comprador. Desde el panel puedes solicitar convertirte en vendedor.
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="login-split-right">
-    <div class="login-split-right-inner">
-      <div class="login-tabs">
-        <button class="login-tab active" id="tabLogin" onclick="tlSwitchTab('login')">Iniciar sesión</button>
-        <button class="login-tab" id="tabRegister" onclick="tlSwitchTab('register')">Crear cuenta</button>
-      </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/form-validation.js"></script>
+  <script>
+    // Rellena las credenciales de la cuenta de prueba con un clic
+    document.getElementById('btnRellenarVendedor').addEventListener('click', () => {
+      document.getElementById('loginEmail').value = 'vendedor1@trustlink.com';
+      document.getElementById('loginPassword').value = 'Trustlink2026';
+      document.getElementById('btnLogin').focus();
+    });
 
-      <!-- LOGIN -->
-      <div id="panelLogin">
-        <div class="login-form-icon">
-          <img src="img/logo.png" alt="TrustLink" style="width:30px; height:30px; object-fit:contain;" onerror="this.outerHTML='<svg viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\'><path d=\'M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z\'/></svg>'">
-        </div>
-        <h2 class="login-form-title">Bienvenido de nuevo</h2>
-        <p class="login-form-sub">Inicia sesión para comprar, vender y construir tu historial de confianza.</p>
+    function tlSwitchTab(tab) {
+      document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+      document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+      document.getElementById('panelLogin').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('panelRegister').style.display = tab === 'register' ? 'block' : 'none';
+    }
 
-        <div class="demo-cred-card">
-          <div class="demo-cred-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l1-5h16l1 5"/><path d="M3 9h18v11H3z"/><path d="M8 14h8"/></svg>
-          </div>
-          <div class="demo-cred-body">
-            <div class="demo-cred-title">Cuenta de prueba · Vendedor</div>
-            <div class="demo-cred-line">
-              <span><code>vendedor1@trustlink.com</code></span>
-              <span><code>Trustlink2026</code></span>
-            </div>
-          </div>
-          <button type="button" class="demo-cred-fill" id="btnRellenarVendedor">Usar</button>
-        </div>
+    function tlMostrarError(elId, mensaje) {
+      const el = document.getElementById(elId);
+      el.textContent = mensaje;
+      el.style.display = 'block';
+    }
 
-        <form id="loginForm" novalidate>
-          <div class="field field-icon">
-            <label>Correo electrónico</label>
-            <div class="field-input-wrap">
-              <svg class="field-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6l-10 7L2 6"/><path d="M2 6h20v12H2z"/></svg>
-              <input type="email" id="loginEmail" placeholder="tucorreo@ejemplo.com" autocomplete="email" required>
-            </div>
-          </div>
-          <div class="field field-icon">
-            <label>Contraseña</label>
-            <div class="field-input-wrap">
-              <svg class="field-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required>
-            </div>
-          </div>
-          <div id="loginError" class="form-error" style="display:none;"></div>
-          <button type="submit" class="btn btn-primary btn-block btn-lg-pad" id="btnLogin">Iniciar sesión</button>
-        </form>
-      </div>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnLogin');
+      document.getElementById('loginError').style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'Ingresando...';
 
-      <!-- REGISTRO -->
-      <div id="panelRegister" style="display:none;">
-        <div class="login-form-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
-        </div>
-        <h2 class="login-form-title">Crea tu cuenta</h2>
-        <p class="login-form-sub">Empiezas como comprador con S/ 230.00 de crédito para probar la plataforma.</p>
+      try {
+        await tlSignIn(document.getElementById('loginEmail').value.trim(), document.getElementById('loginPassword').value);
+        window.location.href = 'redirigir.html';
+      } catch (err) {
+        tlMostrarError('loginError', err.message === 'Invalid login credentials' ? 'Correo o contraseña incorrectos.' : err.message);
+        btn.disabled = false;
+        btn.textContent = 'Iniciar sesión';
+      }
+    });
 
-        <form id="registerForm" novalidate>
-          <div class="field field-icon">
-            <label>Nombre completo</label>
-            <div class="field-input-wrap">
-              <svg class="field-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0114 0v1"/></svg>
-              <input type="text" id="regNombre" placeholder="Ej. María" required>
-            </div>
-            <div class="field-hint-msg" id="regNombreMsg"></div>
-          </div>
-          <div class="field field-icon">
-            <label>Apellido</label>
-            <div class="field-input-wrap">
-              <svg class="field-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0114 0v1"/></svg>
-              <input type="text" id="regApellido" placeholder="Ej. Quispe">
-            </div>
-          </div>
-          <div class="field field-icon">
-            <label>DNI</label>
-            <div class="field-input-wrap">
-              <svg class="field-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h6M7 13h10"/></svg>
-              <input type="text" id="regDni" placeholder="8 dígitos" maxlength="8" inputmode="numeric">
-            </div>
-            <div class="field-hint-msg" id="regDniMsg"></div>
-          </div>
-          <div class="field field-icon">
-            <label>Teléfono</label>
-            <div class="field-input-wrap">
-              <svg class="field-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-              <input type="tel" id="regTelefono" placeholder="Ej. 987 654 321">
-            </div>
-            <div class="field-hint-msg" id="regTelefonoMsg"></div>
-          </div>
-          <div class="field field-icon">
-            <label>Correo electrónico</label>
-            <div class="field-input-wrap">
-              <svg class="field-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 6l-10 7L2 6"/><path d="M2 6h20v12H2z"/></svg>
-              <input type="email" id="regEmail" placeholder="tucorreo@ejemplo.com" required>
-            </div>
-            <div class="field-hint-msg" id="regEmailMsg"></div>
-          </div>
-          <div class="field field-icon">
-            <label>Contraseña</label>
-            <div class="field-input-wrap">
-              <svg class="field-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              <input type="password" id="regPassword" placeholder="Crea una contraseña" required>
-            </div>
-            <ul class="password-requirements" id="passwordRequirements">
-              <li id="reqLength" data-ok="false"><span class="req-dot"></span> Al menos 8 caracteres</li>
-              <li id="reqNumber" data-ok="false"><span class="req-dot"></span> Al menos 1 número</li>
-              <li id="reqUpper" data-ok="false"><span class="req-dot"></span> Al menos 1 letra mayúscula</li>
-            </ul>
-          </div>
-          <div id="registerError" class="form-error" style="display:none;"></div>
-          <button type="submit" class="btn btn-primary btn-block btn-lg-pad" id="btnRegister">Crear cuenta</button>
-        </form>
-      </div>
+    // ---------- Validación en vivo del formulario de registro ----------
+    // (usa tlValidateField / tlValidatePassword de js/form-validation.js)
 
-      <div class="login-footer-note">
-        Al registrarte, tu cuenta empieza como comprador. Desde el panel puedes solicitar convertirte en vendedor.
-      </div>
-    </div>
-  </div>
-</div>
+    tlLiveValidate('regNombre', (v) => v.trim().length >= 2, 'regNombreMsg', 'Ingresa tu nombre');
+    tlLiveValidate('regDni', (v) => v.trim() === '' || /^\d{8}$/.test(v.trim()), 'regDniMsg', 'El DNI debe tener 8 dígitos');
+    tlLiveValidate('regTelefono', (v) => v.trim() === '' || /^[\d\s+()-]{6,15}$/.test(v.trim()), 'regTelefonoMsg', 'Ingresa un teléfono válido');
+    tlLiveValidate('regEmail', (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()), 'regEmailMsg', 'Ingresa un correo válido');
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase-client.js"></script>
-<script src="js/form-validation.js"></script>
-<script>
-// Rellena las credenciales de la cuenta de prueba con un clic
-document.getElementById('btnRellenarVendedor').addEventListener('click', () => {
-  document.getElementById('loginEmail').value = 'vendedor1@trustlink.com';
-  document.getElementById('loginPassword').value = 'Trustlink2026';
-  document.getElementById('btnLogin').focus();
-});
+    const regPasswordInput = document.getElementById('regPassword');
+    regPasswordInput.addEventListener('input', () => {
+      const v = regPasswordInput.value;
+      const checks = tlCheckPasswordRules(v);
+      tlSetRequirement('reqLength', checks.length);
+      tlSetRequirement('reqNumber', checks.number);
+      tlSetRequirement('reqUpper', checks.upper);
+      tlSetFieldState(regPasswordInput, v === '' ? null : (checks.length && checks.number && checks.upper));
+    });
 
-function tlSwitchTab(tab) {
-  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
-  document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
-  document.getElementById('panelLogin').style.display = tab === 'login' ? 'block' : 'none';
-  document.getElementById('panelRegister').style.display = tab === 'register' ? 'block' : 'none';
-}
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnRegister');
+      document.getElementById('registerError').style.display = 'none';
 
-function tlMostrarError(elId, mensaje) {
-  const el = document.getElementById(elId);
-  el.textContent = mensaje;
-  el.style.display = 'block';
-}
+      const nombre = document.getElementById('regNombre').value.trim();
+      const apellido = document.getElementById('regApellido').value.trim();
+      const dni = document.getElementById('regDni').value.trim();
+      const telefono = document.getElementById('regTelefono').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const passChecks = tlCheckPasswordRules(password);
 
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const btn = document.getElementById('btnLogin');
-  document.getElementById('loginError').style.display = 'none';
-  btn.disabled = true;
-  btn.textContent = 'Ingresando...';
+      if (nombre.length < 2) { tlMostrarError('registerError', 'Ingresa tu nombre.'); return; }
+      if (dni && !/^\d{8}$/.test(dni)) { tlMostrarError('registerError', 'El DNI debe tener 8 dígitos.'); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { tlMostrarError('registerError', 'Ingresa un correo electrónico válido.'); return; }
+      if (!(passChecks.length && passChecks.number && passChecks.upper)) {
+        tlMostrarError('registerError', 'La contraseña debe tener al menos 8 caracteres, 1 número y 1 letra mayúscula.');
+        return;
+      }
 
-  try {
-    await tlSignIn(document.getElementById('loginEmail').value.trim(), document.getElementById('loginPassword').value);
-    window.location.href = 'redirigir.html';
-  } catch (err) {
-    tlMostrarError('loginError', err.message === 'Invalid login credentials' ? 'Correo o contraseña incorrectos.' : err.message);
-    btn.disabled = false;
-    btn.textContent = 'Iniciar sesión';
-  }
-});
+      btn.disabled = true;
+      btn.textContent = 'Creando cuenta...';
 
-// ---------- Validación en vivo del formulario de registro ----------
-// (usa tlValidateField / tlValidatePassword de js/form-validation.js)
-
-tlLiveValidate('regNombre', (v) => v.trim().length >= 2, 'regNombreMsg', 'Ingresa tu nombre');
-tlLiveValidate('regDni', (v) => v.trim() === '' || /^\d{8}$/.test(v.trim()), 'regDniMsg', 'El DNI debe tener 8 dígitos');
-tlLiveValidate('regTelefono', (v) => v.trim() === '' || /^[\d\s+()-]{6,15}$/.test(v.trim()), 'regTelefonoMsg', 'Ingresa un teléfono válido');
-tlLiveValidate('regEmail', (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()), 'regEmailMsg', 'Ingresa un correo válido');
-
-const regPasswordInput = document.getElementById('regPassword');
-regPasswordInput.addEventListener('input', () => {
-  const v = regPasswordInput.value;
-  const checks = tlCheckPasswordRules(v);
-  tlSetRequirement('reqLength', checks.length);
-  tlSetRequirement('reqNumber', checks.number);
-  tlSetRequirement('reqUpper', checks.upper);
-  tlSetFieldState(regPasswordInput, v === '' ? null : (checks.length && checks.number && checks.upper));
-});
-
-document.getElementById('registerForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const btn = document.getElementById('btnRegister');
-  document.getElementById('registerError').style.display = 'none';
-
-  const nombre = document.getElementById('regNombre').value.trim();
-  const apellido = document.getElementById('regApellido').value.trim();
-  const dni = document.getElementById('regDni').value.trim();
-  const telefono = document.getElementById('regTelefono').value.trim();
-  const email = document.getElementById('regEmail').value.trim();
-  const password = document.getElementById('regPassword').value;
-  const passChecks = tlCheckPasswordRules(password);
-
-  if (nombre.length < 2) { tlMostrarError('registerError', 'Ingresa tu nombre.'); return; }
-  if (dni && !/^\d{8}$/.test(dni)) { tlMostrarError('registerError', 'El DNI debe tener 8 dígitos.'); return; }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { tlMostrarError('registerError', 'Ingresa un correo electrónico válido.'); return; }
-  if (!(passChecks.length && passChecks.number && passChecks.upper)) {
-    tlMostrarError('registerError', 'La contraseña debe tener al menos 8 caracteres, 1 número y 1 letra mayúscula.');
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'Creando cuenta...';
-
-  try {
-    await tlSignUp(email, password, nombre, telefono, apellido || null, dni || null);
-    window.location.href = 'redirigir.html';
-  } catch (err) {
-    tlMostrarError('registerError', err.message);
-    btn.disabled = false;
-    btn.textContent = 'Crear cuenta';
-  }
-});
-</script>
+      try {
+        await tlSignUp(email, password, nombre, telefono, apellido || null, dni || null);
+        window.location.href = 'redirigir.html';
+      } catch (err) {
+        tlMostrarError('registerError', err.message);
+        btn.disabled = false;
+        btn.textContent = 'Crear cuenta';
+      }
+    });
+  </script>
 </body>
+
 </html>

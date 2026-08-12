@@ -122,21 +122,21 @@
 
 @media (max-width: 900px) {
   .login-split { flex-direction: column; }
-  .login-split-left { padding: 40px 28px; position: static; width: 100%; height: auto; min-height: 0; }
+  /* padding-top con espacio de sobra para que la píldora "Volver al
+     inicio" (fixed, arriba a la izquierda) nunca choque con el logo */
+  .login-split-left { padding: 78px 28px 40px; position: static; width: 100%; height: auto; min-height: 0; }
   .login-split-right { margin-left: 0; width: 100%; min-height: 0; }
   .login-split-right { padding: 36px 24px; }
 }
 
-/* Marca reutilizada dentro del panel izquierdo del login */
-.login-back-link {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 0.82rem; font-weight: 600;
-  color: var(--tl-grey-600);
-  margin-bottom: 28px;
-  transition: color .15s;
-}
+/* Nota: había una segunda regla ".login-back-link" aquí (en flujo
+   normal, con margin-bottom) que competía con la de arriba (fixed,
+   píldora flotante). Las dos aplicaban a la vez y en celular (donde
+   el panel izquierdo tiene menos padding) la píldora terminaba
+   encimada sobre el logo. Se elimina esa segunda regla — la única
+   versión que queda es la píldora fixed de arriba, y el padding-top
+   del media query de arriba le da despeje al logo. */
 .login-back-link svg { width: 15px; height: 15px; }
-.login-back-link:hover { color: var(--tl-white); }
 
 .login-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; width: fit-content; }
 .login-brand img { height: 40px; width: auto; border-radius: 0; }
